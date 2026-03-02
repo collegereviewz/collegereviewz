@@ -32,3 +32,4 @@ dist-ssr
 
 # Vite
 *.timestamp-*
+node_modules/

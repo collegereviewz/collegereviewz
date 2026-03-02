@@ -11,10 +11,13 @@ import Exams from './pages/Exams'
 import Scholarship from './pages/Scholarship'
 import StudyAbroad from './pages/StudyAbroad'
 import Contact from './pages/Contact'
-import WriteReview from './pages/WriteReview'
+import Resources from './pages/Resources'
+import WriteReview from './pages/ReviewPage'
 import Support from './pages/Support'
-import Login from './pages/Login'
+import Login from './pages/LoginPage'
 import FloatingAskExperts from './components/FloatingAskExperts'
+import SignupPage from './pages/SignupPage'
+import ProfilePage from './pages/ProfilePage'
 
 function AppContent() {
   const [loading, setLoading] = useState(true);
@@ -38,6 +41,7 @@ function AppContent() {
     if (location.pathname.startsWith('/Scholarship')) return 'Scholarship';
     if (location.pathname.startsWith('/StudyAbroad')) return 'Study Abroad';
     if (location.pathname.startsWith('/Contact')) return 'Contact Us';
+    if (location.pathname.startsWith('/Resources')) return 'Resources';
     return 'Home';
   };
 
@@ -46,7 +50,7 @@ function AppContent() {
       <AnimatePresence>
         {loading && <Preloader />}
       </AnimatePresence>
-      
+
       <div style={{ minHeight: '100vh', background: '#fff', zoom: 1.1 }}>
         <Header currentView={getCurrentView()} />
         <main>
@@ -66,9 +70,12 @@ function AppContent() {
                 <Route path="/Scholarship/" element={<Scholarship />} />
                 <Route path="/StudyAbroad/" element={<StudyAbroad />} />
                 <Route path="/Contact/" element={<Contact />} />
+                <Route path="/Resources/" element={<Resources />} />
                 <Route path="/WriteReview/" element={<WriteReview />} />
                 <Route path="/Support/" element={<Support />} />
                 <Route path="/Login/" element={<Login />} />
+                <Route path="/Signup/" element={<SignupPage />} />
+                <Route path="/Profile/" element={<ProfilePage />} />
               </Routes>
             </motion.div>
           </AnimatePresence>

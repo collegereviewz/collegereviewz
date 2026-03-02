@@ -35,7 +35,8 @@ const LoginPage = () => {
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
-                navigate('/review');
+                window.dispatchEvent(new Event('auth-change'));
+                navigate('/WriteReview/');
             } else {
                 alert(data.message || 'Login failed');
             }

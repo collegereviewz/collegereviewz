@@ -2,12 +2,30 @@ import Review from '../models/Review.model.js';
 
 export const createReview = async (req, res) => {
     try {
-        const { author, role, content, type, mediaUrl, hashtags } = req.body;
-        const review = new Review({ author, role, content, type, mediaUrl, hashtags });
+        const { author, role, content, type, mediaUrl, hashtags, userId } = req.body;
+        const review = new Review({
+            user: userId || null,
+            author,
+            role,
+            content,
+            type,
+            mediaUrl,
+            hashtags
+        });
         const savedReview = await review.save();
         res.status(201).json(savedReview);
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+};
+
+export const getUserReviews = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const reviews = await Review.find({ user: userId }).sort({ createdAt: -1 });
+        res.status(200).json(reviews);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
     }
 };
 

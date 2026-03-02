@@ -201,6 +201,9 @@ const ReviewPage = () => {
     const [filterTag, setFilterTag] = useState(null); // Selected hashtag or category
     const [mediaProgress, setMediaProgress] = useState({}); // {id: {current, total, percentage} }
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
+    const [followedTags, setFollowedTags] = useState(['IITs', 'NEET 2026']); // Default Interests
+    const [filterAuthor, setFilterAuthor] = useState(null); // Selected author filter
+    const [suggestedHashtags, setSuggestedHashtags] = useState([]); // [NEW] Suggested tags based on current input
     const [modalConfig, setModalConfig] = useState({ isOpen: false, title: '', message: '', type: 'danger', onConfirm: () => { } });
     const [showVideoOptions, setShowVideoOptions] = useState(false);
     const [isVideoRecording, setIsVideoRecording] = useState(false);
@@ -277,6 +280,161 @@ const ReviewPage = () => {
     ];
 
     const categories = ['Engineering', 'Medical', 'Management', 'Law', 'Design'];
+
+    const getTrendingTags = (posts) => {
+        const tagCounts = {};
+        posts.forEach(post => {
+            // Match #hashtags and @mentions
+            const tags = post.content?.match(/#\w+|@\w+/g) || [];
+            tags.forEach(tag => {
+                const cleanTag = tag.trim();
+                tagCounts[cleanTag] = (tagCounts[cleanTag] || 0) + 1;
+            });
+        });
+
+        return Object.entries(tagCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 8) // Show more tags for accumulation
+            .map(([tag, count]) => ({
+                tag: tag.startsWith('#') ? tag.slice(1) : tag,
+                count: `${count} ${count === 1 ? 'post' : 'posts'}`,
+                postCount: count,
+                trending: count > 2,
+                isMention: tag.startsWith('@')
+            }));
+    };
+
+    const getTopReviewers = (posts) => {
+        const userStats = {};
+        posts.forEach(post => {
+            const author = post.author || "Anonymous student";
+            if (!userStats[author]) {
+                userStats[author] = { posts: 0, score: 0, avatar: author[0].toUpperCase() };
+            }
+            userStats[author].posts += 1;
+            userStats[author].score += 100; // 100 points per post
+            userStats[author].score += (post.upvotes || 0) * 10;
+            userStats[author].score -= (post.downvotes || 0) * 5;
+            userStats[author].score += (post.comments?.length || 0) * 20;
+        });
+
+        return Object.entries(userStats)
+            .sort((a, b) => b[1].score - a[1].score)
+            .slice(0, 3)
+            .map(([name, stats]) => ({
+                name,
+                posts: stats.posts,
+                avatar: stats.avatar
+            }));
+    };
+
+    const getSuggestions = (text) => {
+        if (!text || text.length < 3) return [];
+
+        const contextMap = [
+            {
+                category: 'Startup & Business',
+                keywords: ['startup', 'entrepreneur', 'business', 'founder', 'venture', 'funding', 'idea', 'pitch', 'company', 'unicorn'],
+                tags: ['#startupIndia', '#entrepreneurship', '#ventureCapital', '#founderLife', '#businessGrowth', '#startup']
+            },
+            {
+                category: 'IT & Tech',
+                keywords: ['software', 'coding', 'programming', 'developer', 'web', 'app', 'code', 'javascript', 'python', 'java', 'tech', 'technology'],
+                tags: ['#InformationTechnology', '#ITJobs', '#Coding', '#TechLife', '#SoftwareEngineer', '#Programming']
+            },
+            {
+                category: 'Medical & Healthcare',
+                keywords: ['aiims', 'radiology', 'mbbs', 'doctor', 'medical', 'neet', 'medicine', 'hospital', 'surgery', 'biology', 'patient', 'clinic'],
+                tags: ['#MedicalStudent', '#MBBSLife', '#Doctor', '#Radiology', '#NEET2026', '#AIIMSDelhi', '#Healthcare']
+            },
+            {
+                category: 'Engineering & Exams',
+                keywords: ['iit', 'nit', 'jee', 'engineering', 'btech', 'physics', 'maths', 'gate', 'exam', 'admission', 'results'],
+                tags: ['#Engineering', '#IITJEE', '#BTech', '#IITian', '#GATE2025', '#AdmissionSeason']
+            },
+            {
+                category: 'Campus Life',
+                keywords: ['college', 'university', 'campus', 'hostel', 'fests', 'friends', 'canteen', 'student', 'study', 'education', 'graduation'],
+                tags: ['#CampusLife', '#StudentLife', '#CollegeReview', '#HostelVibes', '#UniversityLife']
+            },
+            {
+                category: 'AI & Data',
+                keywords: ['ai', 'ml', 'machine', 'learning', 'data', 'analytics', 'automation', 'intelligence', 'robotics'],
+                tags: ['#ArtificialIntelligence', '#MachineLearning', '#DataScience', '#FutureTech', '#AIRevolution']
+            }
+        ];
+
+        const lowercaseText = text.toLowerCase();
+        // Extract words with at least 3 characters to avoid noisy matches like 'i' or 'am'
+        const inputWords = lowercaseText.match(/[a-z]{3,}/g) || [];
+
+        let scoreMap = {};
+
+        contextMap.forEach(context => {
+            let contextScore = 0;
+            context.keywords.forEach(keyword => {
+                // Primary check: Whole word match (highest relevance)
+                if (inputWords.includes(keyword)) {
+                    contextScore += 10;
+                }
+                // Secondary check: Prefix match (e.g., "radiolog" matching "radiology")
+                else if (inputWords.some(w => w.startsWith(keyword) || keyword.startsWith(w))) {
+                    contextScore += 5;
+                }
+            });
+
+            if (contextScore > 0) {
+                context.tags.forEach(tag => {
+                    scoreMap[tag] = (scoreMap[tag] || 0) + contextScore;
+                });
+            }
+        });
+
+        // Sort by score and then alphabetically
+        return Object.entries(scoreMap)
+            .filter(([tag]) => !lowercaseText.includes(tag.toLowerCase().replace('#', '')))
+            .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+            .slice(0, 6)
+            .map(([tag]) => tag);
+    };
+
+    useEffect(() => {
+        // Debounce slightly to avoid flickering as the user types
+        const timer = setTimeout(() => {
+            const suggestions = getSuggestions(newPostContent);
+            setSuggestedHashtags(suggestions);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [newPostContent]);
+
+    const renderContentWithTags = (content) => {
+        if (!content) return null;
+        return content.split(/(\s+)/).map((part, i) => {
+            if (part.startsWith('#') || part.startsWith('@')) {
+                const isMention = part.startsWith('@');
+                return (
+                    <span
+                        key={i}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setFilterTag(part.slice(1));
+                        }}
+                        style={{
+                            color: isMention ? colors.accent : colors.primary,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            textDecoration: 'none'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
+                        onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}
+                    >
+                        {part}
+                    </span>
+                );
+            }
+            return part;
+        });
+    };
 
     const handleToggleCategory = (category, isEdit = false) => {
         const currentContent = isEdit ? editContent : newPostContent;
@@ -618,7 +776,8 @@ const ReviewPage = () => {
             content: newPostContent,
             type: finalType,
             mediaUrl: mediaUrl,
-            hashtags: hashtagList
+            hashtags: hashtagList,
+            userId: user?._id || null
         };
 
         try {
@@ -852,11 +1011,21 @@ const ReviewPage = () => {
         let sorted = [...posts];
 
         // Filter logic
-        if (filterTag) {
+        if (filterAuthor) {
+            sorted = sorted.filter(post => post.author?.toLowerCase() === filterAuthor.toLowerCase());
+        } else if (filterTag) {
             sorted = sorted.filter(post =>
                 post.hashtags?.some(tag => tag.toLowerCase() === filterTag.toLowerCase()) ||
-                post.content?.toLowerCase().includes(`#${filterTag.toLowerCase()}`)
+                post.content?.toLowerCase().includes(`#${filterTag.toLowerCase()}`) ||
+                post.content?.toLowerCase().includes(`@${filterTag.toLowerCase()}`)
             );
+        } else if (followedTags.length > 0) {
+            // Prioritize followed tags/interests
+            sorted = sorted.filter(post =>
+                followedTags.some(tag => post.content?.toLowerCase().includes(`#${tag.toLowerCase()}`))
+            );
+            // If no posts match followed tags, show all
+            if (sorted.length === 0) sorted = [...posts];
         }
 
         if (sortType === 'top') {
@@ -927,9 +1096,32 @@ const ReviewPage = () => {
                             <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: colors.accent }}>Improve Your Feed</h4>
                             <p style={{ fontSize: '13px', color: '#94a3b8', lineHeight: '1.5', marginBottom: '16px' }}>Follow more colleges and topics to get personalized reviews.</p>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                {['IITs', 'NEET 2026', 'MBA', 'CUET', 'Coding', 'Scholarships'].map(tag => (
-                                    <span key={tag} style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.05)', border: `1px solid ${colors.border}`, borderRadius: '20px', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }} className="hover-primary">+ {tag}</span>
-                                ))}
+                                {['IITs', 'NEET 2026', 'MBA', 'CUET', 'Coding', 'Scholarships'].map(tag => {
+                                    const isFollowed = followedTags.includes(tag);
+                                    return (
+                                        <span
+                                            key={tag}
+                                            onClick={() => {
+                                                if (isFollowed) setFollowedTags(followedTags.filter(t => t !== tag));
+                                                else setFollowedTags([...followedTags, tag]);
+                                            }}
+                                            style={{
+                                                padding: '6px 12px',
+                                                background: isFollowed ? colors.primary : 'rgba(255,255,255,0.05)',
+                                                border: `1px solid ${isFollowed ? colors.primary : colors.border}`,
+                                                color: isFollowed ? '#fff' : '#94a3b8',
+                                                borderRadius: '20px',
+                                                fontSize: '11px',
+                                                fontWeight: 600,
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s'
+                                            }}
+                                            className="hover-primary"
+                                        >
+                                            {isFollowed ? '✓' : '+'} {tag}
+                                        </span>
+                                    );
+                                })}
                             </div>
                         </div>
                     </aside>
@@ -955,7 +1147,7 @@ const ReviewPage = () => {
                         </button>
                     </div>
 
-                    {filterTag && (
+                    {(filterTag || filterAuthor) && (
                         <motion.div
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -971,9 +1163,11 @@ const ReviewPage = () => {
                             }}
                         >
                             <span style={{ fontSize: '14px', color: '#94a3b8' }}>Showing results for</span>
-                            <span style={{ fontWeight: 800, color: colors.primary, fontSize: '15px' }}>#{filterTag}</span>
+                            <span style={{ fontWeight: 800, color: colors.primary, fontSize: '15px' }}>
+                                {filterAuthor ? `User: ${filterAuthor}` : `#${filterTag}`}
+                            </span>
                             <button
-                                onClick={() => setFilterTag(null)}
+                                onClick={() => { setFilterTag(null); setFilterAuthor(null); }}
                                 style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}
                                 className="hover-primary"
                             >
@@ -1012,6 +1206,42 @@ const ReviewPage = () => {
                                 />
                             </div>
                         </div>
+
+                        {suggestedHashtags.length > 0 && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    gap: '8px',
+                                    marginBottom: '16px',
+                                    paddingLeft: '52px'
+                                }}
+                            >
+                                <span style={{ fontSize: '11px', color: colors.accent, fontWeight: 800, alignSelf: 'center', marginRight: '4px' }}>SUGGESTED:</span>
+                                {suggestedHashtags.map(tag => (
+                                    <button
+                                        key={tag}
+                                        onClick={() => setNewPostContent(prev => `${prev.trim()} ${tag} `)}
+                                        style={{
+                                            padding: '4px 10px',
+                                            borderRadius: '6px',
+                                            background: 'rgba(92, 225, 255, 0.1)',
+                                            border: `1px solid ${colors.accent}33`,
+                                            color: colors.accent,
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s'
+                                        }}
+                                        className="hover-bg"
+                                    >
+                                        + {tag}
+                                    </button>
+                                ))}
+                            </motion.div>
+                        )}
 
                         <AnimatePresence>
                             {isRecording && (
@@ -1512,9 +1742,7 @@ const ReviewPage = () => {
                                         <>
                                             {post.content && (
                                                 <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#e2e8f0', marginBottom: '12px' }}>
-                                                    {post.content.split(' ').map((word, i) =>
-                                                        word.startsWith('#') ? <span key={i} style={{ color: colors.accent, fontWeight: 600 }}>{word} </span> : word + ' '
-                                                    )}
+                                                    {renderContentWithTags(post.content)}
                                                 </p>
                                             )}
                                         </>
@@ -1857,28 +2085,38 @@ const ReviewPage = () => {
                             <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <TrendingUp size={20} color={colors.primary} /> Trending Reviews
                             </h3>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                {[
-                                    { tag: 'IIT Bombay', count: '1.2k reviews', trending: true },
-                                    { tag: 'Scholarships 2026', count: '2.4k views', trending: true },
-                                    { tag: 'NEET PG Results', count: '850 posts', new: true },
-                                    { tag: 'BITS Pilani', count: '500+ student reviews' }
-                                ].map((item, i) => (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                {getTrendingTags(posts).map((item, i) => (
                                     <div
                                         key={i}
                                         onClick={() => setFilterTag(item.tag)}
-                                        style={{ cursor: 'pointer', padding: '8px', borderRadius: '8px', transition: 'background 0.2s' }}
+                                        style={{
+                                            cursor: 'pointer',
+                                            padding: '8px 14px',
+                                            borderRadius: '12px',
+                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                            background: item.postCount > 5 ? `linear-gradient(135deg, ${colors.primary}22, ${colors.accent}11)` : 'rgba(255,255,255,0.03)',
+                                            border: `1px solid ${item.postCount > 5 ? colors.primary + '33' : 'rgba(255,255,255,0.05)'}`,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '2px',
+                                            minWidth: 'fit-content',
+                                            position: 'relative',
+                                            overflow: 'hidden'
+                                        }}
                                         className="hover-bg"
                                     >
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                <Hash size={14} color={colors.primary} />
-                                                <span style={{ fontWeight: 600, fontSize: '14px' }}>{item.tag}</span>
-                                            </div>
-                                            {item.trending && <span style={{ fontSize: '10px', background: 'rgba(0, 150, 255, 0.1)', color: colors.primary, padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>Trending</span>}
-                                            {item.new && <span style={{ fontSize: '10px', background: 'rgba(92, 225, 255, 0.1)', color: colors.accent, padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>New</span>}
+                                        {item.postCount > 10 && (
+                                            <div style={{ position: 'absolute', top: -5, right: -5, width: '20px', height: '20px', background: colors.accent, filter: 'blur(10px)', opacity: 0.3 }} />
+                                        )}
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <Hash size={12} color={item.isMention ? colors.accent : colors.primary} />
+                                            <span style={{ fontWeight: 700, fontSize: '13px', color: item.postCount > 5 ? '#fff' : '#cbd5e1' }}>{item.tag}</span>
                                         </div>
-                                        <span style={{ fontSize: '12px', color: '#64748b' }}>{item.count}</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <span style={{ fontSize: '10px', color: '#64748b' }}>{item.count}</span>
+                                            {item.trending && <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: colors.primary }} className="pulse" />}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -1899,20 +2137,21 @@ const ReviewPage = () => {
                         <div style={{ background: colors.card, borderRadius: '16px', padding: '20px', border: `1px solid ${colors.border}`, marginTop: '24px' }}>
                             <h4 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '16px', color: colors.accent }}>Top Reviewers</h4>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                {[
-                                    { name: 'Ananya S.', points: '1200', avatar: 'AS' },
-                                    { name: 'Rahul K.', points: '950', avatar: 'RK' },
-                                    { name: 'Pritha M.', points: '800', avatar: 'PM' }
-                                ].map((user, idx) => (
+                                {getTopReviewers(posts).map((user, idx) => (
                                     <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                         <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: colors.secondary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, color: colors.accent }}>
                                             {user.avatar}
                                         </div>
                                         <div style={{ flex: 1 }}>
                                             <div style={{ fontSize: '13px', fontWeight: 600 }}>{user.name}</div>
-                                            <div style={{ fontSize: '11px', color: '#64748b' }}>{user.points} points</div>
+                                            <div style={{ fontSize: '11px', color: '#64748b' }}>{user.posts} {user.posts === 1 ? 'post' : 'posts'}</div>
                                         </div>
-                                        <button style={{ padding: '4px 10px', borderRadius: '6px', background: 'transparent', border: `1px solid ${colors.primary}`, color: colors.primary, fontSize: '11px', cursor: 'pointer' }}>Follow</button>
+                                        <button
+                                            onClick={() => setFilterAuthor(user.name)}
+                                            style={{ padding: '4px 10px', borderRadius: '6px', background: 'transparent', border: `1px solid ${colors.primary}`, color: colors.primary, fontSize: '11px', cursor: 'pointer' }}
+                                        >
+                                            Follow
+                                        </button>
                                     </div>
                                 ))}
                             </div>

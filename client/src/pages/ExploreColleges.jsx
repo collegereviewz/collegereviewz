@@ -6,7 +6,6 @@ import {
   Trash2, SlidersHorizontal, ArrowRight, Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
 import { getCollegeLogo, guessDomainByName } from '../utils/logoUtils';
 
 // College Logos
@@ -17,15 +16,11 @@ import iitKanpurLogo from '../assets/ExploreColleges/iitkanpur.png';
 import iitKgpLogo from '../assets/ExploreColleges/iitkgp.png';
 
 const ExploreColleges = () => {
-  const navigate = useNavigate();
   const [selectedStream, setSelectedStream] = useState('BE/B.Tech');
   const [sortBy, setSortBy] = useState('Ranking');
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const tabsRef = useRef(null);
-  const sentinelRef = useRef(null);
-  const [tabsFixed, setTabsFixed] = useState(false);
-  const STRIP_H = 140;
 
   const checkScroll = useCallback(() => {
     const el = tabsRef.current;
@@ -45,17 +40,6 @@ const ExploreColleges = () => {
       window.removeEventListener('resize', checkScroll);
     };
   }, [checkScroll]);
-
-  // Switch to fixed when sentinel scrolls past header
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => setTabsFixed(!entry.isIntersecting),
-      { rootMargin: '-65px 0px 0px 0px', threshold: 0 }
-    );
-    const el = sentinelRef.current;
-    if (el) observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
 
   const filters = [
     { label: 'Stream', options: ['BE/B.Tech', 'MBBS', 'MBA', 'Law', 'Science', 'Commerce'] },
@@ -151,38 +135,20 @@ const ExploreColleges = () => {
   return (
     <div style={{ backgroundColor: '#fff', minHeight: '100vh', paddingTop: '140px' }}>
       <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 32px' }}>
+        
 
-        {/* Header — scrolls away */}
+        {/* Header Section */}
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#5b51d8', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '16px' }}>
-            <div style={{ width: '24px', height: '24px', background: 'rgba(91, 81, 216, 0.1)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <GraduationCap size={14} />
-            </div>
-            BE/B.TECH COLLEGES
-          </div>
-          <h1 style={{ fontSize: '48px', fontWeight: 950, color: '#1e293b', marginBottom: '32px', letterSpacing: '-1.5px' }}>
-            BTech Colleges in India 2026: <span style={{ background: 'linear-gradient(135deg, #5b51d8, #38bdf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Fees, Admissions, Placements, Rankings, Cutoff</span>
-          </h1>
+           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#5b51d8', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '16px' }}>
+              <div style={{ width: '24px', height: '24px', background: 'rgba(91, 81, 216, 0.1)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <GraduationCap size={14} />
+              </div>
+              COLLEGES
+           </div>
+           <h1 style={{ fontSize: '48px', fontWeight: 950, color: '#1e293b', marginBottom: '32px', letterSpacing: '-1.5px' }}>
+             List of Colleges , <span style={{ background: 'linear-gradient(135deg, #5b51d8, #38bdf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Fees, Cutoff & Rankings</span>
+           </h1>
         </div>
-      </div>
-
-      {/* Sentinel div — triggers fixed mode when scrolled past */}
-      <div ref={sentinelRef} style={{ height: '1px' }} />
-
-      {/* Placeholder to prevent layout jump when strip goes fixed */}
-      {tabsFixed && <div style={{ height: STRIP_H }} />}
-
-      {/* Tabs + Filter strip */}
-      <div style={{
-        ...(tabsFixed
-          ? { position: 'fixed', top: '65px', left: 0, right: 0, zIndex: 900 }
-          : { position: 'relative' }),
-        background: '#fff',
-        borderBottom: tabsFixed ? '1px solid #e2e8f0' : 'none',
-        boxShadow: tabsFixed ? '0 4px 16px rgba(0,0,0,0.07)' : 'none',
-        padding: tabsFixed ? '12px 0' : '0',
-      }}>
-        <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 32px' }}>
 
         {/* Tab Selection with Scroll Controls */}
         <div style={{ position: 'relative', marginBottom: '30px' }}>
@@ -237,7 +203,7 @@ const ExploreColleges = () => {
             }} 
             className="no-scrollbar"
           >
-            {['MBBS', 'BE/B.Tech', 'BBA', 'BCA', 'B.Sc (Nursing)', 'Arts', 'Law', 'Science', 'Commerce', 'ME/M.Tech', 'Pharmacy'].map(tab => (
+            {['MBBS', 'BE/B.Tech', 'BBA', 'BCA', 'B.Sc (Nursing)', 'Arts', 'Law', 'Science', 'Commerce', 'Pharmacy', 'ME/M.Tech'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setSelectedStream(tab)}
@@ -276,39 +242,36 @@ const ExploreColleges = () => {
           </div>
         </div>
 
-          {/* Filter Bar - inside sticky strip */}
-          <div style={{
-            background: '#fff', borderRadius: '16px', border: '1.5px solid #f1f5f9',
-            padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '15px',
-            marginBottom: tabsFixed ? '0' : '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)', overflowX: 'auto'
-          }}>
-            <button style={{
-              display: 'flex', alignItems: 'center', gap: '8px', background: '#f8fafc',
+        {/* Filter Bar */}
+        <div style={{ 
+          background: '#fff', borderRadius: '16px', border: '1.5px solid #f1f5f9', 
+          padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '15px',
+          marginBottom: '30px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)', overflowX: 'auto'
+        }}>
+            <button style={{ 
+              display: 'flex', alignItems: 'center', gap: '8px', background: '#f8fafc', 
               border: '1.5px solid #e2e8f0', padding: '10px 18px', borderRadius: '10px',
-              fontSize: '13px', fontWeight: 800, color: '#64748b', whiteSpace: 'nowrap', cursor: 'pointer'
+              fontSize: '13px', fontWeight: 800, color: '#64748b', whiteSpace: 'nowrap'
             }}>
               <Filter size={16} /> All Filter
             </button>
-            <div style={{ width: '1.5px', height: '30px', background: '#e2e8f0', flexShrink: 0 }} />
+            <div style={{ width: '1.5px', height: '30px', background: '#e2e8f0' }} />
+            
             {filters.map(f => (
-              <div key={f.label} style={{ position: 'relative', flex: 1, minWidth: '120px' }}>
+              <div key={f.label} style={{ position: 'relative', flex: 1, minWidth: '150px' }}>
                 <select style={{
-                  width: '100%', padding: '10px 14px', borderRadius: '10px',
+                  width: '100%', padding: '12px 16px', borderRadius: '10px',
                   border: '1.5px solid #e2e8f0', background: '#fff', color: '#64748b',
-                  fontSize: '13px', fontWeight: 700, appearance: 'none', cursor: 'pointer', outline: 'none'
+                  fontSize: '13px', fontWeight: 700, appearance: 'none', cursor: 'pointer',
+                  outline: 'none'
                 }}>
                   <option>{f.label}</option>
                   {f.options.map(o => <option key={o}>{o}</option>)}
                 </select>
-                <ChevronDown size={14} style={{ position: 'absolute', right: '10px', top: '55%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#64748b' }} />
+                <ChevronDown size={14} style={{ position: 'absolute', right: '12px', top: '55%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#64748b' }} />
               </div>
             ))}
-          </div>
         </div>
-      </div>
-
-      {/* === Main scrollable content === */}
-      <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 32px' }}>
 
         {/* Stats and Sort */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
@@ -380,12 +343,7 @@ const ExploreColleges = () => {
                                         <img src={col.logo || logoUrl} alt="logo" style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
                                     </div>
                                     <div>
-                                        <h4 
-                                          onClick={() => navigate(`/college/${col.name}`)}
-                                          style={{ fontSize: '15px', fontWeight: 900, color: '#5b51d8', marginBottom: '6px', lineHeight: 1.4, cursor: 'pointer' }}
-                                        >
-                                          {col.name}
-                                        </h4>
+                                        <h4 style={{ fontSize: '15px', fontWeight: 900, color: '#5b51d8', marginBottom: '6px', lineHeight: 1.4 }}>{col.name}</h4>
                                         <p style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, marginBottom: '16px' }}>{col.location}</p>
                                         <div style={{ display: 'flex', gap: '8px' }}>
                                             <button 

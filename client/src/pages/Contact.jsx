@@ -48,7 +48,7 @@ const Contact = () => {
         {/* Decorative circles */}
         <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)' }} />
         <div style={{ position: 'absolute', bottom: '-40px', left: '-40px', width: '160px', height: '160px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
-        
+
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -70,7 +70,7 @@ const Contact = () => {
       {/* Main Content */}
       <section style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 24px 60px' }}>
         <div className="contact-grid">
-          
+
           {/* Left Side — Contact Info Cards */}
           <div>
             <div className="contact-cards" style={{ marginBottom: '20px' }}>
@@ -130,7 +130,7 @@ const Contact = () => {
                 <MapPin size={22} />
               </div>
               <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>Visit Us</h3>
-              
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Clock size={14} style={{ color: '#5b51d8', flexShrink: 0 }} />
@@ -143,8 +143,8 @@ const Contact = () => {
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <Building2 size={14} style={{ color: '#5b51d8', flexShrink: 0, marginTop: '2px' }} />
                   <p style={{ fontSize: '13px', color: '#64748b', fontWeight: 600, lineHeight: 1.6 }}>
-                     217, 2nd Floor, Diamond
-Arcade,<br />
+                    217, 2nd Floor, Diamond
+                    Arcade,<br />
                     Shyam Nagar Road, 68 Jessore Road,<br />
                     Kolkata – 700055, India
                   </p>
@@ -162,7 +162,7 @@ Arcade,<br />
           >
             <h2 style={{ fontSize: '26px', fontWeight: 950, color: '#1e293b', marginBottom: '8px' }}>Send a Message</h2>
             <p style={{ fontSize: '13px', color: '#64748b', fontWeight: 500, marginBottom: '28px' }}>Fill out the form below and we'll get back to you soon.</p>
-            
+
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div>
                 <label style={labelStyle}>Full Name *</label>
@@ -246,8 +246,8 @@ Arcade,<br />
           viewport={{ once: true }}
           style={{ borderRadius: '20px', overflow: 'hidden', border: '1.5px solid #f1f5f9', height: '400px' }}
         >
-          <a 
-            href="https://www.google.com/maps/search/217+2nd+Floor+Diamond+Arcade+Shyam+Nagar+Road+68+Jessore+Road+Kolkata+700055" 
+          <a
+            href="https://www.google.com/maps/search/217+2nd+Floor+Diamond+Arcade+Shyam+Nagar+Road+68+Jessore+Road+Kolkata+700055"
             target="_blank" rel="noopener noreferrer"
             style={{ display: 'block', width: '100%', height: '100%', position: 'relative' }}
           >

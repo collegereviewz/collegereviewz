@@ -1,4 +1,6 @@
 import User from '../models/User.model.js';
+import Review from '../models/Review.model.js';
+import Scholarship from '../models/Scholarship.model.js';
 
 export const updateProfile = async (req, res) => {
     try {
@@ -37,5 +39,26 @@ export const updateProfile = async (req, res) => {
     } catch (error) {
         console.error("Profile Update Error:", error);
         res.status(500).json({ message: 'Server error updating profile', error: error.message });
+    }
+};
+
+export const getUserActivity = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        const [reviews, scholarships, user] = await Promise.all([
+            Review.find({ user: userId }).sort({ createdAt: -1 }),
+            Scholarship.find({ user: userId }).sort({ createdAt: -1 }),
+            User.findById(userId).select('openToAbroad')
+        ]);
+
+        res.status(200).json({
+            reviews,
+            scholarships,
+            openToAbroad: user?.openToAbroad || false
+        });
+    } catch (error) {
+        console.error("User Activity Fetch Error:", error);
+        res.status(500).json({ message: 'Server error fetching user activity', error: error.message });
     }
 };

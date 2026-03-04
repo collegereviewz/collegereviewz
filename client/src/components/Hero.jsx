@@ -289,7 +289,7 @@ const Hero = ({ onNavigate }) => (
 
           {/* ── LEFT ──────────────────────────────── */}
           <div>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -299,7 +299,7 @@ const Hero = ({ onNavigate }) => (
               India's #1 Trusted Platform
             </motion.div>
 
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
@@ -312,7 +312,7 @@ const Hero = ({ onNavigate }) => (
               &amp; Counselling Platform
             </motion.h1>
 
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
@@ -321,7 +321,7 @@ const Hero = ({ onNavigate }) => (
               Real ratings from verified students. Explore fees, placements, and campus life.
             </motion.p>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.7 }}
@@ -363,7 +363,7 @@ const Hero = ({ onNavigate }) => (
             </p>
 
             <div className="hero-ctas">
-              <button 
+              <button
                 onClick={() => onNavigate('Explore Colleges')}
                 style={{ background: 'linear-gradient(135deg, #5b51d8, #38bdf8)', color: '#fff', padding: '13px 28px', borderRadius: '50px', fontWeight: 800, fontSize: '13px', border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(91,81,216,0.25)', fontFamily: 'inherit', transition: 'all 0.2s' }}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(91,81,216,0.4)'; }}
@@ -375,7 +375,9 @@ const Hero = ({ onNavigate }) => (
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.background = 'transparent'; }}>
                 Get Expert Counselling
               </button>
-              <button style={{ background: '#fff', color: '#1e293b', padding: '13px 24px', borderRadius: '50px', fontWeight: 800, fontSize: '13px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 6px 20px rgba(0,0,0,0.2)', fontFamily: 'inherit', transition: 'all 0.2s' }}
+              <button
+                onClick={() => onNavigate('Write Review')}
+                style={{ background: '#fff', color: '#1e293b', padding: '13px 24px', borderRadius: '50px', fontWeight: 800, fontSize: '13px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 6px 20px rgba(0,0,0,0.2)', fontFamily: 'inherit', transition: 'all 0.2s' }}
                 onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
                 onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
                 Write A Review &amp; Earn <ChevronRight size={15} strokeWidth={3} style={{ color: '#5b51d8' }} />

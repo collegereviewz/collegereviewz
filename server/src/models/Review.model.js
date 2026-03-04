@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 
 const reviewSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: false
+    },
     author: {
         type: String,
         required: true,
@@ -30,12 +35,6 @@ const reviewSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    upvotedBy: [{
-        type: String
-    }],
-    downvotedBy: [{
-        type: String
-    }],
     comments: [{
         author: String,
         content: String,
@@ -52,21 +51,7 @@ const reviewSchema = new mongoose.Schema({
     }],
     hashtags: [{
         type: String
-    }],
-    collegeId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'College'
-    },
-    collegeName: {
-        type: String
-    },
-    rating: {
-        type: Number,
-        required: true,
-        min: 1,
-        max: 5,
-        default: 5
-    }
+    }]
 }, { timestamps: true });
 
 const Review = mongoose.model('Review', reviewSchema);

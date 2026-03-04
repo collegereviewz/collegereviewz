@@ -37,41 +37,27 @@ export const getCollegeLogo = (domain, name) => {
  * This is a basic mapper for major Indian institutions.
  */
 export const guessDomainByName = (name) => {
-    if (!name) return null;
-    const cleanName = name.toUpperCase().trim();
-
     const mappings = {
-        'IIT DELHI': 'iitd.ac.in',
-        'AIIMS NEW DELHI': 'aiims.edu',
-        'IIM AHMEDABAD': 'iima.ac.in',
-        'NIT TRICHY': 'nitt.edu',
-        'BITS PILANI': 'bits-pilani.ac.in',
-        'MANIPAL UNIVERSITY': 'manipal.edu',
-        'IIT BOMBAY': 'iitb.ac.in',
-        'SRM UNIVERSITY': 'srmist.edu.in',
-        'VIT VELLORE': 'vit.ac.in',
+        'IIT Delhi': 'iitd.ac.in',
+        'AIIMS New Delhi': 'aiims.edu',
+        'IIM Ahmedabad': 'iima.ac.in',
+        'NIT Trichy': 'nitt.edu',
+        'BITS Pilani': 'bits-pilani.ac.in',
+        'Manipal University': 'manipal.edu',
+        'IIT Bombay': 'iitb.ac.in',
+        'SRM University': 'srmist.edu.in',
+        'VIT Vellore': 'vit.ac.in',
         'LPU': 'lpu.in',
-        'AMITY UNIVERSITY': 'amity.edu',
-        'DELHI UNIVERSITY': 'du.ac.in',
-        'IIT MADRAS': 'iitm.ac.in',
-        'IIT KANPUR': 'iitk.ac.in',
-        'IIT KHARAGPUR': 'iitkgp.ac.in',
-        'IIT ROORKEE': 'iitr.ac.in',
-        'IIT GUWAHATI': 'iitg.ac.in',
-        'JNU NEW DELHI': 'jnu.ac.in',
-        'BHU VARANASI': 'bhu.ac.in',
-        'SYMBIOSIS INSTITUTE OF TECHNOLOGY': 'sitpune.edu.in',
-        'CHANDIGARH COLLEGE OF ENGINEERING AND TECHNOLOGY': 'ccet.ac.in'
+        'Amity University': 'amity.edu',
+        'Delhi University': 'du.ac.in',
+        'IIT Madras': 'iitm.ac.in',
+        'IIT Kanpur': 'iitk.ac.in',
+        'IIT Kharagpur': 'iitkgp.ac.in',
+        'IIT Roorkee': 'iitr.ac.in',
+        'IIT Guwahati': 'iitg.ac.in',
+        'JNU New Delhi': 'jnu.ac.in',
+        'BHU Varanasi': 'bhu.ac.in'
     };
 
-    // Try direct mapping first
-    if (mappings[cleanName]) return mappings[cleanName];
-
-    // Try substring matching for major universities if they appear in the name
-    if (cleanName.includes('BITS PILANI')) return 'bits-pilani.ac.in';
-    if (cleanName.includes('VIT VELLORE')) return 'vit.ac.in';
-    if (cleanName.includes('SYMBIOSIS')) return 'siu.edu.in';
-    if (cleanName.includes('AMITY')) return 'amity.edu';
-
-    return null;
+    return mappings[name] || null;
 };

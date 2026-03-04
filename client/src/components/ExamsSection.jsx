@@ -16,7 +16,7 @@ import tsEamcetLogo from '../assets/Exams/taseamcat.png';
 import wbjeeLogo from '../assets/Exams/wbjee.png';
 
 const ExamsSection = ({ showHeader = true }) => {
-  const [selectedStream, setSelectedStream] = useState('School Academics (Boards & School)');
+  const [selectedStream, setSelectedStream] = useState('MBBS');
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const tabsRef = useRef(null);
@@ -39,29 +39,12 @@ const ExamsSection = ({ showHeader = true }) => {
       window.removeEventListener('resize', checkScroll);
     };
   }, [checkScroll]);
-
-  const categories = [
-    'School Academics (Boards & School)',
-    'Olympiads & Scholarships (School)',
-    'UG Entrance – Engineering/Architecture',
-    'UG Entrance – Medical & Allied',
-    'UG Entrance – Arts/Commerce/Law/Design/Mgmt',
-    'PG Entrance – STEM & Medical',
-    'PG Entrance – MBA/Law/Arts/Design',
-    'Govt Jobs – Civil Services (UPSC/State PSC)',
-    'Govt Jobs – SSC/Bank/Railways',
-    'Govt Jobs – Defence & Police',
-    'Teaching & Research Eligibility',
-    'Professional Licenses (CA/CS/Medical/Bar etc.)',
-    'Study Abroad & Global Tests'
-  ];
-
   const exams = [
     {
       id: 1,
       name: 'CUET 2025',
       fullName: 'Common Universities Entrance Test',
-      category: 'UG Entrance – Arts/Commerce/Law/Design/Mgmt',
+      category: 'Science',
       examDate: '11 May 26 - 31 May 26',
       appDate: '03 Jan 26 - 30 Jan 26',
       resultDate: '30 Jul 26',
@@ -72,7 +55,7 @@ const ExamsSection = ({ showHeader = true }) => {
       id: 2,
       name: 'JEE Main 2026',
       fullName: 'Joint Entrance Exam Main',
-      category: 'UG Entrance – Engineering/Architecture',
+      category: 'BE/B.Tech',
       examDate: '22 Jan 26 - 29 Jan 26',
       appDate: '15 Oct 25 - 25 Nov 25',
       resultDate: '19 Feb 26',
@@ -83,7 +66,7 @@ const ExamsSection = ({ showHeader = true }) => {
       id: 3,
       name: 'JEE Advanced 2026',
       fullName: 'Joint Entrance Examination Advanced',
-      category: 'UG Entrance – Engineering/Architecture',
+      category: 'BE/B.Tech',
       examDate: '17 May 26',
       appDate: '23 Apr 26 - 02 May 26',
       resultDate: '01 Jun 26',
@@ -94,7 +77,7 @@ const ExamsSection = ({ showHeader = true }) => {
       id: 4,
       name: 'TS EAMCET 2026',
       fullName: 'Telangana State Engineering Agriculture...',
-      category: 'UG Entrance – Engineering/Architecture',
+      category: 'BE/B.Tech',
       examDate: '29 Apr 26 - 05 May 26',
       appDate: '01 Mar 26 - 04 Apr 26',
       resultDate: '11 May 26',
@@ -105,7 +88,7 @@ const ExamsSection = ({ showHeader = true }) => {
       id: 5,
       name: 'GATE 2026',
       fullName: 'Graduate Aptitude Test in Engineering',
-      category: 'PG Entrance – STEM & Medical',
+      category: 'ME/M.Tech',
       examDate: '07 Feb 26',
       appDate: '28 Aug 25 - 13 Oct 25',
       resultDate: '19 Mar 26',
@@ -116,7 +99,7 @@ const ExamsSection = ({ showHeader = true }) => {
       id: 6,
       name: 'WBJEE 2025',
       fullName: 'West Bengal Joint Entrance Examination',
-      category: 'UG Entrance – Engineering/Architecture',
+      category: 'BE/B.Tech',
       examDate: '27 Apr 25',
       appDate: '09 Jan 25 - 05 Feb 25',
       resultDate: '22 Aug 25',
@@ -192,7 +175,7 @@ const ExamsSection = ({ showHeader = true }) => {
             }} 
             className="no-scrollbar"
           >
-            {categories.map(tab => (
+            {['MBBS', 'BE/B.Tech', 'BBA', 'BCA', 'B.Sc (Nursing)', 'Arts', 'Law', 'Science', 'Commerce', 'Pharmacy', 'ME/M.Tech'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setSelectedStream(tab)}
@@ -208,18 +191,17 @@ const ExamsSection = ({ showHeader = true }) => {
                   scrollSnapAlign: 'start'
                 }}
               >
-                {tab.includes('School') && <BookOpen size={18} />}
-                {tab.includes('Engineering') && <Settings size={18} />}
-                {tab.includes('Medical') && <Stethoscope size={18} />}
-                {tab.includes('Arts/Commerce') && <TrendingUp size={18} />}
-                {tab.includes('STEM') && <FlaskConical size={18} />}
-                {tab.includes('MBA') && <Briefcase size={18} />}
-                {tab.includes('Govt Jobs') && <Landmark size={18} />}
-                {tab.includes('Civil Services') && <Users size={18} />}
-                {tab.includes('Teaching') && <GraduationCap size={18} />}
-                {tab.includes('Licenses') && <Scale size={18} />}
-                {tab.includes('Abroad') && <FileText size={18} />}
-                {!['School', 'Engineering', 'Medical', 'Arts/Commerce', 'STEM', 'MBA', 'Govt Jobs', 'Civil Services', 'Teaching', 'Licenses', 'Abroad'].some(keyword => tab.includes(keyword)) && <Search size={18} />}
+                {tab === 'MBBS' && <Users size={18} />}
+                {tab === 'BE/B.Tech' && <Settings size={18} />}
+                {tab === 'BBA' && <Briefcase size={18} />}
+                {tab === 'BCA' && <Code size={18} />}
+                {tab === 'B.Sc (Nursing)' && <Stethoscope size={18} />}
+                {tab === 'Arts' && <Palette size={18} />}
+                {tab === 'Law' && <Scale size={18} />}
+                {tab === 'Science' && <FlaskConical size={18} />}
+                {tab === 'Commerce' && <TrendingUp size={18} />}
+                {tab === 'Pharmacy' && <Stethoscope size={18} />}
+                {tab === 'ME/M.Tech' && <Settings size={18} />}
                 {tab}
               </button>
             ))}

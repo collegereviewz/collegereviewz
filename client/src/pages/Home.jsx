@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Hero from '../components/Hero';
 import NewsUpdatesSection from '../components/NewsUpdatesSection';
 import TopColleges from '../components/TopColleges';
+import ExploreSection from '../components/ExploreSection';
 import PopularCourses from '../components/PopularCourses';
 import RewardsSection from '../components/RewardsSection';
 import ScholarshipSection from '../components/ScholarshipSection';
@@ -19,6 +20,7 @@ const Home = () => {
     if (view === 'Home') navigate('/');
     else if (view === 'Courses') navigate('/Courses/');
     else if (view === 'Explore Colleges') navigate('/ExploreColleges/');
+    else if (view === 'Write Review') navigate('/WriteReview/');
     window.scrollTo(0, 0);
   };
 
@@ -32,40 +34,43 @@ const Home = () => {
   return (
     <>
       <Hero onNavigate={handleNavigate} />
-      
+
       <motion.div {...fadeInUp}>
         <NewsUpdatesSection />
       </motion.div>
-      
+
       <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.1 }}>
         <TopColleges />
       </motion.div>
-      
-      
+
+      <motion.div {...fadeInUp}>
+        <ExploreSection onNavigate={handleNavigate} />
+      </motion.div>
+
       <motion.div {...fadeInUp}>
         <PopularCourses onNavigate={handleNavigate} />
       </motion.div>
-      
+
       <motion.div {...fadeInUp}>
         <RewardsSection />
       </motion.div>
-      
+
       <motion.div {...fadeInUp}>
         <ScholarshipSection />
       </motion.div>
-      
+
       <motion.div {...fadeInUp}>
         <ExamsSection />
       </motion.div>
-      
+
       <motion.div {...fadeInUp}>
         <BoardExamsSection />
       </motion.div>
-      
+
       <motion.div {...fadeInUp}>
         <TestimonialsSection />
       </motion.div>
-      
+
       <motion.div {...fadeInUp}>
         <NewsSection />
       </motion.div>

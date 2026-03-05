@@ -39,3 +39,25 @@ export const updateProfile = async (req, res) => {
         res.status(500).json({ message: 'Server error updating profile', error: error.message });
     }
 };
+
+import Review from '../models/Review.model.js';
+
+export const getUserDashboardStats = async (req, res) => {
+    try {
+        const identifier = req.params.identifier; // This will be the user's fullName or email
+
+        // Count reviews where author matches the user's full name
+        const reviewCount = await Review.countDocuments({ author: identifier });
+
+        // Since we don't have explicit models for Scholarships or College Applications yet,
+        // we will mock those specific counts for now but return the real review count.
+        res.status(200).json({
+            reviewsWritten: reviewCount,
+            scholarshipsApplied: 0, // Mocked for now until Scholarship model is implemented
+            collegesInterested: 0 // Mocked for now
+        });
+    } catch (error) {
+        console.error("Dashboard Stats Error:", error);
+        res.status(500).json({ message: 'Server error fetching dashboard stats', error: error.message });
+    }
+};

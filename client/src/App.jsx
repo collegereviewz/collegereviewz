@@ -12,27 +12,32 @@ import StudyAbroad from './pages/StudyAbroad'
 import Contact from './pages/Contact'
 import WriteAReview from './pages/WriteAReview'
 import Support from './pages/Support'
-import Login from './pages/LoginPage'
+import LoginPage from './pages/LoginPage'
 import FloatingAskExperts from './components/FloatingAskExperts'
 import SignupPage from './pages/SignupPage'
+import AIVoiceAssistant from './components/AIVoiceAssisstance'
 import ExploreColleges from './pages/ExploreColleges/ExploreColleges';
+import ProfilePage from './pages/ProfilePage';
 import CollegeProfileWrapper from './pages/CollegeProfileWrapper';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
 import { lazy } from 'react';
 
 // Individual college pages (lazy loaded)
-const IITBombay    = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/IITBombay'));
-const IITDelhi     = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/IITDelhi'));
-const IITMadras    = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/IITMadras'));
-const IITKanpur    = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/IITKanpur'));
+const IITBombay = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/IITBombay'));
+const IITDelhi = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/IITDelhi'));
+const IITMadras = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/IITMadras'));
+const IITKanpur = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/IITKanpur'));
 const IITKharagpur = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/IITKharagpur'));
-const IITRoorkee   = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/IITRoorkee'));
-const NITTrichy    = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/NITTrichy'));
-const BITSPilani   = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/BITSPilani'));
-const VITVellore   = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/VITVellore'));
-const SRMChennai   = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/SRMChennai'));
+const IITRoorkee = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/IITRoorkee'));
+const NITTrichy = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/NITTrichy'));
+const BITSPilani = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/BITSPilani'));
+const VITVellore = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/VITVellore'));
+const SRMChennai = lazy(() => import('./pages/ExploreColleges/BE-BTech/Colleges/SRMChennai'));
 
 function AppContent() {
   const [loading, setLoading] = useState(true);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -56,14 +61,15 @@ function AppContent() {
     return 'Home';
   };
 
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
   return (
     <>
       <AnimatePresence>
         {loading && <Preloader />}
       </AnimatePresence>
-      
-      <div style={{ minHeight: '100vh', background: '#fff', zoom: 1.1 }}>
-        <Header currentView={getCurrentView()} />
+      <div style={{ minHeight: '100vh', background: '#fff', zoom: isAdminRoute ? 1 : 1.1 }}>
+        {!isAdminRoute && <Header currentView={getCurrentView()} />}
         <main>
           <AnimatePresence mode="wait">
             <motion.div
@@ -83,30 +89,34 @@ function AppContent() {
                 <Route path="/Contact/" element={<Contact />} />
                 <Route path="/WriteReview/" element={<WriteAReview />} />
                 <Route path="/Support/" element={<Support />} />
-                <Route path="/Login/" element={<Login />} />
+                <Route path="/Login/" element={<LoginPage />} />
                 <Route path="/Signup/" element={<SignupPage />} />
+                <Route path="/Profile/" element={<ProfilePage />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/college/:collegeName" element={<CollegeProfileWrapper />} />
 
                 {/* Individual College Pages (lazy) */}
-                <Route path="/ExploreColleges/BE-BTech/IIT-Bombay"    element={<Suspense fallback={<div style={{padding:'120px',textAlign:'center',color:'#5b51d8',fontWeight:800}}>Loading...</div>}><IITBombay /></Suspense>} />
-                <Route path="/ExploreColleges/BE-BTech/IIT-Delhi"     element={<Suspense fallback={<div style={{padding:'120px',textAlign:'center',color:'#5b51d8',fontWeight:800}}>Loading...</div>}><IITDelhi /></Suspense>} />
-                <Route path="/ExploreColleges/BE-BTech/IIT-Madras"    element={<Suspense fallback={<div style={{padding:'120px',textAlign:'center',color:'#5b51d8',fontWeight:800}}>Loading...</div>}><IITMadras /></Suspense>} />
-                <Route path="/ExploreColleges/BE-BTech/IIT-Kanpur"    element={<Suspense fallback={<div style={{padding:'120px',textAlign:'center',color:'#5b51d8',fontWeight:800}}>Loading...</div>}><IITKanpur /></Suspense>} />
-                <Route path="/ExploreColleges/BE-BTech/IIT-Kharagpur" element={<Suspense fallback={<div style={{padding:'120px',textAlign:'center',color:'#5b51d8',fontWeight:800}}>Loading...</div>}><IITKharagpur /></Suspense>} />
-                <Route path="/ExploreColleges/BE-BTech/IIT-Roorkee"   element={<Suspense fallback={<div style={{padding:'120px',textAlign:'center',color:'#5b51d8',fontWeight:800}}>Loading...</div>}><IITRoorkee /></Suspense>} />
-                <Route path="/ExploreColleges/BE-BTech/NIT-Trichy"    element={<Suspense fallback={<div style={{padding:'120px',textAlign:'center',color:'#5b51d8',fontWeight:800}}>Loading...</div>}><NITTrichy /></Suspense>} />
-                <Route path="/ExploreColleges/BE-BTech/BITS-Pilani"   element={<Suspense fallback={<div style={{padding:'120px',textAlign:'center',color:'#5b51d8',fontWeight:800}}>Loading...</div>}><BITSPilani /></Suspense>} />
-                <Route path="/ExploreColleges/BE-BTech/VIT-Vellore"   element={<Suspense fallback={<div style={{padding:'120px',textAlign:'center',color:'#5b51d8',fontWeight:800}}>Loading...</div>}><VITVellore /></Suspense>} />
-                <Route path="/ExploreColleges/BE-BTech/SRM-Chennai"   element={<Suspense fallback={<div style={{padding:'120px',textAlign:'center',color:'#5b51d8',fontWeight:800}}>Loading...</div>}><SRMChennai /></Suspense>} />
+                <Route path="/ExploreColleges/BE-BTech/IIT-Bombay" element={<Suspense fallback={<div style={{ padding: '120px', textAlign: 'center', color: '#5b51d8', fontWeight: 800 }}>Loading...</div>}><IITBombay /></Suspense>} />
+                <Route path="/ExploreColleges/BE-BTech/IIT-Delhi" element={<Suspense fallback={<div style={{ padding: '120px', textAlign: 'center', color: '#5b51d8', fontWeight: 800 }}>Loading...</div>}><IITDelhi /></Suspense>} />
+                <Route path="/ExploreColleges/BE-BTech/IIT-Madras" element={<Suspense fallback={<div style={{ padding: '120px', textAlign: 'center', color: '#5b51d8', fontWeight: 800 }}>Loading...</div>}><IITMadras /></Suspense>} />
+                <Route path="/ExploreColleges/BE-BTech/IIT-Kanpur" element={<Suspense fallback={<div style={{ padding: '120px', textAlign: 'center', color: '#5b51d8', fontWeight: 800 }}>Loading...</div>}><IITKanpur /></Suspense>} />
+                <Route path="/ExploreColleges/BE-BTech/IIT-Kharagpur" element={<Suspense fallback={<div style={{ padding: '120px', textAlign: 'center', color: '#5b51d8', fontWeight: 800 }}>Loading...</div>}><IITKharagpur /></Suspense>} />
+                <Route path="/ExploreColleges/BE-BTech/IIT-Roorkee" element={<Suspense fallback={<div style={{ padding: '120px', textAlign: 'center', color: '#5b51d8', fontWeight: 800 }}>Loading...</div>}><IITRoorkee /></Suspense>} />
+                <Route path="/ExploreColleges/BE-BTech/NIT-Trichy" element={<Suspense fallback={<div style={{ padding: '120px', textAlign: 'center', color: '#5b51d8', fontWeight: 800 }}>Loading...</div>}><NITTrichy /></Suspense>} />
+                <Route path="/ExploreColleges/BE-BTech/BITS-Pilani" element={<Suspense fallback={<div style={{ padding: '120px', textAlign: 'center', color: '#5b51d8', fontWeight: 800 }}>Loading...</div>}><BITSPilani /></Suspense>} />
+                <Route path="/ExploreColleges/BE-BTech/VIT-Vellore" element={<Suspense fallback={<div style={{ padding: '120px', textAlign: 'center', color: '#5b51d8', fontWeight: 800 }}>Loading...</div>}><VITVellore /></Suspense>} />
+                <Route path="/ExploreColleges/BE-BTech/SRM-Chennai" element={<Suspense fallback={<div style={{ padding: '120px', textAlign: 'center', color: '#5b51d8', fontWeight: 800 }}>Loading...</div>}><SRMChennai /></Suspense>} />
               </Routes>
             </motion.div>
           </AnimatePresence>
         </main>
-        <Footer />
-        <FloatingAskExperts />
+        {!isAdminRoute && <Footer />}
+        {!isAdminRoute && <FloatingAskExperts onOpen={() => setIsAssistantOpen(true)} />}
+        {!isAdminRoute && <AIVoiceAssistant isOpen={isAssistantOpen} onClose={() => setIsAssistantOpen(false)} />}
       </div>
     </>
-  )
+  );
 }
 
 function App() {

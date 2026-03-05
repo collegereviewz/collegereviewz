@@ -133,11 +133,56 @@ export const deleteComment = async (req, res) => {
     try {
         const { id, commentId } = req.params;
         const review = await Review.findById(id);
+        if (!review) return res.status(404).json({ message: "Review not found." });
+
         review.comments = review.comments.filter(c => c._id.toString() !== commentId);
         await review.save();
-        res.status(200).json(review);
+        res.json(review);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: "Error deleting comment", error: error.message });
+    }
+};
+
+export const getTrendingTags = async (req, res) => {
+    try {
+        // Aggregate all hashtags to find the most popular ones
+        const tags = await Review.aggregate([
+            { $unwind: "$hashtags" },
+            { $group: { _id: { $toLower: "$hashtags" }, count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $limit: 10 }
+        ]);
+
+        const formattedTags = tags.map(tag => ({
+            tag: `#${tag._id}`, // Keep hashtags readable
+            count: `${tag.count} posts`,
+            rawTag: tag._id // For filtering
+        }));
+
+        res.json(formattedTags);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching trending tags", error: error.message });
+    }
+};
+
+export const getTopReviewers = async (req, res) => {
+    try {
+        // Aggregate authors by post count
+        const topReviewers = await Review.aggregate([
+            { $group: { _id: "$author", postCount: { $sum: 1 } } },
+            { $sort: { postCount: -1 } },
+            { $limit: 5 }
+        ]);
+
+        const formattedReviewers = topReviewers.map(reviewer => ({
+            name: reviewer._id || 'Anonymous Student',
+            points: reviewer.postCount.toString(), // Using 'points' field to mean 'posts'
+            avatar: reviewer._id ? reviewer._id.substring(0, 2).toUpperCase() : 'AS'
+        }));
+
+        res.json(formattedReviewers);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching top reviewers", error: error.message });
     }
 };
 

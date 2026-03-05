@@ -18,6 +18,8 @@ import authRoutes from './route/auth.route.js';
 import userRoutes from './route/user.route.js';
 import collegeRoutes from './route/college.route.js';
 import { initCronJobs } from './services/cron.service.js';
+import voiceRoutes from './route/voice.route.js';
+import adminRoutes from './route/admin.route.js';
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -31,6 +33,10 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/colleges', collegeRoutes);
+app.use('/api/voice', voiceRoutes);
+app.use('/api/admin', adminRoutes);
+
+console.log('✅ Voice Routes mounted at /api/voice');
 
 // MongoDB Connection
 const connectDB = async () => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, GraduationCap, Clock, Wallet, CheckCircle2, User, Globe, ArrowRight } from 'lucide-react';
+import { Mail, GraduationCap, Clock, Wallet, CheckCircle2, User, Globe, ArrowRight, Star, Award, Building } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const ProfilePage = () => {
@@ -21,7 +21,6 @@ const ProfilePage = () => {
     });
 
     const [message, setMessage] = useState({ type: '', text: '' }); // { type: 'success' | 'error', text: '' }
-
     const API_BASE = 'http://localhost:5000/api/user/profile';
 
     useEffect(() => {
@@ -43,6 +42,9 @@ const ProfilePage = () => {
                     canAffordCoaching: parsedUser.canAffordCoaching || false,
                     openToAbroad: parsedUser.openToAbroad || false,
                 });
+
+
+
                 setLoading(false);
             } catch (err) {
                 navigate('/login');
@@ -142,7 +144,7 @@ const ProfilePage = () => {
                     </div>
 
                     <div
-                        onClick={() => navigate('/review')}
+                        onClick={() => navigate('/WriteReview/')}
                         style={{
                             padding: '12px 24px',
                             borderRadius: '50px',
@@ -160,7 +162,7 @@ const ProfilePage = () => {
                         onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
                         onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
                     >
-                        Write a Review <ArrowRight size={16} />
+                        Write Review <ArrowRight size={16} />
                     </div>
                 </div>
 
@@ -183,7 +185,7 @@ const ProfilePage = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleUpdate} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '32px' }}>
+                <form onSubmit={handleUpdate} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '32px', background: 'rgba(0,0,0,0.2)', padding: '32px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
 
                     {/* Left Column: Basic Details */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

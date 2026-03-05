@@ -8,11 +8,15 @@ import {
     deleteReview,
     updateReview,
     updateComment,
-    deleteComment
+    deleteComment,
+    getTrendingTags,
+    getTopReviewers
 } from '../controller/review.controller.js';
 
 const router = express.Router();
 
+router.get('/trending', getTrendingTags);
+router.get('/top-reviewers', getTopReviewers);
 router.get('/', getAllReviews);
 router.post('/', createReview);
 router.patch('/:id/upvote', updateUpvote);

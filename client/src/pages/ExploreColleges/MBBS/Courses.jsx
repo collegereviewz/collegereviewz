@@ -42,7 +42,7 @@ const Courses = ({ collegeData }) => {
     if (level === 'UG' || level === 'UNDER GRADUATE') level = 'UG PROGRAMS';
     if (level === 'PG' || level === 'POST GRADUATE') level = 'PG PROGRAMS';
     if (level === 'DIPLOMA') level = 'DIPLOMA PROGRAMS';
-    
+
     if (!acc[level]) acc[level] = [];
     acc[level].push(course);
     return acc;
@@ -79,7 +79,7 @@ const Courses = ({ collegeData }) => {
         <h2 style={{ fontSize: '18px', fontWeight: 900, marginBottom: '24px', color: '#1e293b' }}>
           Available Streams & Courses at {collegeName.split(',')[0]}
         </h2>
-        
+
         {loading ? (
           <div style={{ padding: '20px', color: '#64748b' }}>Loading courses...</div>
         ) : error && courses.length === 0 ? (
@@ -90,7 +90,7 @@ const Courses = ({ collegeData }) => {
               <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '16px', fontWeight: 600 }}>
                 {level}:
               </p>
-              
+
               <table style={{ width: '100%', borderCollapse: 'collapse', borderRadius: '8px', overflow: 'hidden' }}>
                 <thead>
                   <tr style={headerStyle}>

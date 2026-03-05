@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { MessageSquare } from 'lucide-react';
 
-const FloatingAskExperts = () => {
+const FloatingAskExperts = ({ onOpen }) => {
   return (
     <div style={{
       position: 'fixed',
@@ -17,6 +17,7 @@ const FloatingAskExperts = () => {
       {/* Icon Circle */}
       <motion.div
         whileHover={{ scale: 1.1 }}
+        onClick={onOpen}
         style={{
           width: '56px',
           height: '56px',
@@ -37,6 +38,7 @@ const FloatingAskExperts = () => {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+        onClick={onOpen}
         style={{
           padding: '14px 28px',
           borderRadius: '100px',

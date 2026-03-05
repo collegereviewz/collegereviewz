@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    phoneNumber: {
+        type: String,
+        default: ''
+    },
     openToAbroad: {
         type: Boolean,
         default: false

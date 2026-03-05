@@ -7,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_fallback_secret_key';
 export const signup = async (req, res) => {
     try {
         const {
-            fullName, email, password, openToAbroad, currentClass,
+            fullName, email, password, phoneNumber, openToAbroad, currentClass,
             annualBudget, canAffordCoaching, educationalLoanComfort, stream, age
         } = req.body;
 
@@ -22,6 +22,7 @@ export const signup = async (req, res) => {
             fullName,
             email,
             password: hashedPassword,
+            phoneNumber,
             openToAbroad,
             currentClass,
             annualBudget,

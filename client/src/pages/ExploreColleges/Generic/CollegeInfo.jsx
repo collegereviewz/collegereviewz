@@ -12,7 +12,7 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
     const name = collegeData?.name || 'College Name';
     const location = collegeData?.location || 'Location Not Available';
     const type = collegeData?.rankingInfo || 'Institution Type';
-    
+
     // We don't have this data yet, until CSV logic is added
     const established = '—';
     const averagePackage = '—';
@@ -44,20 +44,20 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
     const activeList = dynamicUpdates[updatesTab] || [];
 
     const quickFacts = [
-        { label: 'NIRF Rank',          value: rankingStr },
-        { label: 'Location',           value: location },
-        { label: 'Average Package',    value: averagePackage },
-        { label: 'Highest Package',    value: highestPackage },
-        { label: 'Entrance Exam',      value: entranceExam },
-        { label: 'Established',        value: established },
+        { label: 'NIRF Rank', value: rankingStr },
+        { label: 'Location', value: location },
+        { label: 'Average Package', value: averagePackage },
+        { label: 'Highest Package', value: highestPackage },
+        { label: 'Entrance Exam', value: entranceExam },
+        { label: 'Established', value: established },
     ];
 
     const viewDetails = [
-        { icon: <Info size={14} />,              label: 'Admission 2026', id: 'Admission 2026' },
-        { icon: <BookOpen size={14} />,          label: 'Fees Structure', id: 'Course & Fees' },
-        { icon: <Trophy size={14} />,            label: 'Rankings', id: 'Ranking and Placement' },
+        { icon: <Info size={14} />, label: 'Admission 2026', id: 'Admission 2026' },
+        { icon: <BookOpen size={14} />, label: 'Fees Structure', id: 'Course & Fees' },
+        { icon: <Trophy size={14} />, label: 'Rankings', id: 'Ranking and Placement' },
         { icon: <SlidersHorizontal size={14} />, label: 'Cutoff Trends', id: 'Cut Off' },
-        { icon: <Users size={14} />,             label: 'Placements', id: 'Ranking and Placement' },
+        { icon: <Users size={14} />, label: 'Placements', id: 'Ranking and Placement' },
     ];
 
     const whyChoose = [
@@ -67,28 +67,28 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
     ];
 
     const tableContent = [
-        { id: 'college-info',         label: 'College Info' },
-        { id: 'courses-fees',         label: 'Course & Fees' },
-        { id: 'cut-off',              label: 'Cut Off' },
-        { id: 'admission',            label: 'Admission 2026' },
-        { id: 'reviews',              label: 'Reviews' },
-        { id: 'ranking-placement',    label: 'Ranking and Placement' },
-        { id: 'result',               label: 'Result' },
-        { id: 'location',             label: 'Location' },
-        { id: 'photo-video',          label: 'Photo & Video' },
-        { id: 'scholarship',          label: 'Scholarship' },
-        { id: 'notification-upload',  label: 'Notification & Upload' },
-        { id: 'q-a',                  label: 'Q & A' },
-        { id: 'facility',             label: 'Facility' },
-        { id: 'student-life',         label: 'Student Life & Campus Culture' },
-        { id: 'contact-details',      label: 'Contact Details' }
+        { id: 'college-info', label: 'College Info' },
+        { id: 'courses-fees', label: 'Course & Fees' },
+        { id: 'cut-off', label: 'Cut Off' },
+        { id: 'admission', label: 'Admission 2026' },
+        { id: 'reviews', label: 'Reviews' },
+        { id: 'ranking-placement', label: 'Ranking and Placement' },
+        { id: 'result', label: 'Result' },
+        { id: 'location', label: 'Location' },
+        { id: 'photo-video', label: 'Photo & Video' },
+        { id: 'scholarship', label: 'Scholarship' },
+        { id: 'notification-upload', label: 'Notification & Upload' },
+        { id: 'q-a', label: 'Q & A' },
+        { id: 'facility', label: 'Facility' },
+        { id: 'student-life', label: 'Student Life & Campus Culture' },
+        { id: 'contact-details', label: 'Contact Details' }
     ];
 
     // Placeholder Tables
     const dates = [
         { event: 'Registration Date', date: '—' },
-        { event: 'Exam Date',         date: '—' },
-        { event: 'Result Date',       date: '—' },
+        { event: 'Exam Date', date: '—' },
+        { event: 'Result Date', date: '—' },
     ];
 
     const feesData = [
@@ -97,7 +97,7 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
 
     // ─── HELPERS ──────────────────────────────────────────────────────────────
     const card = { background: '#fff', borderRadius: '20px', padding: '24px', border: '1px solid #e2e8f0' };
-    const h2s  = { fontSize: '16px', fontWeight: 900, color: '#1e293b', marginBottom: '16px' };
+    const h2s = { fontSize: '16px', fontWeight: 900, color: '#1e293b', marginBottom: '16px' };
 
     const StyledTable = ({ columns, rows }) => (
         <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', marginTop: '14px' }}>
@@ -170,7 +170,7 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
                             ))}
                         </div>
                     </div>
-                    
+
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '220px', overflowY: 'auto' }} className="no-scrollbar">
                         {loadingUpdates ? (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -180,21 +180,21 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
                             </div>
                         ) : activeList.length > 0 ? (
                             activeList.map((upd, i) => (
-                                <a 
-                                    key={i} 
-                                    href={upd.link} 
-                                    target="_blank" 
+                                <a
+                                    key={i}
+                                    href={upd.link}
+                                    target="_blank"
                                     rel="noopener noreferrer"
-                                    style={{ 
+                                    style={{
                                         textDecoration: 'none',
-                                        background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)', 
-                                        borderRadius: '12px', 
-                                        padding: '12px', 
-                                        display: 'flex', 
+                                        background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)',
+                                        borderRadius: '12px',
+                                        padding: '12px',
+                                        display: 'flex',
                                         flexDirection: 'column',
                                         gap: '4px',
                                         border: '1px solid #e2e8f0',
-                                        transition: 'transform 0.2s' 
+                                        transition: 'transform 0.2s'
                                     }}
                                     onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
                                     onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
@@ -285,7 +285,7 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
 
                 {/* LEFT: Sticky Sidebar (TOC + Banner) */}
                 <div style={{ position: 'sticky', top: '80px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    
+
                     {/* Table of Contents */}
                     <div style={{ ...card, padding: '16px' }}>
                         <h3 style={{ fontSize: '13px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>Table Content</h3>

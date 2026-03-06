@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, GraduationCap, Clock, Wallet, CheckCircle2, User, Globe, ArrowRight } from 'lucide-react';
+import { Mail, GraduationCap, Clock, Wallet, CheckCircle2, User, Globe, ArrowRight, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const ProfilePage = () => {
@@ -15,6 +15,7 @@ const ProfilePage = () => {
         stream: 'Science',
         currentClass: '12th',
         budget: '',
+        phoneNumber: '',
         educationalLoanComfort: 'Medium',
         canAffordCoaching: false,
         openToAbroad: false,
@@ -39,6 +40,7 @@ const ProfilePage = () => {
                     stream: parsedUser.stream || 'Science',
                     currentClass: parsedUser.currentClass || '12th',
                     budget: parsedUser.annualBudget || '',
+                    phoneNumber: parsedUser.phoneNumber || '',
                     educationalLoanComfort: parsedUser.educationalLoanComfort || 'Medium',
                     canAffordCoaching: parsedUser.canAffordCoaching || false,
                     openToAbroad: parsedUser.openToAbroad || false,
@@ -116,7 +118,7 @@ const ProfilePage = () => {
     });
 
     return (
-        <div style={{ background: '#0f172a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '120px 20px 40px' }}>
+        <div style={{ background: '#0f172a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '120px 20px 60px' }}>
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -128,17 +130,17 @@ const ProfilePage = () => {
                     border: '1px solid rgba(255, 255, 255, 0.08)',
                     borderRadius: '24px',
                     width: '100%',
-                    maxWidth: '900px',
-                    padding: '40px',
+                    maxWidth: '800px',
+                    padding: '24px 32px',
                     boxShadow: '0 24px 60px rgba(0,0,0,0.4)',
                 }}
             >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
                     <div>
-                        <h1 style={{ margin: '0 0 8px 0', fontSize: '28px', fontWeight: 900, color: '#fff', letterSpacing: '-0.5px' }}>
+                        <h1 style={{ margin: '0 0 4px 0', fontSize: '24px', fontWeight: 900, color: '#fff', letterSpacing: '-0.5px' }}>
                             Student Profile
                         </h1>
-                        <p style={{ margin: 0, color: '#94a3b8', fontSize: '15px' }}>Manage your details to get personalized college recommendations.</p>
+                        <p style={{ margin: 0, color: '#94a3b8', fontSize: '13px' }}>Manage your details to get personalized college recommendations.</p>
                     </div>
 
                     <div
@@ -149,7 +151,7 @@ const ProfilePage = () => {
                             background: 'linear-gradient(135deg, #5b51d8, #38bdf8)',
                             color: '#fff',
                             fontWeight: 800,
-                            fontSize: '14px',
+                            fontSize: '13px',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
@@ -183,11 +185,11 @@ const ProfilePage = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleUpdate} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '32px' }}>
+                <form onSubmit={handleUpdate} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '24px' }}>
 
                     {/* Left Column: Basic Details */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                        <h3 style={{ margin: '0 0 8px', fontSize: '16px', color: '#e2e8f0', fontWeight: 700, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>Personal Info</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <h3 style={{ margin: '0 0 4px', fontSize: '15px', color: '#e2e8f0', fontWeight: 700, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '6px' }}>Personal Info</h3>
 
                         <div>
                             <label style={labelStyle}>Full Name</label>
@@ -202,6 +204,14 @@ const ProfilePage = () => {
                             <div style={{ position: 'relative' }}>
                                 <Mail size={18} color="#64748b" style={{ position: 'absolute', left: '14px', top: '14px' }} />
                                 <input type="email" value={user?.email || ''} disabled style={{ ...inputStyle, paddingLeft: '44px', opacity: 0.6, cursor: 'not-allowed' }} />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label style={labelStyle}>Phone Number</label>
+                            <div style={{ position: 'relative' }}>
+                                <Sparkles size={18} color="#64748b" style={{ position: 'absolute', left: '14px', top: '14px' }} />
+                                <input type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} required style={{ ...inputStyle, paddingLeft: '44px' }} placeholder="+91 9876543210" />
                             </div>
                         </div>
 
@@ -239,8 +249,8 @@ const ProfilePage = () => {
                     </div>
 
                     {/* Right Column: Preferences */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                        <h3 style={{ margin: '0 0 8px', fontSize: '16px', color: '#e2e8f0', fontWeight: 700, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>Preferences & Details</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <h3 style={{ margin: '0 0 4px', fontSize: '15px', color: '#e2e8f0', fontWeight: 700, borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '6px' }}>Preferences & Details</h3>
 
                         <div>
                             <label style={labelStyle}>Annual College Budget (in ₹ Lakhs)</label>

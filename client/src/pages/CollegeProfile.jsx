@@ -15,7 +15,7 @@ const CollegeProfile = () => {
     const [activeTab, setActiveTab] = useState('College Info');
 
     const tabs = [
-        'College Info', 'Course & Fees', 'Cut Off', 'Admission 2026', 
+        'College Info', 'Course & Fees', 'Cut Off', 'Admission', 
         'Reviews', 'Ranking and Placement', 'Result', 'Location'
     ];
 
@@ -72,7 +72,7 @@ const CollegeProfile = () => {
                         </div>
                         <div>
                             <h1 style={{ fontSize: '32px', fontWeight: 900, marginBottom: '8px', letterSpacing: '-0.5px' }}>
-                                {collegeName || 'IIT Bombay'} - Indian Institute of Technology - Fees, Admissions, Placements, Rankings, Cutoff
+                                {collegeName || 'IIT Bombay'} - Indian Institute of Technology - Fees, Admission, Placements, Rankings, Cutoff
                             </h1>
                             <div style={{ display: 'flex', gap: '16px', fontSize: '14px', fontWeight: 600, opacity: 0.9 }}>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><MapPin size={16} /> Powai, Mumbai</span>
@@ -249,7 +249,7 @@ const CollegeProfile = () => {
                                 <h3 style={{ fontSize: '18px', fontWeight: 900, marginBottom: '16px' }}>View Details</h3>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     {[
-                                        { icon: <Info size={14} />, label: 'Admission 2026' },
+                                        { icon: <Info size={14} />, label: 'Admission' },
                                         { icon: <BookOpen size={14} />, label: 'Fees Structure' },
                                         { icon: <Trophy size={14} />, label: 'Rankings' },
                                         { icon: <SlidersHorizontal size={14} />, label: 'Cutoff Trends' },
@@ -267,7 +267,7 @@ const CollegeProfile = () => {
 
                     {/* Admission Dates and Table */}
                     <div style={{ background: '#fff', borderRadius: '20px', padding: '32px', border: '1px solid #e2e8f0' }}>
-                        <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#1e293b', marginBottom: '24px' }}>IIT Bombay Admission 2026 Dates</h2>
+                        <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#1e293b', marginBottom: '24px' }}>IIT Bombay Admission Dates</h2>
                         <p style={{ fontSize: '14px', lineHeight: 1.6, color: '#64748b', marginBottom: '20px' }}>
                             IIT Bombay also offers M.Tech and MSc as other popular programs. Admission to these programs is based on national-level entrance exams, including IIT JAM and GATE. Here are the important dates of the admission process conducted by IIT Bombay:
                         </p>
@@ -301,7 +301,7 @@ const CollegeProfile = () => {
 
                     {/* Fees Structure Table */}
                     <div style={{ background: '#fff', borderRadius: '20px', padding: '32px', border: '1px solid #e2e8f0' }}>
-                        <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#1e293b', marginBottom: '24px' }}>IIT Bombay Fees 2026</h2>
+                        <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#1e293b', marginBottom: '24px' }}>IIT Bombay Admission</h2>
                         <p style={{ fontSize: '14px', lineHeight: 1.6, color: '#64748b', marginBottom: '20px' }}>
                             IIT Bombay offers B.Tech with a total fee of ₹ 8,82,500. The details for <span style={{ color: '#5b51d8', fontWeight: 700 }}>IIT Bombay Courses & Fees</span> are mentioned in the table below:
                         </p>
@@ -358,10 +358,10 @@ const CollegeProfile = () => {
                         <h3 style={{ fontSize: '18px', fontWeight: 900, marginBottom: '16px' }}>Table Content</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             {[
-                                'IIT Bombay Admission 2026 Dates',
-                                'IIT Bombay Fees 2026',
+                                'IIT Bombay Admission Dates',
+                                'IIT Bombay Fees',
                                 'IIT Bombay Ranking',
-                                'IIT Bombay Admission 2026',
+                                'IIT Bombay Admission',
                                 'IIT Bombay Cutoff',
                                 'IIT Bombay Placement'
                             ].map((item, i) => (

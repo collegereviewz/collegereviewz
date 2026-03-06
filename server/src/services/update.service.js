@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import College from '../models/College.model.js';
+import { extractCollegeInfo } from './gemini.service.js';
 
 /**
  * Heuristic to guess official website domain from college name
@@ -65,11 +66,11 @@ export const guessDomain = (name) => {
 /**
  * Scraping logic for news/notifications/events
  */
-export const scrapeUpdates = async (domain) => {
+export const scrapeUpdates = async (domain, collegeName = '') => {
     try {
         const url = domain.startsWith('http') ? domain : `https://${domain}`;
         const { data } = await axios.get(url, {
-            timeout: 10000,
+            timeout: 15000,
             headers: { 'User-Agent': 'Mozilla/5.0' }
         });
         const $ = cheerio.load(data);
@@ -79,6 +80,7 @@ export const scrapeUpdates = async (domain) => {
             news: [],
             events: [],
             fees: null,
+            courses: [],
             avgPackage: null,
             highestPackage: null,
             lastUpdated: new Date()
@@ -86,17 +88,19 @@ export const scrapeUpdates = async (domain) => {
 
         const pageText = $('body').text().replace(/\s+/g, ' ');
 
-        // Basic Regex for Fees (look for "fees", "tuition" followed by numbers/currency)
-        const feeMatch = pageText.match(/(?:fees|tuition|total fee|fee structure)[^0-9]*₹?\s*([0-9,]{4,7})/i);
-        if (feeMatch) updates.fees = `₹${feeMatch[1]}`;
+        // Use AI if collegeName is provided to better parse fees and other info
+        if (collegeName) {
+            console.log(`Using Gemini to extract info for ${collegeName}...`);
+            const aiData = await extractCollegeInfo(collegeName, pageText);
+            if (aiData) {
+                if (aiData.fees) updates.fees = aiData.fees;
+                if (aiData.courses) updates.courses = aiData.courses;
+                if (aiData.avgPackage) updates.avgPackage = aiData.avgPackage;
+                if (aiData.highestPackage) updates.highestPackage = aiData.highestPackage;
+            }
+        }
 
-        // Basic Regex for Placement (look for "average package", "highest package")
-        const avgPkgMatch = pageText.match(/(?:average package|avg pkg|placement average)[^0-9]*₹?\s*([0-9,]{5,8})/i);
-        if (avgPkgMatch) updates.avgPackage = `₹${avgPkgMatch[1]}`;
-
-        const highPkgMatch = pageText.match(/(?:highest package|highest pkg|max placement)[^0-9]*₹?\s*([0-9,]{5,9})/i);
-        if (highPkgMatch) updates.highestPackage = `₹${highPkgMatch[1]}`;
-
+        // Fallback or additional Scraping for basic links (always useful)
         $('a').each((i, el) => {
             const text = $(el).text().trim();
             const href = $(el).attr('href');
@@ -136,22 +140,56 @@ export const scrapeUpdates = async (domain) => {
  * Update a specific college by ID
  */
 export const updateCollegeData = async (collegeId) => {
-    const college = await College.findById(collegeId);
-    if (!college) return null;
+    try {
+        const college = await College.findById(collegeId);
+        if (!college) return null;
 
-    let domain = college.officialWebsite || guessDomain(college.name);
-    if (!domain) return null;
+        let domain = college.officialWebsite || guessDomain(college.name);
+        if (!domain) {
+            // Even without domain, we can try Gemini "research"
+            console.log(`No domain found for ${college.name}, trying Gemini research direct...`);
+            const aiData = await extractCollegeInfo(college.name);
+            if (aiData) {
+                if (aiData.fees) college.fees = aiData.fees;
+                if (aiData.courses && aiData.courses.length > 0) college.courses = aiData.courses;
+                if (aiData.avgPackage) college.avgPackage = aiData.avgPackage;
+                if (aiData.highestPackage) college.highestPackage = aiData.highestPackage;
+                college.updates = { ...college.updates, lastUpdated: new Date() };
+                await college.save();
+                return college.updates;
+            }
+            return null;
+        }
 
-    if (!college.officialWebsite) college.officialWebsite = domain;
+        if (!college.officialWebsite) college.officialWebsite = domain;
 
-    const scrapedData = await scrapeUpdates(domain);
-    if (scrapedData) {
-        college.updates = scrapedData;
-        if (scrapedData.fees) college.fees = scrapedData.fees;
-        if (scrapedData.avgPackage) college.avgPackage = scrapedData.avgPackage;
-        if (scrapedData.highestPackage) college.highestPackage = scrapedData.highestPackage;
+        const scrapedData = await scrapeUpdates(domain, college.name);
+
+        if (scrapedData) {
+            college.updates = scrapedData;
+            if (scrapedData.fees) college.fees = scrapedData.fees;
+            if (scrapedData.courses && scrapedData.courses.length > 0) college.courses = scrapedData.courses;
+            if (scrapedData.avgPackage) college.avgPackage = scrapedData.avgPackage;
+            if (scrapedData.highestPackage) college.highestPackage = scrapedData.highestPackage;
+        }
+
+        // AGGRESSIVE FALLBACK: If fees are still missing or too simple after scraping, do direct AI research
+        if (!college.fees || college.fees.length < 3 || college.fees === "Check Website") {
+            console.log(`Fees missing/poor for ${college.name} after scraping. Triggering deep Gemini research...`);
+            const aiData = await extractCollegeInfo(college.name);
+            if (aiData) {
+                if (aiData.fees) college.fees = aiData.fees;
+                if (aiData.courses && aiData.courses.length > 0) college.courses = aiData.courses;
+                if (aiData.avgPackage) college.avgPackage = aiData.avgPackage;
+                if (aiData.highestPackage) college.highestPackage = aiData.highestPackage;
+            }
+        }
+
+        college.updates.lastUpdated = new Date();
         await college.save();
-        return scrapedData;
+        return college.updates;
+    } catch (err) {
+        console.error(`Update Error for ${collegeId}:`, err.message);
+        return null;
     }
-    return null;
 };

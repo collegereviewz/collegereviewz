@@ -9,16 +9,17 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
     const collegeId = collegeData?._id || collegeData?.data?._id;
     // collegeData comes from ExploreColleges when "View Details" or Name is clicked.
     // We default to it, but fallback if not perfectly formed.
+    // Map data from collegeData
     const name = collegeData?.name || 'College Name';
     const location = collegeData?.location || 'Location Not Available';
     const type = collegeData?.rankingInfo || 'Institution Type';
     
-    // We don't have this data yet, until CSV logic is added
-    const established = '—';
-    const averagePackage = '—';
-    const highestPackage = '—';
-    const entranceExam = '—';
-    const rankingStr = '—';
+    // We get these from the grouped collegeData
+    const established = collegeData?.establishedYear || '—';
+    const averagePackage = collegeData?.placement || collegeData?.avgPackage || '—';
+    const highestPackage = collegeData?.highestPackage || '—';
+    const entranceExam = collegeData?.entranceExam || '—';
+    const rankingStr = collegeData?.rankingInfo || '—';
 
     // ─── DYNAMIC UPDATES LOGIC ──────────────────────────────────────────────
     const [dynamicUpdates, setDynamicUpdates] = useState({ notifications: [], news: [], events: [] });
@@ -27,10 +28,10 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
 
     useEffect(() => {
         const fetchUpdates = async () => {
-            if (!collegeData?._id) return;
+            if (!collegeId) return;
             try {
                 setLoadingUpdates(true);
-                const response = await axios.get(`http://localhost:5000/api/colleges/${collegeData._id}/updates`);
+                const response = await axios.get(`http://localhost:5000/api/colleges/${collegeId}/updates`);
                 setDynamicUpdates(response.data);
             } catch (error) {
                 console.error('Error fetching dynamic updates:', error);
@@ -39,7 +40,7 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
             }
         };
         fetchUpdates();
-    }, [collegeData?._id]);
+    }, [collegeId]);
 
     const activeList = dynamicUpdates[updatesTab] || [];
 
@@ -50,10 +51,10 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
         { label: 'Highest Package',    value: highestPackage },
         { label: 'Entrance Exam',      value: entranceExam },
         { label: 'Established',        value: established },
-    ];
+    ].filter(f => f.value && f.value !== '—');
 
     const viewDetails = [
-        { icon: <Info size={14} />,              label: 'Admission 2026', id: 'Admission 2026' },
+        { icon: <Info size={14} />,              label: 'Admission', id: 'Admission' },
         { icon: <BookOpen size={14} />,          label: 'Fees Structure', id: 'Course & Fees' },
         { icon: <Trophy size={14} />,            label: 'Rankings', id: 'Ranking and Placement' },
         { icon: <SlidersHorizontal size={14} />, label: 'Cutoff Trends', id: 'Cut Off' },
@@ -62,38 +63,31 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
 
     const whyChoose = [
         `Learn more about ${name}`,
-        'Placements and ROI statistics coming soon',
-        'Top recruiter details to be updated',
+        averagePackage !== '—' ? `Excellent placements with an average package of ${averagePackage}` : 'Placements and ROI statistics coming soon',
+        highestPackage !== '—' ? `Highest package reaches up to ${highestPackage}` : 'Top recruiter details to be updated',
     ];
+
+    // Map fees from courses array
+    const feesData = collegeData?.courses?.length > 0 
+        ? collegeData.courses.map(c => ({ course: c.course, firstYear: c.fees || '—', total: c.fees || '—' }))
+        : [];
+
+    const hasFees = feesData.length > 0;
+    const hasPlacement = averagePackage !== '—' || highestPackage !== '—';
 
     const tableContent = [
-        { id: 'college-info',         label: 'College Info' },
-        { id: 'courses-fees',         label: 'Course & Fees' },
-        { id: 'cut-off',              label: 'Cut Off' },
-        { id: 'admission',            label: 'Admission 2026' },
-        { id: 'reviews',              label: 'Reviews' },
-        { id: 'ranking-placement',    label: 'Ranking and Placement' },
-        { id: 'result',               label: 'Result' },
-        { id: 'location',             label: 'Location' },
-        { id: 'photo-video',          label: 'Photo & Video' },
-        { id: 'scholarship',          label: 'Scholarship' },
-        { id: 'notification-upload',  label: 'Notification & Upload' },
-        { id: 'q-a',                  label: 'Q & A' },
-        { id: 'facility',             label: 'Facility' },
-        { id: 'student-life',         label: 'Student Life & Campus Culture' },
-        { id: 'contact-details',      label: 'Contact Details' }
-    ];
-
-    // Placeholder Tables
-    const dates = [
-        { event: 'Registration Date', date: '—' },
-        { event: 'Exam Date',         date: '—' },
-        { event: 'Result Date',       date: '—' },
-    ];
-
-    const feesData = [
-        { course: '—', firstYear: '—', total: '—' },
-    ];
+        { id: 'college-info',         label: 'College Info', show: true },
+        { id: 'courses-fees',         label: 'Course & Fees', show: hasFees },
+        { id: 'cut-off',              label: 'Cut Off', show: false }, // Hidden for now
+        { id: 'admission',            label: 'Admission', show: true }, // Enabled now
+        { id: 'reviews',              label: 'Reviews', show: true },
+        { id: 'ranking-placement',    label: 'Ranking and Placement', show: hasPlacement },
+        { id: 'result',               label: 'Result', show: false },
+        { id: 'location',             label: 'Location', show: true },
+        { id: 'photo-video',          label: 'Photo & Video', show: false },
+        { id: 'scholarship',          label: 'Scholarship', show: false },
+        { id: 'contact-details',      label: 'Contact Details', show: true }
+    ].filter(item => item.show);
 
     // ─── HELPERS ──────────────────────────────────────────────────────────────
     const card = { background: '#fff', borderRadius: '20px', padding: '24px', border: '1px solid #e2e8f0' };
@@ -136,7 +130,7 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <h2 style={{ ...h2s, marginBottom: 0 }}>Latest Updates</h2>
-                            {!loadingUpdates && <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#ecfdf5', padding: '2px 8px', borderRadius: '12px', border: '1px solid #10b981' }}>
+                            {activeList.length > 0 && <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#ecfdf5', padding: '2px 8px', borderRadius: '12px', border: '1px solid #10b981' }}>
                                 <div style={{ width: '6px', height: '6px', background: '#10b981', borderRadius: '50%', animation: 'pulse 1.5s infinite' }} />
                                 <span style={{ fontSize: '9px', fontWeight: 800, color: '#047857' }}>LIVE</span>
                             </div>}
@@ -208,7 +202,7 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
                             ))
                         ) : (
                             <div style={{ padding: '20px', textAlign: 'center', color: '#94a3b8', fontSize: '12px' }}>
-                                No recent {updatesTab} found for {name}.
+                                Visit official website for latest updates.
                             </div>
                         )}
                     </div>
@@ -231,9 +225,17 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
                 <div style={card}>
                     <h3 style={h2s}>View Details</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        {viewDetails.map((item, i) => (
+                        {viewDetails.filter(item => {
+                            if (item.label === 'Fees Structure') return hasFees;
+                            if (item.label === 'Placements') return hasPlacement;
+                            if (item.label === 'Rankings') return rankingStr !== '—';
+                            return false; // Hide others for now
+                        }).map((item, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 10px', borderRadius: '8px', cursor: 'pointer', transition: 'background 0.2s' }}
-                                onClick={() => onTabChange(item.id)}
+                                onClick={() => {
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    setTimeout(() => onTabChange(item.id), 200);
+                                }}
                                 onMouseEnter={e => e.currentTarget.style.background = '#f1f5f9'}
                                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                                 <span style={{ color: '#5b51d8' }}>{item.icon}</span>
@@ -251,7 +253,7 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
                 <div style={card}>
                     <h3 style={h2s}>Overview</h3>
                     <p style={{ fontSize: '13px', lineHeight: 1.9, color: '#475569', textAlign: 'left' }}>
-                        {name} is located in <strong>{location}</strong>. It is recognized as {type}. Detailed overview and admission descriptions will be updated here based on CSV data.
+                        {name} is located in <strong>{location}</strong>. It is recognized as {type}. Detailed overview and admission descriptions will be updated here based on the latest data.
                     </p>
                 </div>
 
@@ -305,8 +307,8 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
 
                     {/* Comparison Banner in Sidebar */}
                     <div style={{ background: 'linear-gradient(135deg, #1e1b4b, #5b51d8)', borderRadius: '20px', padding: '24px', color: '#fff', textAlign: 'center' }}>
-                        <h4 style={{ fontSize: '14px', fontWeight: 800, marginBottom: '10px' }}>Want to Compare with Other Colleges?</h4>
-                        <p style={{ fontSize: '11px', opacity: 0.8, marginBottom: '16px', lineHeight: 1.5 }}>Get a detailed comparison based on fees, placements, and infrastructure.</p>
+                        <h4 style={{ fontSize: '14px', fontWeight: 800, marginBottom: '10px' }}>Want to Compare?</h4>
+                        <p style={{ fontSize: '11px', opacity: 0.8, marginBottom: '16px', lineHeight: 1.5 }}>Get a detailed comparison based on fees and placements.</p>
                         <button
                             style={{ width: '100%', padding: '8px', background: '#fff', color: '#5b51d8', borderRadius: '10px', border: 'none', fontWeight: 800, cursor: 'pointer', fontSize: '12px', transition: 'transform 0.2s' }}
                             onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.04)'}
@@ -323,33 +325,17 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
                     <div id="college-info" style={{ ...card, padding: '28px' }}>
                         <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{name} College Info</h2>
                         <p style={{ fontSize: '13px', lineHeight: 1.9, color: '#475569' }}>
-                            Comprehensive college info spanning history, departments, and vision will be available soon.
+                            Comprehensive college info spanning history, departments, and vision.
                         </p>
                     </div>
 
                     {/* 2. Course & Fees */}
-                    <div id="courses-fees" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{name} Course & Fees</h2>
-                        <StyledTable columns={['Course', '1st Year Fee', 'Total Fee']} rows={feesData.map(r => [r.course, r.firstYear, r.total])} />
-                    </div>
-
-                    {/* 3. Cut Off */}
-                    <div id="cut-off" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{name} Cut Off</h2>
-                        <StyledTable
-                            columns={['Branch', 'Category', 'Opening Rank', 'Closing Rank']}
-                            rows={[
-                                ['—', '—', '—', '—'],
-                            ]}
-                        />
-                    </div>
-
-                    {/* 4. Admission 2026 */}
-                    <div id="admission" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{name} Admission 2026</h2>
-                        <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#1e293b' }}>Important Dates</h3>
-                        <StyledTable columns={['Events', 'Dates']} rows={dates.map(r => [r.event, r.date])} />
-                    </div>
+                    {hasFees && (
+                        <div id="courses-fees" style={{ ...card, padding: '28px' }}>
+                            <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{name} Course & Fees</h2>
+                            <StyledTable columns={['Course', 'Intake', 'Fee']} rows={collegeData.courses.map(r => [r.course, r.intake || '—', r.fees || '—'])} />
+                        </div>
+                    )}
 
                     {/* 5. Reviews */}
                     <div id="reviews" style={{ ...card, padding: '28px' }}>
@@ -357,25 +343,18 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
                     </div>
 
                     {/* 6. Ranking and Placement */}
-                    <div id="ranking-placement" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{name} Ranking & Placement</h2>
-                        <StyledTable
-                            columns={['Metric', 'Detail']}
-                            rows={[
-                                ['NIRF Ranking', '—'],
-                                ['Average Package', '—'],
-                                ['Highest Package', '—'],
-                            ]}
-                        />
-                    </div>
-
-                    {/* 7. Result */}
-                    <div id="result" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{name} Result</h2>
-                        <p style={{ fontSize: '13px', lineHeight: 1.9, color: '#475569' }}>
-                            Latest semester results and academic performance statistics.
-                        </p>
-                    </div>
+                    {hasPlacement && (
+                        <div id="ranking-placement" style={{ ...card, padding: '28px' }}>
+                            <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{name} Ranking & Placement</h2>
+                            <StyledTable
+                                columns={['Metric', 'Detail']}
+                                rows={[
+                                    ['Average Package', averagePackage],
+                                    ['Highest Package', highestPackage],
+                                ].filter(r => r[1] !== '—')}
+                            />
+                        </div>
+                    )}
 
                     {/* 8. Location */}
                     <div id="location" style={{ ...card, padding: '28px' }}>
@@ -385,59 +364,11 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
                         </p>
                     </div>
 
-                    {/* 9. Photo & Video */}
-                    <div id="photo-video" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{name} Photo & Video</h2>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100px', background: '#f8fafc', borderRadius: '12px', color: '#94a3b8', fontSize: '13px', fontWeight: 600 }}>
-                            Media Gallery Loading...
-                        </div>
-                    </div>
-
-                    {/* 10. Scholarship */}
-                    <div id="scholarship" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{name} Scholarship</h2>
-                        <p style={{ fontSize: '13px', lineHeight: 1.9, color: '#475569' }}>
-                            Information regarding state, central, and merit-based scholarships will be updated here.
-                        </p>
-                    </div>
-
-                    {/* 11. Notification & Upload */}
-                    <div id="notification-upload" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>Notification & Upload</h2>
-                        <p style={{ fontSize: '13px', lineHeight: 1.9, color: '#475569' }}>
-                            Important circulars and document upload protocols.
-                        </p>
-                    </div>
-
-                    {/* 12. Q & A */}
-                    <div id="q-a" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>Q & A</h2>
-                        <p style={{ fontSize: '13px', lineHeight: 1.9, color: '#475569' }}>
-                            Frequently asked questions by prospective students.
-                        </p>
-                    </div>
-
-                    {/* 13. Facility */}
-                    <div id="facility" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{name} Facility</h2>
-                        <p style={{ fontSize: '13px', lineHeight: 1.9, color: '#475569' }}>
-                            Details about libraries, labs, hostels, and sports complexes.
-                        </p>
-                    </div>
-
-                    {/* 14. Student Life & Campus Culture */}
-                    <div id="student-life" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>Student Life & Campus Culture</h2>
-                        <p style={{ fontSize: '13px', lineHeight: 1.9, color: '#475569' }}>
-                            Clubs, fests, and extracurricular activities.
-                        </p>
-                    </div>
-
                     {/* 15. Contact Details */}
                     <div id="contact-details" style={{ ...card, padding: '28px' }}>
                         <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>Contact Details</h2>
                         <p style={{ fontSize: '13px', lineHeight: 1.9, color: '#475569' }}>
-                            Official website, phone numbers, and admissions desk email coming soon.
+                            Official website: <a href={collegeData.officialWebsite} target="_blank" rel="noopener noreferrer">{collegeData.officialWebsite || 'Check Website'}</a>
                         </p>
                     </div>
 

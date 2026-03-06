@@ -12,16 +12,16 @@ import engineeringColleges from '../../data/engineeringColleges';
 
 // Map: exact college name → route path for individual detail pages
 const COLLEGE_ROUTES = {
-  'IIT BOMBAY - INDIAN INSTITUTE OF TECHNOLOGY - [IITB]':           '/ExploreColleges/BE-BTech/IIT-Bombay',
-  'IIT DELHI - INDIAN INSTITUTE OF TECHNOLOGY [IITD], NEW DELHI':  '/ExploreColleges/BE-BTech/IIT-Delhi',
+  'IIT BOMBAY - INDIAN INSTITUTE OF TECHNOLOGY - [IITB]': '/ExploreColleges/BE-BTech/IIT-Bombay',
+  'IIT DELHI - INDIAN INSTITUTE OF TECHNOLOGY [IITD], NEW DELHI': '/ExploreColleges/BE-BTech/IIT-Delhi',
   'IIT MADRAS - INDIAN INSTITUTE OF TECHNOLOGY - [IITM], CHENNAI': '/ExploreColleges/BE-BTech/IIT-Madras',
-  'IIT KANPUR - INDIAN INSTITUTE OF TECHNOLOGY - [IITK], KANPUR':  '/ExploreColleges/BE-BTech/IIT-Kanpur',
+  'IIT KANPUR - INDIAN INSTITUTE OF TECHNOLOGY - [IITK], KANPUR': '/ExploreColleges/BE-BTech/IIT-Kanpur',
   'IIT KHARAGPUR - INDIAN INSTITUTE OF TECHNOLOGY - [IITKGP], KHARAGPUR': '/ExploreColleges/BE-BTech/IIT-Kharagpur',
   'IIT ROORKEE - INDIAN INSTITUTE OF TECHNOLOGY - [IITR], ROORKEE': '/ExploreColleges/BE-BTech/IIT-Roorkee',
   'NIT TRICHY - NATIONAL INSTITUTE OF TECHNOLOGY - [NITT], TIRUCHIRAPPALLI': '/ExploreColleges/BE-BTech/NIT-Trichy',
   'BITS PILANI - BIRLA INSTITUTE OF TECHNOLOGY AND SCIENCE, PILANI': '/ExploreColleges/BE-BTech/BITS-Pilani',
-  'VIT VELLORE - VELLORE INSTITUTE OF TECHNOLOGY':                  '/ExploreColleges/BE-BTech/VIT-Vellore',
-  'SRM INSTITUTE OF SCIENCE AND TECHNOLOGY, KATTANKULATHUR':        '/ExploreColleges/BE-BTech/SRM-Chennai',
+  'VIT VELLORE - VELLORE INSTITUTE OF TECHNOLOGY': '/ExploreColleges/BE-BTech/VIT-Vellore',
+  'SRM INSTITUTE OF SCIENCE AND TECHNOLOGY, KATTANKULATHUR': '/ExploreColleges/BE-BTech/SRM-Chennai',
 };
 
 function getCollegeRoute(name) {
@@ -37,7 +37,7 @@ const ExploreColleges = () => {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const tabsRef = useRef(null);
-  
+
   const [canScrollFilterLeft, setCanScrollFilterLeft] = useState(false);
   const [canScrollFilterRight, setCanScrollFilterRight] = useState(true);
   const filtersRef = useRef(null);
@@ -60,12 +60,12 @@ const ExploreColleges = () => {
   ];
 
   const INDIAN_STATES = [
-    "All", "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", 
-    "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli", "Daman and Diu", "Delhi", 
-    "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", "Jharkhand", 
-    "Karnataka", "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", "Maharashtra", 
-    "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Puducherry", "Punjab", 
-    "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", 
+    "All", "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar",
+    "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli", "Daman and Diu", "Delhi",
+    "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", "Jharkhand",
+    "Karnataka", "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", "Maharashtra",
+    "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Puducherry", "Punjab",
+    "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh",
     "Uttarakhand", "West Bengal"
   ];
 
@@ -154,17 +154,64 @@ const ExploreColleges = () => {
         if (isMounted) {
           if (data.success) {
             // Map the data to the format ExploreColleges expects natively
-             const mapped = data.data.map(col => ({
+            const mapped = data.data.map(col => {
+              // Determine fee display: Prioritize the 'fees' field if it's a descriptive string (from Gemini)
+              let displayFees = "Check Website";
+
+              const cleanFee = (str) => {
+                if (!str) return null;
+                const s = str.toString().trim();
+
+                // If it already looks like a formatted range or has units, keep it but clean currency
+                if (s.toLowerCase().includes('lakh') || s.toLowerCase().includes('cr') || s.includes('-')) {
+                  return s.replace('₹', '').trim();
+                }
+
+                const num = parseFloat(s.replace(/[^0-9.]/g, ''));
+                if (!isNaN(num) && num > 0) {
+                  if (num < 100) {
+                    // It's likely already in Lakhs (e.g. 3.5), just missing unit
+                    return `${num}- ${num} Lakh`;
+                  } else if (num >= 10000000) {
+                    const cr = (num / 10000000).toFixed(2);
+                    return `${cr}- ${cr} Cr`;
+                  } else if (num >= 10000) {
+                    const lakh = (num / 100000).toFixed(2);
+                    return `${lakh}- ${lakh} Lakh`;
+                  }
+                  return `₹${num.toLocaleString('en-IN')}`;
+                }
+                return s;
+              };
+
+              if (col.fees) {
+                displayFees = cleanFee(col.fees);
+              } else if (col.courses && col.courses.length > 0) {
+                const validFees = col.courses
+                  .map(c => parseInt(c.fees?.replace(/[^0-9]/g, '') || '0'))
+                  .filter(f => f > 0);
+                if (validFees.length > 0) {
+                  const min = Math.min(...validFees);
+                  if (min < 100) displayFees = `${min}- ${min} Lakh`;
+                  else displayFees = `₹${min.toLocaleString('en-IN')}`;
+                }
+              }
+
+              return {
                 id: col._id,
                 name: col.name,
                 location: `${col.district || ''}, ${col.state || ''}`.replace(/^, | , $/g, ''),
-                fees: col.fees || "Check Website",
+                fees: displayFees,
                 placement: col.avgPackage || "Check Website",
-                highestPackage: col.highestPackage || (col.avgPackage ? `₹${(parseInt(col.avgPackage.replace(/[^0-9]/g, '') || '0') * 1.5).toLocaleString('en-IN')}` : "Check Website"),
+                highestPackage: col.highestPackage || (col.avgPackage ? `₹${(parseInt(col.avgPackage.replace(/[^0-9]/g, '') || '0') * 1.5).toLocaleString('en-IN')}` : null),
                 rankingInfo: col.institutionType || "AICTE Approved",
                 rating: col.rating || 0,
-                reviews: col.reviewsCount || 0
-             }));
+                reviewsCount: col.reviewsCount || 0,
+                courses: col.courses || [],
+                establishedYear: col.establishedYear || "—",
+                managementType: col.managementType || "Private"
+              };
+            });
             setDisplayedColleges(mapped);
             setTotalPages(data.totalPages || 1);
             setTotalColleges(data.totalColleges || 0);
@@ -229,7 +276,7 @@ const ExploreColleges = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', position: 'relative' }}>
             {/* Left Scroll Arrow for Tabs */}
             {canScrollLeft && (
-              <button 
+              <button
                 onClick={() => tabsRef.current?.scrollBy({ left: -200, behavior: 'smooth' })}
                 style={{
                   width: '36px', height: '36px', background: '#fff',
@@ -242,37 +289,37 @@ const ExploreColleges = () => {
               </button>
             )}
 
-             <div ref={tabsRef} style={{ display: 'flex', gap: '16px', overflowX: 'auto', flex: 1, padding: '4px 0' }} className="no-scrollbar">
-                {streams.map((s) => (
-                  <button
-                    key={s.name}
-                    onClick={() => { setSelectedStream(s.name); setCurrentPage(1); }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '10px 24px',
-                      borderRadius: '50px',
-                      whiteSpace: 'nowrap',
-                      background: selectedStream === s.name ? 'linear-gradient(135deg, #5b51d8, #38bdf8)' : '#fff',
-                      color: selectedStream === s.name ? '#fff' : '#1e293b',
-                      fontSize: '14px',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                      border: 'none',
-                      boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-                      transition: 'all 0.3s ease'
-                    }}
-                  >
-                    {s.icon}
-                    {s.name}
-                  </button>
-                ))}
-             </div>
+            <div ref={tabsRef} style={{ display: 'flex', gap: '16px', overflowX: 'auto', flex: 1, padding: '4px 0' }} className="no-scrollbar">
+              {streams.map((s) => (
+                <button
+                  key={s.name}
+                  onClick={() => { setSelectedStream(s.name); setCurrentPage(1); }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 24px',
+                    borderRadius: '50px',
+                    whiteSpace: 'nowrap',
+                    background: selectedStream === s.name ? 'linear-gradient(135deg, #5b51d8, #38bdf8)' : '#fff',
+                    color: selectedStream === s.name ? '#fff' : '#1e293b',
+                    fontSize: '14px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    border: 'none',
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  {s.icon}
+                  {s.name}
+                </button>
+              ))}
+            </div>
 
-             {/* Right Scroll Arrow for Tabs */}
-             {canScrollRight && (
-              <button 
+            {/* Right Scroll Arrow for Tabs */}
+            {canScrollRight && (
+              <button
                 onClick={() => tabsRef.current?.scrollBy({ left: 200, behavior: 'smooth' })}
                 style={{
                   width: '36px', height: '36px', background: '#fff',
@@ -283,7 +330,7 @@ const ExploreColleges = () => {
               >
                 <ChevronRight size={18} color="#64748b" />
               </button>
-             )}
+            )}
           </div>
 
           {/* Filter Bar */}
@@ -304,22 +351,22 @@ const ExploreColleges = () => {
 
             {/* Left Scroll Arrow for Filters */}
             {canScrollFilterLeft && (
-                <button 
-                  onClick={() => filtersRef.current?.scrollBy({ left: -200, behavior: 'smooth' })}
-                  style={{
-                    width: '32px', height: '32px', background: '#cbd5e1', color: '#fff',
-                    border: 'none', borderRadius: '50px', display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', cursor: 'pointer', flexShrink: 0
-                  }}
-                >
-                  <ChevronLeft size={16} />
-                </button>
+              <button
+                onClick={() => filtersRef.current?.scrollBy({ left: -200, behavior: 'smooth' })}
+                style={{
+                  width: '32px', height: '32px', background: '#cbd5e1', color: '#fff',
+                  border: 'none', borderRadius: '50px', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', cursor: 'pointer', flexShrink: 0
+                }}
+              >
+                <ChevronLeft size={16} />
+              </button>
             )}
 
             <div ref={filtersRef} className="no-scrollbar" style={{ display: 'flex', flex: 1, gap: '12px', overflowX: 'auto', scrollBehavior: 'smooth' }}>
               {filters.map((f, i) => (
-                <div 
-                  key={i} 
+                <div
+                  key={i}
                   onClick={() => setOpenFilter(openFilter === f.label ? null : f.label)}
                   style={{
                     flexShrink: 0, minWidth: '150px', background: '#f8fafc', border: '1px solid #e2e8f0',
@@ -332,7 +379,7 @@ const ExploreColleges = () => {
                     {f.label === 'State' && selectedState !== 'All' ? selectedState : f.label}
                   </span>
                   <ChevronDown size={14} color="#64748b" style={{ flexShrink: 0, marginLeft: '8px' }} />
-                  
+
                   {/* Dropdown for State */}
                   <AnimatePresence>
                     {openFilter === f.label && f.label === 'State' && (
@@ -349,11 +396,11 @@ const ExploreColleges = () => {
                         className="no-scrollbar"
                       >
                         {f.options.map((opt, idx) => (
-                          <div 
+                          <div
                             key={idx}
-                            onClick={(e) => { 
-                              e.stopPropagation(); 
-                              setSelectedState(opt); 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedState(opt);
                               setOpenFilter(null);
                               setCurrentPage(1);
                             }}
@@ -379,16 +426,16 @@ const ExploreColleges = () => {
 
             {/* Right Scroll Arrow for Filters */}
             {canScrollFilterRight && (
-                <button 
-                  onClick={() => filtersRef.current?.scrollBy({ left: 200, behavior: 'smooth' })}
-                  style={{
-                    width: '32px', height: '32px', background: '#cbd5e1', color: '#fff',
-                    border: 'none', borderRadius: '50px', display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', cursor: 'pointer', flexShrink: 0
-                  }}
-                >
-                  <ArrowRight size={16} />
-                </button>
+              <button
+                onClick={() => filtersRef.current?.scrollBy({ left: 200, behavior: 'smooth' })}
+                style={{
+                  width: '32px', height: '32px', background: '#cbd5e1', color: '#fff',
+                  border: 'none', borderRadius: '50px', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', cursor: 'pointer', flexShrink: 0
+                }}
+              >
+                <ArrowRight size={16} />
+              </button>
             )}
 
             <div style={{ width: '1px', height: '24px', background: '#e2e8f0', margin: '0 4px', flexShrink: 0 }} />
@@ -400,8 +447,8 @@ const ExploreColleges = () => {
               flexShrink: 0, minWidth: '240px', transition: 'all 0.2s ease'
             }}>
               <Search size={18} color="#64748b" />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Search College Name or Location..."
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
@@ -411,7 +458,7 @@ const ExploreColleges = () => {
                 }}
               />
               {searchTerm && (
-                <button 
+                <button
                   onClick={() => setSearchTerm('')}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
                 >
@@ -426,24 +473,24 @@ const ExploreColleges = () => {
 
 
       <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 32px' }}>
-        
+
         {/* Count and Sort Section */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', padding: '0 8px', marginTop: '20px' }}>
           <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a' }}>
             Found {totalColleges} {selectedStream === 'All' ? '' : selectedStream} Colleges
           </h2>
-          
+
           <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
             <span style={{ fontSize: '14px', fontWeight: 900, color: '#0f172a' }}>Sort</span>
             <div style={{ display: 'flex', gap: '20px' }}>
               {['Popularity', 'Highest Fees', 'Lowest Fees', 'Ranking'].map((s) => (
                 <label key={s} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                  <input 
-                    type="radio" 
-                    name="sort" 
-                    checked={sortBy === s} 
+                  <input
+                    type="radio"
+                    name="sort"
+                    checked={sortBy === s}
                     onChange={() => setSortBy(s)}
-                    style={{ accentColor: '#5b51d8', width: '16px', height: '16px' }} 
+                    style={{ accentColor: '#5b51d8', width: '16px', height: '16px' }}
                   />
                   <span style={{ fontSize: '13px', fontWeight: 700, color: '#64748b' }}>{s}</span>
                 </label>
@@ -454,162 +501,162 @@ const ExploreColleges = () => {
 
         {/* Data Table */}
         <div style={{ overflow: 'hidden', marginBottom: '60px', background: '#fff' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                <thead>
-                    <tr style={{ background: 'linear-gradient(135deg, #5b51d8, #38bdf8)', color: '#fff' }}>
-                        <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', borderRight: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>CD Rank</th>
-                        <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', borderRight: '1px solid rgba(255,255,255,0.1)' }}>Colleges</th>
-                        <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', borderRight: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>Fees Structure</th>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ background: 'linear-gradient(135deg, #5b51d8, #38bdf8)', color: '#fff' }}>
+                <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', borderRight: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>CD Rank</th>
+                <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', borderRight: '1px solid rgba(255,255,255,0.1)' }}>Colleges</th>
+                <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', borderRight: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>Fees Structure</th>
+                {selectedStream === 'MBBS' ? (
+                  <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', borderRight: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>Clinical Exposure</th>
+                ) : (
+                  <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', borderRight: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>Placement</th>
+                )}
+                <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', borderRight: '1px solid rgba(255,255,255,0.1)' }}>User Review</th>
+                {selectedStream === 'MBBS' ? (
+                  <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', textAlign: 'center' }}>Institution Type & Ranking</th>
+                ) : (
+                  <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', textAlign: 'center' }}>Ranking</th>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr><td colSpan="6" style={{ padding: '80px', textAlign: 'center', fontSize: '18px', fontWeight: 800, color: '#64748b' }}>Loading colleges from database...</td></tr>
+              ) : displayedColleges.map((col, idx) => {
+                const rankNum = (currentPage - 1) * itemsPerPage + idx + 1;
+
+                return (
+                  <React.Fragment key={idx}>
+                    <tr style={{ transition: 'background 0.2s ease' }}>
+                      {/* CD RANK */}
+                      <td style={{ padding: '24px 20px 10px', fontSize: '14px', fontWeight: 700, color: '#334155', verticalAlign: 'top', borderRight: '1px solid rgba(0,0,0,0.1)', textAlign: 'center' }}>#{rankNum}</td>
+
+                      {/* COLLEGES */}
+                      <td style={{ padding: '24px 20px 10px', borderRight: '1px solid rgba(0,0,0,0.1)' }}>
+                        <div style={{ display: 'flex', gap: '15px' }}>
+                          <div style={{ width: '45px', height: '45px', borderRadius: '8px', border: '1px solid #e2e8f0', padding: '4px', background: '#fff', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                            <CollegeLogo collegeName={col.name} style={{ maxWidth: '100%', maxHeight: '100%' }} />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <h4 onClick={() => {
+                              const route = getCollegeRoute(col.name);
+                              if (route) navigate(route);
+                              else navigate(`/college/${encodeURIComponent(col.name)}`, { state: { collegeData: col } });
+                            }}
+                              style={{ fontSize: '15px', fontWeight: 800, color: '#5b51d8', marginBottom: '4px', cursor: 'pointer', lineHeight: 1.4, textTransform: 'uppercase' }}>
+                              {col.name}
+                            </h4>
+                            <p style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, marginBottom: '14px' }}>
+                              {col.location} | Estd: {col.establishedYear} | {col.managementType} | AICTE, UGC Approved
+                            </p>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button style={{ padding: '7px 14px', background: '#5b51d8', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><ArrowRight size={13} /> Apply</button>
+                              <button style={{ padding: '7px 14px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Download size={13} /> Brochure</button>
+                              <button style={{ padding: '7px 14px', background: '#fff', color: '#5b51d8', border: '1px solid #5b51d8', borderRadius: '4px', fontSize: '11px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Heart size={13} /> Save</button>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* FEES STRUCTURE */}
+                      <td style={{ padding: '24px 20px 10px', verticalAlign: 'top', borderRight: '1px solid rgba(0,0,0,0.1)', textAlign: 'center' }}>
+                        <div style={{ fontSize: '15px', fontWeight: 900, color: '#10b981', marginBottom: '4px' }}>{col.fees}</div>
+                        <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, marginBottom: '12px', lineHeight: 1.4 }}>
+                          {selectedStream} - Total Fees
+                        </div>
+                        <button style={{ padding: '7px 12px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', margin: '0 auto' }}>
+                          <Users size={12} color="#f59e0b" /> Compare Fees
+                        </button>
+                      </td>
+
+                      {/* PLACEMENT / CLINICAL EXPOSURE */}
+                      <td style={{ padding: '24px 20px 10px', verticalAlign: 'top', borderRight: '1px solid rgba(0,0,0,0.1)', textAlign: 'center' }}>
                         {selectedStream === 'MBBS' ? (
-                            <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', borderRight: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>Clinical Exposure</th>
+                          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
+                            <div style={{ fontSize: '14px', fontWeight: 900, color: '#10b981', marginBottom: '4px' }}>Excellent</div>
+                            <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>Clinical Exposure</div>
+                          </div>
                         ) : (
-                            <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', borderRight: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>Placement</th>
+                          <>
+                            <div style={{ marginBottom: '10px' }}>
+                              <div style={{ fontSize: '14px', fontWeight: 900, color: '#10b981' }}>{col.placement}</div>
+                              <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>Average Package</div>
+                            </div>
+                            <div style={{ marginBottom: '12px' }}>
+                              <div style={{ fontSize: '14px', fontWeight: 900, color: '#10b981' }}>{col.highestPackage}</div>
+                              <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>Highest Package</div>
+                            </div>
+                            <button style={{ padding: '7px 12px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', margin: '0 auto' }}>
+                              <FlaskConical size={12} color="#5b51d8" /> Compare Placement
+                            </button>
+                          </>
                         )}
-                        <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', borderRight: '1px solid rgba(255,255,255,0.1)' }}>User Review</th>
-                        {selectedStream === 'MBBS' ? (
-                            <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', textAlign: 'center' }}>Institution Type & Ranking</th>
-                        ) : (
-                            <th style={{ padding: '18px 20px', fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', textAlign: 'center' }}>Ranking</th>
-                        )}
+                      </td>
+
+                      {/* USER REVIEW */}
+                      <td style={{ padding: '24px 20px 10px', verticalAlign: 'top', borderRight: '1px solid rgba(0,0,0,0.1)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                          <Star size={24} fill="#f59e0b" color="#f59e0b" />
+                          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2' }}>
+                            <span style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b' }}>
+                              {Number(col.rating).toFixed(1)}
+                            </span>
+                            <span style={{ color: '#64748b', fontWeight: 700, fontSize: '12px' }}>
+                              ({col.reviewsCount} Reviews)
+                            </span>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <button
+                            onClick={() => {
+                              const route = getCollegeRoute(col.name);
+                              if (route) navigate(route, { state: { activeTab: 'Reviews' } });
+                              else navigate(`/college/${encodeURIComponent(col.name)}`, { state: { collegeData: col, activeTab: 'Reviews' } });
+                            }}
+                            style={{ padding: '6px 0', width: '100px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer' }}
+                          >
+                            Read Review
+                          </button>
+                          <button
+                            onClick={() => {
+                              const route = getCollegeRoute(col.name);
+                              if (route) navigate(route, { state: { activeTab: 'Reviews', openWriteReview: true } });
+                              else navigate(`/college/${encodeURIComponent(col.name)}`, { state: { collegeData: col, activeTab: 'Reviews', openWriteReview: true } });
+                            }}
+                            style={{ padding: '6px 0', width: '100px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer' }}
+                          >
+                            Write Review
+                          </button>
+                        </div>
+                      </td>
+
+                      {/* RANKING OR INSTITUTION TYPE */}
+                      <td style={{ padding: '24px 20px 10px', verticalAlign: 'top', textAlign: 'center' }}>
+                        <div style={{ fontSize: '13px', fontWeight: 800, color: '#1e293b', marginBottom: '8px', lineHeight: 1.4 }}>
+                          {selectedStream === 'MBBS' ? col.institutionType || 'Medical College' : col.rankingInfo}
+                        </div>
+                        <div style={{ display: 'inline-block', background: '#fff7ed', color: '#f59e0b', fontSize: '10px', fontWeight: 800, padding: '4px 8px', borderRadius: '4px', marginBottom: '14px' }}>
+                          Best in Social Life
+                        </div>
+                        <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
+                          <button style={{ padding: '7px 12px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Award size={12} /> Scholarship</button>
+                          <button style={{ padding: '7px 12px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Landmark size={12} /> Apply for Loan</button>
+                        </div>
+                      </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {loading ? (
-                      <tr><td colSpan="6" style={{ padding: '80px', textAlign: 'center', fontSize: '18px', fontWeight: 800, color: '#64748b' }}>Loading colleges from database...</td></tr>
-                    ) : displayedColleges.map((col, idx) => {
-                      const rankNum = (currentPage - 1) * itemsPerPage + idx + 1;
-                      
-                      return (
-                        <React.Fragment key={idx}>
-                          <tr style={{ transition: 'background 0.2s ease' }}>
-                              {/* CD RANK */}
-                              <td style={{ padding: '24px 20px 10px', fontSize: '14px', fontWeight: 700, color: '#334155', verticalAlign: 'top', borderRight: '1px solid rgba(0,0,0,0.1)', textAlign: 'center' }}>#{rankNum}</td>
-                              
-                              {/* COLLEGES */}
-                              <td style={{ padding: '24px 20px 10px', borderRight: '1px solid rgba(0,0,0,0.1)' }}>
-                                  <div style={{ display: 'flex', gap: '15px' }}>
-                                      <div style={{ width: '45px', height: '45px', borderRadius: '8px', border: '1px solid #e2e8f0', padding: '4px', background: '#fff', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                                          <CollegeLogo collegeName={col.name} style={{ maxWidth: '100%', maxHeight: '100%' }} />
-                                      </div>
-                                      <div style={{ flex: 1 }}>
-                                          <h4 onClick={() => {
-                                              const route = getCollegeRoute(col.name);
-                                              if (route) navigate(route);
-                                              else navigate(`/college/${encodeURIComponent(col.name)}`, { state: { collegeData: col } });
-                                            }}
-                                            style={{ fontSize: '15px', fontWeight: 800, color: '#5b51d8', marginBottom: '4px', cursor: 'pointer', lineHeight: 1.4, textTransform: 'uppercase' }}>
-                                            {col.name}
-                                          </h4>
-                                          <p style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, marginBottom: '14px' }}>
-                                            {col.location} | Deemed to be University(Pvt) | AICTE, UGC Approved
-                                          </p>
-                                          <div style={{ display: 'flex', gap: '8px' }}>
-                                            <button style={{ padding: '7px 14px', background: '#5b51d8', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><ArrowRight size={13} /> Apply</button>
-                                            <button style={{ padding: '7px 14px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Download size={13} /> Brochure</button>
-                                            <button style={{ padding: '7px 14px', background: '#fff', color: '#5b51d8', border: '1px solid #5b51d8', borderRadius: '4px', fontSize: '11px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Heart size={13} /> Save</button>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </td>
-
-                              {/* FEES STRUCTURE */}
-                              <td style={{ padding: '24px 20px 10px', verticalAlign: 'top', borderRight: '1px solid rgba(0,0,0,0.1)', textAlign: 'center' }}>
-                                  <div style={{ fontSize: '15px', fontWeight: 900, color: '#10b981', marginBottom: '4px' }}>{col.fees}</div>
-                                  <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, marginBottom: '12px', lineHeight: 1.4 }}>
-                                    {selectedStream} - Total Fees
-                                  </div>
-                                  <button style={{ padding: '7px 12px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', margin: '0 auto' }}>
-                                    <Users size={12} color="#f59e0b" /> Compare Fees
-                                  </button>
-                              </td>
-
-                              {/* PLACEMENT / CLINICAL EXPOSURE */}
-                              <td style={{ padding: '24px 20px 10px', verticalAlign: 'top', borderRight: '1px solid rgba(0,0,0,0.1)', textAlign: 'center' }}>
-                                  {selectedStream === 'MBBS' ? (
-                                      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
-                                          <div style={{ fontSize: '14px', fontWeight: 900, color: '#10b981', marginBottom: '4px' }}>Excellent</div>
-                                          <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>Clinical Exposure</div>
-                                      </div>
-                                  ) : (
-                                      <>
-                                          <div style={{ marginBottom: '10px' }}>
-                                            <div style={{ fontSize: '14px', fontWeight: 900, color: '#10b981' }}>{col.placement}</div>
-                                            <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>Average Package</div>
-                                          </div>
-                                          <div style={{ marginBottom: '12px' }}>
-                                            <div style={{ fontSize: '14px', fontWeight: 900, color: '#10b981' }}>{col.highestPackage}</div>
-                                            <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>Highest Package</div>
-                                          </div>
-                                          <button style={{ padding: '7px 12px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', margin: '0 auto' }}>
-                                            <FlaskConical size={12} color="#5b51d8" /> Compare Placement
-                                          </button>
-                                      </>
-                                  )}
-                              </td>
-
-                              {/* USER REVIEW */}
-                              <td style={{ padding: '24px 20px 10px', verticalAlign: 'top', borderRight: '1px solid rgba(0,0,0,0.1)' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-                                      <Star size={24} fill="#f59e0b" color="#f59e0b" />
-                                      <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2' }}>
-                                          <span style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b' }}>
-                                              {Number(col.rating).toFixed(1)}
-                                          </span>
-                                          <span style={{ color: '#64748b', fontWeight: 700, fontSize: '12px' }}>
-                                              ({col.reviews} Reviews)
-                                          </span>
-                                      </div>
-                                  </div>
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                      <button 
-                                          onClick={() => {
-                                              const route = getCollegeRoute(col.name);
-                                              if (route) navigate(route, { state: { activeTab: 'Reviews' } });
-                                              else navigate(`/college/${encodeURIComponent(col.name)}`, { state: { collegeData: col, activeTab: 'Reviews' } });
-                                          }}
-                                          style={{ padding: '6px 0', width: '100px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer' }}
-                                      >
-                                          Read Review
-                                      </button>
-                                      <button 
-                                          onClick={() => {
-                                              const route = getCollegeRoute(col.name);
-                                              if (route) navigate(route, { state: { activeTab: 'Reviews', openWriteReview: true } });
-                                              else navigate(`/college/${encodeURIComponent(col.name)}`, { state: { collegeData: col, activeTab: 'Reviews', openWriteReview: true } });
-                                          }}
-                                          style={{ padding: '6px 0', width: '100px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer' }}
-                                      >
-                                          Write Review
-                                      </button>
-                                  </div>
-                              </td>
-
-                              {/* RANKING OR INSTITUTION TYPE */}
-                              <td style={{ padding: '24px 20px 10px', verticalAlign: 'top', textAlign: 'center' }}>
-                                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#1e293b', marginBottom: '8px', lineHeight: 1.4 }}>
-                                      {selectedStream === 'MBBS' ? col.institutionType || 'Medical College' : col.rankingInfo}
-                                  </div>
-                                  <div style={{ display: 'inline-block', background: '#fff7ed', color: '#f59e0b', fontSize: '10px', fontWeight: 800, padding: '4px 8px', borderRadius: '4px', marginBottom: '14px' }}>
-                                    Best in Social Life
-                                  </div>
-                                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
-                                    <button style={{ padding: '7px 12px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Award size={12} /> Scholarship</button>
-                                    <button style={{ padding: '7px 12px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Landmark size={12} /> Apply for Loan</button>
-                                  </div>
-                              </td>
-                          </tr>
-                          {/* THE "ONE LINE" UNDER THE BOX */}
-                          <tr key={`${idx}-footer`} style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
-                            <td colSpan="6" style={{ padding: '0 20px 0px' }}>
-                               {/* Internal line removed */}
-                            </td>
-                          </tr>
-                        </React.Fragment>
-                      );
-                    })
-                  }
-                </tbody>
-            </table>
+                    {/* THE "ONE LINE" UNDER THE BOX */}
+                    <tr key={`${idx}-footer`} style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
+                      <td colSpan="6" style={{ padding: '0 20px 0px' }}>
+                        {/* Internal line removed */}
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                );
+              })
+              }
+            </tbody>
+          </table>
         </div>
 
         {/* Pagination Section */}
@@ -631,8 +678,8 @@ const ExploreColleges = () => {
               transition: 'all 0.2s ease',
               opacity: currentPage === 1 ? 0.6 : 1
             }}
-            onMouseEnter={e => { if (currentPage !== 1) { e.currentTarget.style.background = 'linear-gradient(135deg, #5b51d8, #38bdf8)'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'transparent'; }}}
-            onMouseLeave={e => { if (currentPage !== 1) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#5b51d8'; e.currentTarget.style.borderColor = '#5b51d8'; }}}
+            onMouseEnter={e => { if (currentPage !== 1) { e.currentTarget.style.background = 'linear-gradient(135deg, #5b51d8, #38bdf8)'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'transparent'; } }}
+            onMouseLeave={e => { if (currentPage !== 1) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#5b51d8'; e.currentTarget.style.borderColor = '#5b51d8'; } }}
           >
             <ChevronLeft size={16} /> Previous
           </button>
@@ -668,8 +715,8 @@ const ExploreColleges = () => {
               transition: 'all 0.2s ease',
               opacity: displayedColleges.length < itemsPerPage ? 0.6 : 1
             }}
-            onMouseEnter={e => { if (displayedColleges.length >= itemsPerPage) { e.currentTarget.style.background = 'linear-gradient(135deg, #5b51d8, #38bdf8)'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'transparent'; }}}
-            onMouseLeave={e => { if (displayedColleges.length >= itemsPerPage) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#5b51d8'; e.currentTarget.style.borderColor = '#5b51d8'; }}}
+            onMouseEnter={e => { if (displayedColleges.length >= itemsPerPage) { e.currentTarget.style.background = 'linear-gradient(135deg, #5b51d8, #38bdf8)'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'transparent'; } }}
+            onMouseLeave={e => { if (displayedColleges.length >= itemsPerPage) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#5b51d8'; e.currentTarget.style.borderColor = '#5b51d8'; } }}
           >
             Next <ChevronRight size={16} />
           </button>

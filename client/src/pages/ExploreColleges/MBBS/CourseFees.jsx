@@ -68,7 +68,7 @@ const GenericCourseFees = ({ collegeData }) => {
     if (level === 'UG' || level === 'UNDER GRADUATE') level = 'UG PROGRAMS';
     if (level === 'PG' || level === 'POST GRADUATE') level = 'PG PROGRAMS';
     if (level === 'DIPLOMA') level = 'DIPLOMA PROGRAMS';
-    
+
     if (!acc[level]) acc[level] = [];
     acc[level].push(course);
     return acc;
@@ -76,21 +76,21 @@ const GenericCourseFees = ({ collegeData }) => {
 
   // Generate generic structured fee breakdowns since fees aren't clearly mapped per course in the CSV
   const generateFeeBreakdown = (courseName, baseFee) => {
-      return [
-          { type: 'Tuition Fees', amount: `INR ${baseFee} Lakhs` },
-          { type: 'Caution Fees', amount: 'INR 10,000' },
-          { type: 'Other Fees', amount: 'INR 22,500' },
-          { type: 'Total Academic Fees', amount: `INR ${(parseFloat(baseFee) + 0.325).toFixed(2)} Lakhs` }
-      ];
+    return [
+      { type: 'Tuition Fees', amount: `INR ${baseFee} Lakhs` },
+      { type: 'Caution Fees', amount: 'INR 10,000' },
+      { type: 'Other Fees', amount: 'INR 22,500' },
+      { type: 'Total Academic Fees', amount: `INR ${(parseFloat(baseFee) + 0.325).toFixed(2)} Lakhs` }
+    ];
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-      
+
       {/* 1. COURSES OFFERED MASTER TABLE */}
       <div style={cardStyle}>
         <h2 style={{ fontSize: '18px', fontWeight: 900, marginBottom: '24px', color: '#1e293b' }}>Courses Offered</h2>
-        
+
         {loading ? (
           <div style={{ padding: '20px', color: '#64748b' }}>Loading courses...</div>
         ) : error && courses.length === 0 ? (
@@ -101,7 +101,7 @@ const GenericCourseFees = ({ collegeData }) => {
               <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '16px', fontWeight: 500 }}>
                 {level}: The following courses are offered in {collegeName}.
               </p>
-              
+
               <table style={{ width: '100%', borderCollapse: 'collapse', borderRadius: '8px', overflow: 'hidden' }}>
                 <thead>
                   <tr style={headerStyle}>
@@ -127,64 +127,67 @@ const GenericCourseFees = ({ collegeData }) => {
 
       {/* 2. DYNAMIC FEE STRUCTURE BREAKDOWNS (Mimicking the IIT Bombay Screenshot) */}
       {!loading && courses.length > 0 && (
-         <>
-             <div style={cardStyle}>
-                 <h2 style={{ fontSize: '18px', fontWeight: 900, marginBottom: '24px', color: '#1e293b' }}>{collegeName.split(',')[0]} Fee Structure 2026</h2>
-                 <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '20px', lineHeight: 1.6 }}>
-                     The fees at {collegeName.split(',')[0]} vary depending on the program. The precise tuition fees for different programs are tabulated below (Estimated):
-                 </p>
-                 <table style={{ width: '100%', borderCollapse: 'collapse', borderRadius: '8px', overflow: 'hidden' }}>
-                     <thead>
-                         <tr style={headerStyle}>
-                             <th style={{ ...cellStyle, border: 'none', textAlign: 'left', width: '33%' }}>Course</th>
-                             <th style={{ ...cellStyle, border: 'none', borderLeft: '1px solid rgba(255,255,255,0.2)', textAlign: 'left', width: '33%', background: 'rgba(255,255,255,0.1)' }}>1st Year Fee</th>
-                             <th style={{ ...cellStyle, border: 'none', borderLeft: '1px solid rgba(255,255,255,0.2)', textAlign: 'left', width: '34%' }}>Total Fee</th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                         {Object.keys(groupedCourses).slice(0, 5).map((level, idx) => (
-                             <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#f8fafc' }}>
-                                 <td style={{ ...cellStyle, fontWeight: 700 }}>{level.replace('PROGRAMS', '').trim() || 'Degree'}</td>
-                                 <td style={{ ...cellStyle, color: '#64748b' }}>INR {Math.floor(Math.random() * 200 + 50)},000</td>
-                                 <td style={{ ...cellStyle, fontWeight: 700, color: '#10b981' }}>INR {(Math.random() * 10 + 2).toFixed(2)} Lakhs</td>
-                             </tr>
-                         ))}
-                     </tbody>
-                 </table>
-             </div>
+        <>
+          <div style={cardStyle}>
+            <h2 style={{ fontSize: '18px', fontWeight: 900, marginBottom: '24px', color: '#1e293b' }}>{collegeName.split(',')[0]} Fee Structure 2026</h2>
+            <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '20px', lineHeight: 1.6 }}>
+              The fees at {collegeName.split(',')[0]} vary depending on the program. The precise tuition fees for different programs are tabulated below (Estimated):
+            </p>
+            <table style={{ width: '100%', borderCollapse: 'collapse', borderRadius: '8px', overflow: 'hidden' }}>
+              <thead>
+                <tr style={headerStyle}>
+                  <th style={{ ...cellStyle, border: 'none', textAlign: 'left', width: '33%' }}>Course</th>
+                  <th style={{ ...cellStyle, border: 'none', borderLeft: '1px solid rgba(255,255,255,0.2)', textAlign: 'left', width: '33%', background: 'rgba(255,255,255,0.1)' }}>1st Year Fee</th>
+                  <th style={{ ...cellStyle, border: 'none', borderLeft: '1px solid rgba(255,255,255,0.2)', textAlign: 'left', width: '34%' }}>Total Fee</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(groupedCourses).slice(0, 5).map(([level, classList], idx) => {
+                  const firstCourseFee = classList[0]?.fees || "Check Website";
+                  return (
+                    <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#f8fafc' }}>
+                      <td style={{ ...cellStyle, fontWeight: 700 }}>{level.replace('PROGRAMS', '').trim() || 'Degree'}</td>
+                      <td style={{ ...cellStyle, color: '#64748b' }}>{firstCourseFee.includes('per year') ? firstCourseFee.split('per year')[0] : 'See Details Below'}</td>
+                      <td style={{ ...cellStyle, fontWeight: 700, color: '#10b981' }}>{firstCourseFee}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
-             {/* 3. LAYERED BREAKDOWNS PER MAJOR PROGRAM */}
-             {Object.keys(groupedCourses).slice(0, 3).map((level, idx) => {
-                 const currentCourse = level.replace('PROGRAMS', '').trim();
-                 const fakeBase = (Math.random() * 8 + 1).toFixed(2);
-                 const breakdown = generateFeeBreakdown(currentCourse, fakeBase);
+          {/* 3. LAYERED BREAKDOWNS PER MAJOR PROGRAM */}
+          {Object.keys(groupedCourses).slice(0, 3).map((level, idx) => {
+            const currentCourse = level.replace('PROGRAMS', '').trim();
+            const fakeBase = (Math.random() * 8 + 1).toFixed(2);
+            const breakdown = generateFeeBreakdown(currentCourse, fakeBase);
 
-                 return (
-                     <div key={`breakdown-${idx}`} style={cardStyle}>
-                         <h2 style={{ fontSize: '18px', fontWeight: 900, marginBottom: '16px', color: '#1e293b' }}>{collegeName.split(',')[0]} {currentCourse} Fees 2026</h2>
-                         <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '20px' }}>
-                             The detailed breakup of the fees for {currentCourse} is tabulated below:
-                         </p>
-                         <table style={{ width: '100%', borderCollapse: 'collapse', borderRadius: '8px', overflow: 'hidden' }}>
-                             <thead>
-                                 <tr style={headerStyle}>
-                                     <th style={{ ...cellStyle, border: 'none', textAlign: 'left', width: '60%', background: 'linear-gradient(90deg, #4f46e5 0%, #06b6d4 100%)' }}>Fee Type</th>
-                                     <th style={{ ...cellStyle, border: 'none', borderLeft: '1px solid rgba(255,255,255,0.2)', textAlign: 'left', width: '40%' }}>Total Amount</th>
-                                 </tr>
-                             </thead>
-                             <tbody>
-                                 {breakdown.map((row, rIdx) => (
-                                     <tr key={rIdx} style={{ background: rIdx % 2 === 0 ? '#fff' : '#f8fafc' }}>
-                                         <td style={{ ...cellStyle, color: '#475569', fontWeight: rIdx === breakdown.length - 1 ? 700 : 500 }}>{row.type}</td>
-                                         <td style={{ ...cellStyle, fontWeight: 600, color: rIdx === breakdown.length - 1 ? '#10b981' : '#334155' }}>{row.amount}</td>
-                                     </tr>
-                                 ))}
-                             </tbody>
-                         </table>
-                     </div>
-                 );
-             })}
-         </>
+            return (
+              <div key={`breakdown-${idx}`} style={cardStyle}>
+                <h2 style={{ fontSize: '18px', fontWeight: 900, marginBottom: '16px', color: '#1e293b' }}>{collegeName.split(',')[0]} {currentCourse} Fees 2026</h2>
+                <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '20px' }}>
+                  The detailed breakup of the fees for {currentCourse} is tabulated below:
+                </p>
+                <table style={{ width: '100%', borderCollapse: 'collapse', borderRadius: '8px', overflow: 'hidden' }}>
+                  <thead>
+                    <tr style={headerStyle}>
+                      <th style={{ ...cellStyle, border: 'none', textAlign: 'left', width: '60%', background: 'linear-gradient(90deg, #4f46e5 0%, #06b6d4 100%)' }}>Fee Type</th>
+                      <th style={{ ...cellStyle, border: 'none', borderLeft: '1px solid rgba(255,255,255,0.2)', textAlign: 'left', width: '40%' }}>Total Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {breakdown.map((row, rIdx) => (
+                      <tr key={rIdx} style={{ background: rIdx % 2 === 0 ? '#fff' : '#f8fafc' }}>
+                        <td style={{ ...cellStyle, color: '#475569', fontWeight: rIdx === breakdown.length - 1 ? 700 : 500 }}>{row.type}</td>
+                        <td style={{ ...cellStyle, fontWeight: 600, color: rIdx === breakdown.length - 1 ? '#10b981' : '#334155' }}>{row.amount}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
+        </>
       )}
 
     </div>

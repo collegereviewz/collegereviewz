@@ -21,20 +21,27 @@ export const getColleges = async (req, res) => {
             query.state = { $regex: new RegExp(`^${state}$`, 'i') };
         }
 
-        // Filter by course
+        // Filter by course/stream inside the courses array
         if (course && course !== 'All' && course !== 'AICTE Approved') {
+            let courseRegex;
             if (course === 'BE/B.Tech') {
-                query.course = { $regex: /Engineering|B.E.|B.Tech/i };
+                courseRegex = /Engineering|B.E.|B.Tech/i;
             } else if (course === 'MBBS' || course === 'B.Sc (Nursing)') {
-                query.course = { $regex: /Medicine|Nursing|MBBS/i };
+                courseRegex = /Medicine|Nursing|MBBS/i;
             } else {
-                query.course = { $regex: course, $options: 'i' };
+                courseRegex = new RegExp(course, 'i');
             }
+            query.courses = { $elemMatch: { course: courseRegex } };
         }
 
         // Filter by specific program/stream drop-down
         if (stream && stream !== 'All' && stream !== '--All--') {
-            query.programme = { $regex: stream, $options: 'i' };
+            const streamMatch = { $elemMatch: { programme: new RegExp(stream, 'i') } };
+            if (query.courses) {
+                query.courses.$elemMatch.programme = new RegExp(stream, 'i');
+            } else {
+                query.courses = streamMatch;
+            }
         }
 
         const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -95,13 +102,38 @@ export const getColleges = async (req, res) => {
 export const getCollegeStats = async (req, res) => {
     try {
         const { name } = req.params;
+        const { triggerScrape = 'false' } = req.query;
 
-        const college = await College.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+        const escapedName = name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+        const college = await College.findOne({
+            $or: [
+                { name: { $regex: new RegExp(`^${escapedName}$`, 'i') } },
+                { name: { $regex: new RegExp(name.split(' - ')[0], 'i') } }
+            ]
+        });
         if (!college) {
             return res.status(404).json({ success: false, message: 'College not found' });
         }
 
-        const pipeline = [
+        // If reviewStats is missing or user requested a fresh scrape, trigger Gemini
+        if (triggerScrape === 'true' || !college.reviewStats || !college.reviewStats.external || !college.reviewStats.external.google.rating) {
+            try {
+                const { extractCollegeInfo } = await import('../services/gemini.service.js');
+                const aiData = await extractCollegeInfo(college.name);
+                if (aiData && aiData.reviewStats) {
+                    college.reviewStats = aiData.reviewStats;
+                    if (aiData.fees) college.fees = aiData.fees;
+                    if (aiData.courses) college.courses = aiData.courses;
+                    if (aiData.avgPackage) college.avgPackage = aiData.avgPackage;
+                    if (aiData.highestPackage) college.highestPackage = aiData.highestPackage;
+                    await college.save();
+                }
+            } catch (aiErr) {
+                console.error('Failed to trigger AI scrape:', aiErr.message);
+            }
+        }
+
+        const statsPipeline = [
             { $match: { collegeId: college._id } },
             {
                 $group: {
@@ -112,13 +144,14 @@ export const getCollegeStats = async (req, res) => {
             }
         ];
 
-        const stats = await Review.aggregate(pipeline);
+        const stats = await Review.aggregate(statsPipeline);
 
         res.json({
             success: true,
             data: {
                 rating: stats.length > 0 ? stats[0].averageRating : 0,
-                reviewsCount: stats.length > 0 ? stats[0].totalReviews : 0
+                reviewsCount: stats.length > 0 ? stats[0].totalReviews : 0,
+                reviewStats: college.reviewStats
             }
         });
     } catch (error) {
@@ -131,19 +164,18 @@ export const getCollegeCourses = async (req, res) => {
     try {
         const { name } = req.params;
 
-        // Find all records that exactly match this college's name
-        // This queries the database, which has already been seeded with both aicteall.csv and medicalcolleges.csv
-        const courses = await College.find({ name: { $regex: new RegExp(`^${name}$`, 'i') } })
-            .select('course levelOfCourse intake programme courseType -_id')
+        // Find the single record for this college
+        const college = await College.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } })
+            .select('courses')
             .lean();
 
-        if (!courses || courses.length === 0) {
+        if (!college || !college.courses || college.courses.length === 0) {
             return res.status(404).json({ success: false, message: 'No courses found for this college' });
         }
 
         res.json({
             success: true,
-            data: courses
+            data: college.courses
         });
     } catch (error) {
         console.error('Error fetching college courses:', error);

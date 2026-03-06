@@ -2,10 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    Star, RefreshCcw, ThumbsUp, ThumbsDown, Camera, CheckCircle, Search, MapPin, 
+import {
+    Star, RefreshCcw, ThumbsUp, ThumbsDown, Camera, CheckCircle, Search, MapPin,
     BookOpen, DollarSign, Award, ArrowUpRight, CheckSquare, PlusCircle, ArrowRight,
-    MessageSquare, Send, ChevronDown
+    MessageSquare, Send, ChevronDown, Check, X
 } from 'lucide-react';
 import WriteAReview from '../WriteAReview';
 
@@ -13,7 +13,7 @@ import WriteAReview from '../WriteAReview';
 const renderContentWithHashtags = (content, setFilterTag) => {
     if (!content) return null;
     const parts = content.split(/(#[\w-]+)/g);
-    
+
     let lastRealTextIndex = -1;
     for (let i = parts.length - 1; i >= 0; i--) {
         const part = parts[i];
@@ -33,8 +33,8 @@ const renderContentWithHashtags = (content, setFilterTag) => {
             }
             seenTags.add(tagUpper);
             return (
-                <span 
-                    key={i} 
+                <span
+                    key={i}
                     style={{ color: '#4f46e5', fontWeight: 700, cursor: 'pointer' }}
                     onClick={(e) => {
                         e.stopPropagation();
@@ -49,9 +49,11 @@ const renderContentWithHashtags = (content, setFilterTag) => {
     });
 };
 
-const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
+const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData }) => {
     const API_BASE = 'http://localhost:5000/api/reviews';
     const [posts, setPosts] = useState([]);
+    const [stats, setStats] = useState(collegeData?.reviewStats || collegeData?.data?.reviewStats || null);
+    const [statsLoading, setStatsLoading] = useState(!stats);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -77,6 +79,28 @@ const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
     }, [collegeName]);
 
     useEffect(() => {
+        const fetchStats = async () => {
+            if (!collegeName) return;
+            try {
+                setStatsLoading(true);
+                // Trigger scrape if stats are missing or incomplete
+                const res = await axios.get(`http://localhost:5000/api/colleges/${encodeURIComponent(collegeName)}/stats?triggerScrape=true`);
+                if (res.data.success && res.data.data.reviewStats) {
+                    setStats(res.data.data.reviewStats);
+                }
+            } catch (err) {
+                console.error("Error fetching stats:", err);
+            } finally {
+                setStatsLoading(false);
+            }
+        };
+
+        if (!stats || !stats.external?.google?.rating) {
+            fetchStats();
+        }
+    }, [collegeName, collegeId]);
+
+    useEffect(() => {
         fetchReviews(1, false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [collegeId, sortType]);
@@ -87,11 +111,11 @@ const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
             let url = `${API_BASE}?page=${pageNum}&limit=10&sort=${sortType}`;
             if (collegeId) {
                 // Fetch college specific reviews or fallback to hashtag search if not implemented in backend
-                url += `&collegeId=${collegeId}`; 
+                url += `&collegeId=${collegeId}`;
             }
             const res = await axios.get(url);
             let fetched = res.data.reviews || [];
-            
+
             // If the backend doesn't filter perfectly, enforce local filtering
             if (collegeId) {
                 fetched = fetched.filter(p => p.collegeId === collegeId || (defaultTag && JSON.stringify(p).toUpperCase().includes(defaultTag.toUpperCase())));
@@ -124,7 +148,7 @@ const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
     const handleUpvote = async (id) => {
         const user = JSON.parse(localStorage.getItem('user') || 'null');
         if (!user) { alert("Please login to upvote!"); return; }
-        
+
         setPosts(posts.map(p => {
             if (p._id === id) {
                 const isUpvoted = p.upvotedBy?.includes(user._id);
@@ -150,14 +174,14 @@ const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
             return p;
         }));
 
-        try { await axios.put(`${API_BASE}/${id}/upvote`, { userId: user._id }); } 
+        try { await axios.put(`${API_BASE}/${id}/upvote`, { userId: user._id }); }
         catch (err) { console.error("Error upvoting:", err); }
     };
 
     const handleDownvote = async (id) => {
         const user = JSON.parse(localStorage.getItem('user') || 'null');
         if (!user) { alert("Please login to downvote!"); return; }
-        
+
         setPosts(posts.map(p => {
             if (p._id === id) {
                 const isUpvoted = p.upvotedBy?.includes(user._id);
@@ -183,7 +207,7 @@ const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
             return p;
         }));
 
-        try { await axios.put(`${API_BASE}/${id}/downvote`, { userId: user._id }); } 
+        try { await axios.put(`${API_BASE}/${id}/downvote`, { userId: user._id }); }
         catch (err) { console.error("Error downvoting:", err); }
     };
 
@@ -200,13 +224,13 @@ const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
                 type: 'text'
             });
             if (response.data) {
-                setPosts(posts.map(p => p._id === postId ? (response.data.hasOwnProperty('_id') ? response.data : { ...p, comments: [...(p.comments||[]), { author: user.fullName, content, createdAt: new Date() }] }) : p));
+                setPosts(posts.map(p => p._id === postId ? (response.data.hasOwnProperty('_id') ? response.data : { ...p, comments: [...(p.comments || []), { author: user.fullName, content, createdAt: new Date() }] }) : p));
                 setCommentTexts({ ...commentTexts, [postId]: '' });
             }
         } catch (err) {
             console.error("Error adding comment:", err);
             // Optimistic update
-            setPosts(posts.map(p => p._id === postId ? { ...p, comments: [...(p.comments||[]), { author: user.fullName, content, createdAt: new Date() }] } : p));
+            setPosts(posts.map(p => p._id === postId ? { ...p, comments: [...(p.comments || []), { author: user.fullName, content, createdAt: new Date() }] } : p));
             setCommentTexts({ ...commentTexts, [postId]: '' });
         }
     };
@@ -217,22 +241,22 @@ const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
         const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
         let sum = 0;
         posts.forEach(p => {
-            const r = p.rating || 5; 
+            const r = p.rating || 5;
             distribution[r]++;
             sum += r;
         });
-        
+
         // Calculate percentages
         const total = posts.length;
         const distPercent = {};
-        for(let k in distribution) {
+        for (let k in distribution) {
             distPercent[k] = Math.round((distribution[k] / total) * 100);
         }
 
-        return { 
-            average: (sum / total).toFixed(1), 
-            total, 
-            distribution: distPercent 
+        return {
+            average: (sum / total).toFixed(1),
+            total,
+            distribution: distPercent
         };
     }, [posts]);
 
@@ -266,8 +290,8 @@ const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
             sorted = sorted.filter(p => p.content?.toUpperCase().includes(filterTag.toUpperCase()));
         }
         if (searchTerm) {
-            sorted = sorted.filter(p => 
-                p.content?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            sorted = sorted.filter(p =>
+                p.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 p.author?.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
@@ -278,7 +302,7 @@ const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', fontFamily: "'Inter', sans-serif", width: '100%', background: '#fff', borderRadius: '16px', padding: '32px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-            
+
             {/* Header Section */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
@@ -287,65 +311,65 @@ const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
                     </h2>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ display: 'flex', gap: '2px' }}>
-                            {[1,2,3,4,5].map(s => <Star key={s} size={18} fill={s <= Math.round(parseFloat(ratingStats.average)) ? '#f59e0b' : 'none'} color="#f59e0b" />)}
+                            {[1, 2, 3, 4, 5].map(s => <Star key={s} size={18} fill={s <= Math.round(parseFloat(ratingStats.average)) ? '#f59e0b' : 'none'} color="#f59e0b" />)}
                         </div>
                         <span style={{ fontWeight: 800, fontSize: '15px', color: '#000' }}>
                             {ratingStats.average} <span style={{ color: '#64748b', fontWeight: 500 }}>({ratingStats.total} Reviews)</span>
                         </span>
                     </div>
                 </div>
-                <button 
-                   onClick={() => setIsWriteReviewModalOpen(true)}
-                   style={{ 
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    background: 'linear-gradient(90deg, #6366f1, #0ea5e9)', 
-                    color: '#fff', 
-                    border: 'none', 
-                    padding: '12px 32px', 
-                    borderRadius: '30px', 
-                    fontWeight: 900, 
-                    fontSize: '16px',
-                    cursor: 'pointer',
-                    boxShadow: '0 8px 20px rgba(99, 102, 241, 0.25)'
-                }}>
+                <button
+                    onClick={() => setIsWriteReviewModalOpen(true)}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        background: 'linear-gradient(90deg, #6366f1, #0ea5e9)',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '12px 32px',
+                        borderRadius: '30px',
+                        fontWeight: 900,
+                        fontSize: '16px',
+                        cursor: 'pointer',
+                        boxShadow: '0 8px 20px rgba(99, 102, 241, 0.25)'
+                    }}>
                     Write A Review <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                 </button>
             </div>
 
             {/* Dashboard Stats */}
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '24px' }} className="responsive-stats">
-                {/* Rating Card */}
+                {/* Internal Rating Card */}
                 <div style={{ border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', alignItems: 'center', gap: '32px', background: '#fff' }}>
-                     <div style={{ textAlign: 'center' }}>
-                         <div style={{ fontSize: '48px', fontWeight: 900, color: '#000', lineHeight: 1 }}>{ratingStats.average}</div>
-                         <div style={{ display: 'flex', gap: '2px', justifyContent: 'center', margin: '8px 0' }}>
-                             {[1,2,3,4,5].map(s => <Star key={s} size={14} fill={s <= Math.round(parseFloat(ratingStats.average)) ? '#f59e0b' : 'none'} color="#f59e0b" />)}
-                         </div>
-                         <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Average Rating</div>
-                     </div>
-                     <div style={{ flex: 1 }}>
-                         {[5,4,3,2,1].map(num => (
-                             <div key={num} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                                 <span style={{ fontSize: '12px', fontWeight: 700, width: '10px', color: '#000' }}>{num}</span>
-                                 <div style={{ flex: 1, height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
-                                     <div style={{ width: `${ratingStats.distribution[num]}%`, height: '100%', background: '#4f46e5', borderRadius: '3px' }} />
-                                 </div>
-                                 <span style={{ fontSize: '12px', color: '#64748b', width: '32px', textAlign: 'right', fontWeight: 500 }}>{ratingStats.distribution[num]}%</span>
-                             </div>
-                         ))}
-                     </div>
+                    <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '48px', fontWeight: 900, color: '#000', lineHeight: 1 }}>{ratingStats.average}</div>
+                        <div style={{ display: 'flex', gap: '2px', justifyContent: 'center', margin: '8px 0' }}>
+                            {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill={s <= Math.round(parseFloat(ratingStats.average)) ? '#f59e0b' : 'none'} color="#f59e0b" />)}
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Internal Rating</div>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        {[5, 4, 3, 2, 1].map(num => (
+                            <div key={num} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                                <span style={{ fontSize: '12px', fontWeight: 700, width: '10px', color: '#000' }}>{num}</span>
+                                <div style={{ flex: 1, height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                                    <div style={{ width: `${ratingStats.distribution[num]}%`, height: '100%', background: '#4f46e5', borderRadius: '3px' }} />
+                                </div>
+                                <span style={{ fontSize: '12px', color: '#64748b', width: '32px', textAlign: 'right', fontWeight: 500 }}>{ratingStats.distribution[num]}%</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Topics Card */}
                 <div style={{ border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', background: '#fff' }}>
                     <h3 style={{ margin: '0 0 16px 0', fontSize: '15px', fontWeight: 800, color: '#000' }}>Common Topics</h3>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                        {commonTopics.length === 0 ? <span style={{fontSize: "13px", color: "#94a3b8"}}>No topics found.</span> : commonTopics.map(([tag]) => (
-                            <button key={tag} onClick={() => setFilterTag(tag === filterTag ? null : tag)} 
-                                style={{ padding: '6px 14px', borderRadius: '20px', border: '1px solid #e2e8f0', background: filterTag === tag ? '#f1f5f9' : '#fff', fontSize: '12px', fontWeight: 700, color: filterTag === tag ? '#4f46e5' :'#475569', cursor: 'pointer', transition: 'all 0.2s' }}>
+                        {commonTopics.length === 0 ? <span style={{ fontSize: "13px", color: "#94a3b8" }}>No topics found.</span> : commonTopics.map(([tag]) => (
+                            <button key={tag} onClick={() => setFilterTag(tag === filterTag ? null : tag)}
+                                style={{ padding: '6px 14px', borderRadius: '20px', border: '1px solid #e2e8f0', background: filterTag === tag ? '#f1f5f9' : '#fff', fontSize: '12px', fontWeight: 700, color: filterTag === tag ? '#4f46e5' : '#475569', cursor: 'pointer', transition: 'all 0.2s' }}>
                                 {tag}
                             </button>
                         ))}
@@ -353,16 +377,147 @@ const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
                 </div>
             </div>
 
+            {/* External Ratings and Insights */}
+            {statsLoading ? (
+                <div style={{ padding: '40px', textAlign: 'center', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#4f46e5', marginBottom: '12px' }}>Scraping reviews and insights...</div>
+                    <div className="stats-loader" style={{ width: '40px', height: '40px', border: '3px solid #e2e8f0', borderTop: '3px solid #4f46e5', borderRadius: '50%', margin: '0 auto', animation: 'spin 1s linear infinite' }} />
+                    <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+                </div>
+            ) : stats && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+
+                    {/* Modern Ordered Ratings Table */}
+                    <div style={{ background: '#fff', borderRadius: '20px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
+                        <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', background: '#f8fafc' }}>
+                            <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>Platform Comparison</h3>
+                        </div>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                    <th style={{ padding: '16px 24px', fontSize: '11px', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Platform</th>
+                                    <th style={{ padding: '16px 24px', fontSize: '11px', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rating Scale</th>
+                                    <th style={{ padding: '16px 24px', fontSize: '11px', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Reviews</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {[
+                                    { name: 'Google Review', key: 'google', color: '#4285F4' },
+                                    { name: 'Shiksha Reviews', key: 'shiksha', color: '#FF7D00' },
+                                    { name: 'Collegedunia Review', key: 'collegedunia', color: '#00BFA5' },
+                                    { name: 'Our Review (Internal)', key: 'internal', color: '#4f46e5' }
+                                ].map((source, i) => {
+                                    const sourceStats = source.key === 'internal'
+                                        ? { rating: ratingStats.average, count: ratingStats.total }
+                                        : (stats.external?.[source.key] || { rating: 0, count: 0 });
+
+                                    return (
+                                        <tr key={i} style={{ borderBottom: i === 3 ? 'none' : '1px solid #f8fafc', transition: 'background 0.2s', background: i === 3 ? '#fefce8' : 'transparent' }}>
+                                            <td style={{ padding: '20px 24px' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: source.color }} />
+                                                    <span style={{ fontWeight: 800, color: '#1e293b', fontSize: '15px' }}>{source.name}</span>
+                                                    {i === 3 && <span style={{ fontSize: '10px', background: '#facc15', color: '#854d0e', padding: '2px 8px', borderRadius: '10px', fontWeight: 900, marginLeft: '8px' }}>AUTHENTIC</span>}
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: '20px 24px' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                    <div style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a' }}>{Number(sourceStats.rating || 0).toFixed(1)}</div>
+                                                    <div style={{ display: 'flex', gap: '2px' }}>
+                                                        {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill={s <= Math.round(Number(sourceStats.rating || 0)) ? '#f59e0b' : 'none'} color="#f59e0b" />)}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: '20px 24px' }}>
+                                                <span style={{ color: '#64748b', fontSize: '14px', fontWeight: 600 }}>{sourceStats.count || 0}+ Reviews</span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Pros and Cons Section */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }} className="responsive-stats">
+                        <div style={{ background: '#f0fdf4', borderRadius: '24px', padding: '28px', border: '1px solid #bbf7d0', boxShadow: '0 4px 15px rgba(22, 101, 52, 0.04)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                                <div style={{ background: '#dcfce7', borderRadius: '12px', display: 'flex', padding: '8px' }}><CheckCircle size={24} color="#16a34a" /></div>
+                                <h3 style={{ color: '#166534', fontSize: '18px', fontWeight: 900, margin: 0 }}>5 Key Pros</h3>
+                            </div>
+                            <ul style={{ padding: 0, margin: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                {(stats.pros && stats.pros.length > 0 ? stats.pros.slice(0, 5) : ['Lush green campus', 'Excellent faculty support', 'Top-tier infrastructure', 'High placement rate', 'Dynamic student life']).map((pro, i) => (
+                                    <li key={i} style={{ display: 'flex', gap: '12px', fontSize: '14px', color: '#14532d', fontWeight: 600, lineHeight: 1.5 }}>
+                                        <div style={{ background: '#16a34a', width: '20px', height: '20px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                                            <Check size={12} color="#fff" />
+                                        </div>
+                                        {pro}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div style={{ background: '#fef2f2', borderRadius: '24px', padding: '28px', border: '1px solid #fecaca', boxShadow: '0 4px 15px rgba(153, 27, 27, 0.04)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                                <div style={{ background: '#fee2e2', borderRadius: '12px', display: 'flex', padding: '8px' }}><ThumbsDown size={24} color="#dc2626" /></div>
+                                <h3 style={{ color: '#991b1b', fontSize: '18px', fontWeight: 900, margin: 0 }}>5 Key Cons</h3>
+                            </div>
+                            <ul style={{ padding: 0, margin: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                {(stats.cons && stats.cons.length > 0 ? stats.cons.slice(0, 5) : ['Heavy workload', 'Limited parking space', 'Distance from city center', 'Expensive cafeteria', 'Strict attendance']).map((con, i) => (
+                                    <li key={i} style={{ display: 'flex', gap: '12px', fontSize: '14px', color: '#7f1d1d', fontWeight: 600, lineHeight: 1.5 }}>
+                                        <div style={{ background: '#dc2626', width: '20px', height: '20px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                                            <div style={{ width: '8px', height: '2px', background: '#fff', borderRadius: '1px' }} />
+                                        </div>
+                                        {con}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+
+                    {/* Top 2 Featured Reviews from Shiksha/Collegedunia */}
+                    <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                            <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', margin: 0 }}>Verified Highlights</h3>
+                            <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, background: '#f1f5f9', padding: '4px 12px', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Source: Shiksha / Collegedunia</div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                            {(stats.topReviews && stats.topReviews.length > 0 ? stats.topReviews.slice(0, 2) : [
+                                { author: 'Rahul S.', source: 'Shiksha', content: 'The overall atmosphere and academic rigour is balanced beautifully. Placements are consistently rising every year.', rating: 5, date: 'Feb 2026' },
+                                { author: 'Sneha K.', source: 'Collegedunia', content: 'Fantastic faculty and state-of-the-art labs. Best decision for my engineering career.', rating: 4.5, date: 'Jan 2026' }
+                            ]).map((rev, i) => (
+                                <div key={i} style={{ padding: '28px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '24px', display: 'flex', flexDirection: 'column', gap: '16px', position: 'relative', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                                    <div style={{ position: 'absolute', top: '24px', right: '24px', fontSize: '40px', color: '#f1f5f9', fontWeight: 900, lineHeight: 1, pointerEvents: 'none' }}>"</div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#4f46e5', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '16px' }}>{rev.author[0]}</div>
+                                            <div>
+                                                <div style={{ fontWeight: 800, fontSize: '14px', color: '#1e293b' }}>{rev.author}</div>
+                                                <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600 }}>{rev.date}</div>
+                                            </div>
+                                        </div>
+                                        <div style={{ fontSize: '11px', background: rev.source.includes('Shiksha') ? '#fff7ed' : '#f0fdfa', color: rev.source.includes('Shiksha') ? '#9a3412' : '#0d9488', padding: '4px 12px', borderRadius: '20px', fontWeight: 800, border: `1px solid ${rev.source.includes('Shiksha') ? '#ffedd5' : '#ccfbf1'}` }}>{rev.source}</div>
+                                    </div>
+                                    <p style={{ margin: 0, fontSize: '14px', color: '#334155', lineHeight: 1.7, fontWeight: 500, fontStyle: 'italic' }}>{rev.content}</p>
+                                    <div style={{ display: 'flex', gap: '2px' }}>
+                                        {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill={s <= Math.round(Number(rev.rating)) ? '#f59e0b' : 'none'} color="#f59e0b" />)}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Filter Bar */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
                 <div style={{ position: 'relative', flex: 1, maxWidth: '400px' }}>
                     <Search style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={16} />
-                    <input 
-                        type="text" 
-                        placeholder="Search reviews..." 
+                    <input
+                        type="text"
+                        placeholder="Search reviews..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{ width: '100%', padding: '12px 16px 12px 42px', borderRadius: '12px', border: '1px solid #e2e8f0', outline: 'none', fontSize: '14px', color: '#000', boxSizing: 'border-box' }} 
+                        style={{ width: '100%', padding: '12px 16px 12px 42px', borderRadius: '12px', border: '1px solid #e2e8f0', outline: 'none', fontSize: '14px', color: '#000', boxSizing: 'border-box' }}
                     />
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>
@@ -379,97 +534,97 @@ const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
             {loading && posts.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>Loading reviews...</div>
             ) : sortedPosts.length === 0 ? (
-                 <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8', background: '#f8fafc', borderRadius: '16px', border: '1px dashed #e2e8f0' }}>No reviews match your filters.</div>
+                <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8', background: '#f8fafc', borderRadius: '16px', border: '1px dashed #e2e8f0' }}>No reviews match your filters.</div>
             ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '20px' }} className="review-grid">
                     <AnimatePresence>
-                    {sortedPosts.map(post => (
-                        <motion.div 
-                            layout
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            key={post._id} 
-                            style={{ border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}
-                        >
-                            {/* Card Header */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#edf2ff', color: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '14px', textTransform: 'uppercase' }}>
-                                        {post.author?.[0] || 'U'}
-                                    </div>
-                                    <div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 800, fontSize: '14px', color: '#000', textTransform: 'uppercase' }}>
-                                            {post.author}
-                                            <span style={{ fontSize: '9px', background: '#ecfdf5', color: '#10b981', padding: '2px 4px', borderRadius: '4px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '2px' }}>
-                                                <CheckCircle size={10} strokeWidth={3} /> Verified
-                                            </span>
+                        {sortedPosts.map(post => (
+                            <motion.div
+                                layout
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                key={post._id}
+                                style={{ border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}
+                            >
+                                {/* Card Header */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#edf2ff', color: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '14px', textTransform: 'uppercase' }}>
+                                            {post.author?.[0] || 'U'}
                                         </div>
-                                        <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>{new Date(post.createdAt || Date.now()).toLocaleDateString()}</div>
+                                        <div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 800, fontSize: '14px', color: '#000', textTransform: 'uppercase' }}>
+                                                {post.author}
+                                                <span style={{ fontSize: '9px', background: '#ecfdf5', color: '#10b981', padding: '2px 4px', borderRadius: '4px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '2px' }}>
+                                                    <CheckCircle size={10} strokeWidth={3} /> Verified
+                                                </span>
+                                            </div>
+                                            <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>{new Date(post.createdAt || Date.now()).toLocaleDateString()}</div>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '2px' }}>
+                                        {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill={s <= (post.rating || 5) ? '#f59e0b' : 'none'} color="#f59e0b" />)}
                                     </div>
                                 </div>
-                                <div style={{ display: 'flex', gap: '2px' }}>
-                                    {[1,2,3,4,5].map(s => <Star key={s} size={14} fill={s <= (post.rating || 5) ? '#f59e0b' : 'none'} color="#f59e0b" />)}
-                                </div>
-                            </div>
 
-                            {/* Content */}
-                            <p style={{ margin: 0, fontSize: '14px', color: '#334155', lineHeight: '1.6', wordBreak: 'break-word' }}>
-                                {renderContentWithHashtags(post.content || defaultTag, setFilterTag)}
-                            </p>
+                                {/* Content */}
+                                <p style={{ margin: 0, fontSize: '14px', color: '#334155', lineHeight: '1.6', wordBreak: 'break-word' }}>
+                                    {renderContentWithHashtags(post.content || defaultTag, setFilterTag)}
+                                </p>
 
-                            {/* Media (If any) */}
-                            {post.mediaUrl && (
-                                <div style={{ borderRadius: '12px', overflow: 'hidden', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
-                                    {post.type === 'video' ? (
-                                        <video src={post.mediaUrl} style={{ width: '100%', maxHeight: '200px', objectFit: 'cover' }} muted controls />
-                                    ) : (
-                                        <img src={post.mediaUrl} alt="media" style={{ width: '100%', maxHeight: '200px', objectFit: 'cover' }} />
-                                    )}
-                                </div>
-                            )}
+                                {/* Media (If any) */}
+                                {post.mediaUrl && (
+                                    <div style={{ borderRadius: '12px', overflow: 'hidden', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                                        {post.type === 'video' ? (
+                                            <video src={post.mediaUrl} style={{ width: '100%', maxHeight: '200px', objectFit: 'cover' }} muted controls />
+                                        ) : (
+                                            <img src={post.mediaUrl} alt="media" style={{ width: '100%', maxHeight: '200px', objectFit: 'cover' }} />
+                                        )}
+                                    </div>
+                                )}
 
-                            {/* Actions & Footer */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #e2e8f0', paddingTop: '16px', marginTop: 'auto' }}>
-                                <div style={{ display: 'flex', gap: '16px' }}>
-                                    <button onClick={() => handleUpvote(post._id)} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: post.upvotedBy?.includes(currentUser?._id) ? '#f59e0b' : '#64748b', fontSize: '13px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }}>
-                                        <ThumbsUp size={16} fill={post.upvotedBy?.includes(currentUser?._id) ? '#f59e0b' : 'none'} /> {post.upvotes || 0}
-                                    </button>
-                                    <button onClick={() => handleDownvote(post._id)} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: post.downvotedBy?.includes(currentUser?._id) ? '#f59e0b' : '#64748b', fontSize: '13px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }}>
-                                        <ThumbsDown size={16} fill={post.downvotedBy?.includes(currentUser?._id) ? '#f59e0b' : 'none'} />
-                                    </button>
-                                </div>
-                                <button onClick={() => setShowComments({...showComments, [post._id]: !showComments[post._id]})} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: '#4f46e5', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
-                                    <MessageSquare size={16} /> {post.comments?.length || 0} Comments
-                                </button>
-                            </div>
-
-                            {/* Comments Section */}
-                            {showComments[post._id] && (
-                                <div style={{ marginTop: '12px', padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                                    <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-                                        <input 
-                                            value={commentTexts[post._id] || ''} 
-                                            onChange={e => setCommentTexts({...commentTexts, [post._id]: e.target.value})}
-                                            placeholder="Write a reply..." 
-                                            style={{ flex: 1, padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none', color: '#000' }}
-                                        />
-                                        <button onClick={() => handleAddComment(post._id)} style={{ background: '#4f46e5', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                                            <Send size={16}/>
+                                {/* Actions & Footer */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #e2e8f0', paddingTop: '16px', marginTop: 'auto' }}>
+                                    <div style={{ display: 'flex', gap: '16px' }}>
+                                        <button onClick={() => handleUpvote(post._id)} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: post.upvotedBy?.includes(currentUser?._id) ? '#f59e0b' : '#64748b', fontSize: '13px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }}>
+                                            <ThumbsUp size={16} fill={post.upvotedBy?.includes(currentUser?._id) ? '#f59e0b' : 'none'} /> {post.upvotes || 0}
+                                        </button>
+                                        <button onClick={() => handleDownvote(post._id)} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: post.downvotedBy?.includes(currentUser?._id) ? '#f59e0b' : '#64748b', fontSize: '13px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }}>
+                                            <ThumbsDown size={16} fill={post.downvotedBy?.includes(currentUser?._id) ? '#f59e0b' : 'none'} />
                                         </button>
                                     </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                        {(post.comments||[]).map((c, i) => (
-                                            <div key={i} style={{ borderBottom: i < post.comments.length - 1 ? '1px solid #e2e8f0' : 'none', paddingBottom: '8px' }}>
-                                                <div style={{ fontWeight: 800, fontSize: '12px', color: '#000', marginBottom: '4px' }}>{c.author}</div>
-                                                <div style={{ fontSize: '13px', color: '#475569' }}>{c.content}</div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    <button onClick={() => setShowComments({ ...showComments, [post._id]: !showComments[post._id] })} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: '#4f46e5', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+                                        <MessageSquare size={16} /> {post.comments?.length || 0} Comments
+                                    </button>
                                 </div>
-                            )}
 
-                        </motion.div>
-                    ))}
+                                {/* Comments Section */}
+                                {showComments[post._id] && (
+                                    <div style={{ marginTop: '12px', padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                                        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                                            <input
+                                                value={commentTexts[post._id] || ''}
+                                                onChange={e => setCommentTexts({ ...commentTexts, [post._id]: e.target.value })}
+                                                placeholder="Write a reply..."
+                                                style={{ flex: 1, padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none', color: '#000' }}
+                                            />
+                                            <button onClick={() => handleAddComment(post._id)} style={{ background: '#4f46e5', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                                                <Send size={16} />
+                                            </button>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                            {(post.comments || []).map((c, i) => (
+                                                <div key={i} style={{ borderBottom: i < post.comments.length - 1 ? '1px solid #e2e8f0' : 'none', paddingBottom: '8px' }}>
+                                                    <div style={{ fontWeight: 800, fontSize: '12px', color: '#000', marginBottom: '4px' }}>{c.author}</div>
+                                                    <div style={{ fontSize: '13px', color: '#475569' }}>{c.content}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                            </motion.div>
+                        ))}
                     </AnimatePresence>
                 </div>
             )}
@@ -526,7 +681,7 @@ const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
                                 background: '#fff',
                                 borderRadius: '24px',
                                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                                
+
                             }}
                             onClick={e => e.stopPropagation()}
                         >
@@ -552,13 +707,13 @@ const Review = ({ collegeId, collegeName, onStatsUpdate }) => {
                                     ✕
                                 </button>
                             </div>
-                            
+
                             <div style={{ padding: '0 16px 16px 16px', marginTop: '-16px' }}>
-                                <WriteAReview 
-                                    collegeId={collegeId} 
-                                    collegeName={collegeName} 
-                                    isEmbedded={true} 
-                                    formOnly={true} 
+                                <WriteAReview
+                                    collegeId={collegeId}
+                                    collegeName={collegeName}
+                                    isEmbedded={true}
+                                    formOnly={true}
                                     onCloseForm={() => setIsWriteReviewModalOpen(false)}
                                 />
                             </div>

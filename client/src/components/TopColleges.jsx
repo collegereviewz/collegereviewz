@@ -1,28 +1,52 @@
-import React, { useState } from 'react';
-import { Star, MapPin, Award, ChevronRight, BookOpen } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Star, MapPin, Award, ChevronRight, BookOpen, Loader2 } from 'lucide-react';
 import { getCollegeLogo, guessDomainByName } from '../utils/logoUtils';
-
-const colleges = [
-  { name: 'IIT Delhi', location: 'New Delhi, India', rating: 4.8, reviews: 2340, courses: 42, fees: '₹2.2L/yr', rank: '#1 Engineering', website: 'https://home.iitd.ac.in', color: '#c7001e' },
-  { name: 'AIIMS New Delhi', location: 'New Delhi, India', rating: 4.9, reviews: 3120, courses: 18, fees: '₹1.6K/yr', rank: '#1 Medical', website: 'https://www.aiims.edu', color: '#0a6fb8' },
-  { name: 'IIM Ahmedabad', location: 'Ahmedabad, Gujarat', rating: 4.7, reviews: 1890, courses: 12, fees: '₹23L/yr', rank: '#1 Management', website: 'https://www.iima.ac.in', color: '#7c3aed' },
-  { name: 'NIT Trichy', location: 'Tiruchirappalli, TN', rating: 4.6, reviews: 1450, courses: 36, fees: '₹1.5L/yr', rank: '#5 Engineering', website: 'https://www.nitt.edu', color: '#047857' },
-  { name: 'Manipal University', location: 'Manipal, Karnataka', rating: 4.5, reviews: 2800, courses: 80, fees: '₹4.5L/yr', rank: '#8 Private Univ', website: 'https://www.manipal.edu', color: '#b45309' },
-  { name: 'BITS Pilani', location: 'Pilani, Rajasthan', rating: 4.7, reviews: 2100, courses: 28, fees: '₹5.2L/yr', rank: '#3 Engineering', website: 'https://www.bits-pilani.ac.in', color: '#e11d48' },
-];
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const categories = ['All', 'Engineering', 'Medical', 'MBA', 'Law', 'Arts'];
 
 const Stars = ({ rating }) => (
   <div style={{ display: 'flex', gap: '2px' }}>
-    {[1,2,3,4,5].map(s => (
+    {[1, 2, 3, 4, 5].map(s => (
       <Star key={s} size={13} fill={s <= Math.round(rating) ? '#f59e0b' : 'transparent'} style={{ color: '#f59e0b' }} strokeWidth={2} />
     ))}
   </div>
 );
 
 const TopColleges = () => {
+  const navigate = useNavigate();
   const [active, setActive] = useState('All');
+  const [colleges, setColleges] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTopColleges = async () => {
+      try {
+        setLoading(true);
+        // Map UI categories to API course filters
+        let courseFilter = active;
+        if (active === 'Engineering') courseFilter = 'BE/B.Tech';
+        if (active === 'Medical') courseFilter = 'MBBS';
+
+        const params = {
+          limit: 12,
+          course: courseFilter === 'All' ? 'All' : courseFilter
+        };
+
+        const res = await axios.get('http://localhost:5000/api/colleges', { params });
+        if (res.data.success) {
+          setColleges(res.data.data);
+        }
+      } catch (err) {
+        console.error("Error fetching top colleges:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTopColleges();
+  }, [active]);
 
   return (
     <section style={{ padding: '72px 32px', background: '#fff' }}>
@@ -39,7 +63,7 @@ const TopColleges = () => {
             India's Best Colleges — <span style={{ color: '#38bdf8' }}>Rated by Students</span>
           </h2>
           <p style={{ color: '#64748b', fontSize: '17px', maxWidth: '520px', margin: '0 auto', lineHeight: 1.7, fontWeight: 500 }}>
-            Real ratings from verified students. Explore fees, placements, and campus life.
+            Real ratings from verified students. Explore proper fees, placements, and campus life.
           </p>
         </div>
 
@@ -63,120 +87,149 @@ const TopColleges = () => {
         </div>
 
         {/* College Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }} className="colleges-grid">
-          {colleges.map((col, i) => {
-            const logoUrl = getCollegeLogo(col.website || guessDomainByName(col.name), col.name);
-            
-            return (
-              <div
-                key={i}
-                style={{
-                  background: '#fff', borderRadius: '24px', padding: '24px 20px',
-                  border: '1.5px solid #f1f5f9', cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)', transition: 'all 0.3s ease',
-                  display: 'flex', flexDirection: 'column', gap: '16px'
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = 'translateY(-10px)';
-                  e.currentTarget.style.boxShadow = '0 32px 80px rgba(91,81,216,0.14)';
-                  e.currentTarget.style.borderColor = '#e0e7ff';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
-                  e.currentTarget.style.borderColor = '#f1f5f9';
-                }}
-              >
-                {/* Top: Rank badge + Logo */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div style={{ 
-                    width: '48px', height: '48px', borderRadius: '12px', 
-                    background: logoUrl ? '#fff' : col.color, 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                    color: '#fff', fontWeight: 900, fontSize: '12px', overflow: 'hidden',
-                    border: '1px solid #f1f5f9'
-                  }}>
-                    {logoUrl ? (
-                      <img 
-                        src={logoUrl} 
-                        alt={col.name} 
-                        style={{ width: '80%', height: '80%', objectFit: 'contain' }} 
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.parentElement.style.background = col.color;
-                          e.target.parentElement.innerHTML = col.name.split(' ').map(n => n[0]).join('');
-                        }}
-                      />
-                    ) : (
-                      col.name.split(' ').map(n => n[0]).join('')
-                    )}
-                  </div>
-                <span style={{ background: '#f0fdf4', color: '#16a34a', fontSize: '10px', fontWeight: 800, padding: '5px 10px', borderRadius: '50px', border: '1px solid #bbf7d0', letterSpacing: '0.05em' }}>
-                  {col.rank}
-                </span>
-              </div>
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '60px' }}>
+            <Loader2 className="animate-spin" size={40} color="#5b51d8" />
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }} className="colleges-grid">
+            {colleges.map((col, i) => {
+              const domain = col.officialWebsite || guessDomainByName(col.name);
+              const logoUrl = getCollegeLogo(domain, col.name);
 
-              {/* Name + Location */}
-              <div>
-                <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#111827', marginBottom: '4px', letterSpacing: '-0.3px' }}>{col.name}</h3>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#94a3b8', fontSize: '12.5px', fontWeight: 600 }}>
-                  <MapPin size={12} strokeWidth={2.5} />
-                  {col.location}
-                </div>
-              </div>
+              // Formatting Proper Fee
+              let displayFee = col.fees || "Check Website";
+              if (!col.fees && col.courses?.length > 0) {
+                const minFee = Math.min(...col.courses.map(c => parseInt(c.fees?.replace(/[^0-9]/g, '') || '0')).filter(f => f > 0));
+                if (minFee !== Infinity) displayFee = `₹${(minFee / 100000).toFixed(1)}L/yr`;
+              }
 
-              {/* Ratings */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', background: '#fafafa', borderRadius: '14px', border: '1px solid #f1f5f9' }}>
-                <Stars rating={col.rating} />
-                <span style={{ fontSize: '14px', fontWeight: 900, color: '#111827' }}>{col.rating}</span>
-                <span style={{ color: '#94a3b8', fontSize: '11.5px', fontWeight: 600 }}>({col.reviews.toLocaleString()})</span>
-              </div>
-
-              {/* Stats */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div style={{ padding: '10px 12px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#5b51d8', marginBottom: '3px' }}>
-                    <BookOpen size={12} strokeWidth={2.5} />
-                    <span style={{ fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Courses</span>
-                  </div>
-                  <div style={{ fontWeight: 900, fontSize: '16px', color: '#111827' }}>{col.courses}+</div>
-                </div>
-                <div style={{ padding: '10px 12px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#10b981', marginBottom: '3px' }}>
-                    <Award size={12} strokeWidth={2.5} />
-                    <span style={{ fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Avg. Fees</span>
-                  </div>
-                  <div style={{ fontWeight: 900, fontSize: '16px', color: '#111827' }}>{col.fees}</div>
-                </div>
-              </div>
-
-              {/* CTA */}
-              <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
-                <button style={{
-                  flex: 1, padding: '12px 6px', borderRadius: '12px',
-                  background: '#111827', color: '#fff', fontWeight: 800, fontSize: '12px',
-                  border: 'none', cursor: 'pointer', transition: 'all 0.2s ease', fontFamily: 'inherit'
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = '#5b51d8'}
-                onMouseLeave={e => e.currentTarget.style.background = '#111827'}
+              return (
+                <div
+                  key={i}
+                  style={{
+                    background: '#fff', borderRadius: '24px', padding: '24px 20px',
+                    border: '1.5px solid #f1f5f9', cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)', transition: 'all 0.3s ease',
+                    display: 'flex', flexDirection: 'column', gap: '16px'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'translateY(-10px)';
+                    e.currentTarget.style.boxShadow = '0 32px 80px rgba(91,81,216,0.14)';
+                    e.currentTarget.style.borderColor = '#e0e7ff';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
+                    e.currentTarget.style.borderColor = '#f1f5f9';
+                  }}
                 >
-                  Read Reviews
-                </button>
-                <button style={{
-                  flex: 1, padding: '12px 6px', borderRadius: '12px',
-                  background: '#f1f5f9', color: '#475569', fontWeight: 800, fontSize: '12px',
-                  border: 'none', cursor: 'pointer', transition: 'all 0.2s ease', fontFamily: 'inherit'
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = '#e2e8f0'}
-                onMouseLeave={e => e.currentTarget.style.background = '#f1f5f9'}
-                >
-                  View College
-                </button>
-              </div>
-            </div>
-            );
-          })}
-        </div>
+                  {/* Top: Rank badge + Logo */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div style={{
+                      width: '48px', height: '48px', borderRadius: '12px',
+                      background: '#fff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: '#fff', fontWeight: 900, fontSize: '12px', overflow: 'hidden',
+                      border: '1px solid #f1f5f9'
+                    }}>
+                      {logoUrl ? (
+                        <img
+                          src={logoUrl}
+                          alt={col.name}
+                          style={{ width: '80%', height: '80%', objectFit: 'contain' }}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.parentElement.style.background = '#5b51d8';
+                            e.target.parentElement.innerHTML = col.name.split(' ').map(n => n[0]).join('');
+                          }}
+                        />
+                      ) : (
+                        col.name.split(' ').map(n => n[0]).join('')
+                      )}
+                    </div>
+                    <span style={{ background: '#f0fdf4', color: '#16a34a', fontSize: '10px', fontWeight: 800, padding: '5px 10px', borderRadius: '50px', border: '1px solid #bbf7d0', letterSpacing: '0.05em' }}>
+                      #{i + 1} Best
+                    </span>
+                  </div>
+
+                  {/* Name + Location */}
+                  <div>
+                    <h3 style={{ fontSize: '16px', fontWeight: 900, color: '#111827', marginBottom: '4px', letterSpacing: '-0.3px', height: '44px', overflow: 'hidden' }}>{col.name}</h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#94a3b8', fontSize: '12px', fontWeight: 600 }}>
+                      <MapPin size={12} strokeWidth={2.5} />
+                      {col.district}, {col.state}
+                    </div>
+                  </div>
+
+                  {/* Ratings */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', background: '#fafafa', borderRadius: '14px', border: '1px solid #f1f5f9' }}>
+                    <Stars rating={col.rating || 4.5} />
+                    <span style={{ fontSize: '14px', fontWeight: 900, color: '#111827' }}>{Number(col.rating || 4.5).toFixed(1)}</span>
+                    <span style={{ color: '#94a3b8', fontSize: '11.5px', fontWeight: 600 }}>({(col.reviewsCount || 100).toLocaleString()})</span>
+                  </div>
+
+                  {/* Stats */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                      <div style={{ padding: '8px 10px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#5b51d8', marginBottom: '2px' }}>
+                          <BookOpen size={10} strokeWidth={3} />
+                          <span style={{ fontSize: '8.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Average Package</span>
+                        </div>
+                        <div style={{ fontWeight: 900, fontSize: '13px', color: '#111827' }}>{col.avgPackage || '—'}</div>
+                      </div>
+                      <div style={{ padding: '8px 10px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#10b981', marginBottom: '2px' }}>
+                          <Award size={10} strokeWidth={3} />
+                          <span style={{ fontSize: '8.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Highest Package</span>
+                        </div>
+                        <div style={{ fontWeight: 900, fontSize: '13px', color: '#111827' }}>{col.highestPackage || '—'}</div>
+                      </div>
+                    </div>
+                    <div style={{ padding: '8px 12px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#f59e0b' }}>
+                        <Award size={12} strokeWidth={2.5} />
+                        <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase' }}>Courses & Fees</span>
+                      </div>
+                      <div style={{ fontWeight: 900, fontSize: '13px', color: '#111827' }}>{displayFee}</div>
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/college/${encodeURIComponent(col.name)}`, { state: { collegeData: col, activeTab: 'Reviews' } });
+                      }}
+                      style={{
+                        flex: 1, padding: '12px 2px', borderRadius: '12px',
+                        background: '#111827', color: '#fff', fontWeight: 800, fontSize: '11px',
+                        border: 'none', cursor: 'pointer', transition: 'all 0.2s ease', fontFamily: 'inherit'
+                      }}
+                    >
+                      Read Reviews
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/college/${encodeURIComponent(col.name)}`, { state: { collegeData: col } });
+                      }}
+                      style={{
+                        flex: 1, padding: '12px 2px', borderRadius: '12px',
+                        background: '#f1f5f9', color: '#475569', fontWeight: 800, fontSize: '11px',
+                        border: 'none', cursor: 'pointer', transition: 'all 0.2s ease', fontFamily: 'inherit'
+                      }}
+                    >
+                      View College
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
       <style>{`
         @media (max-width: 1200px) { .colleges-grid { grid-template-columns: repeat(3, 1fr) !important; } }

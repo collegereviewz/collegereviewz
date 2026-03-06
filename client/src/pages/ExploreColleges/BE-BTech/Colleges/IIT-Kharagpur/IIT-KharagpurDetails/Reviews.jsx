@@ -1,12 +1,11 @@
 import React from 'react';
+import Review from '../../../../Review';
 
-const Reviews = () => {
-  return (
-    <div style={{ padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-      <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#1e293b', marginBottom: '16px' }}>Reviews</h2>
-      <p style={{ color: '#64748b', fontWeight: 500 }}>Content for Reviews will go here.</p>
-    </div>
-  );
+const Reviews = ({ collegeData }) => {
+  const collegeId = collegeData?._id || collegeData?.data?._id;
+  const name = collegeData?.name || 'College Name';
+
+  return <Review collegeId={collegeId} collegeName={name} collegeData={collegeData} />;
 };
 
 export default Reviews;

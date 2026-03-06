@@ -2,19 +2,26 @@ import mongoose from 'mongoose';
 
 const collegeSchema = new mongoose.Schema({
     state: { type: String, required: true },
-    aicteId: { type: String, required: true, unique: true },
+    aicteId: { type: String, unique: true, sparse: true },
+    aisheId: { type: String, unique: true, sparse: true },
     name: { type: String, required: true },
     address: { type: String },
     district: { type: String },
     institutionType: { type: String },
-    programme: { type: String },
     university: { type: String },
-    levelOfCourse: { type: String },
-    course: { type: String },
-    courseType: { type: String },
-    intake: { type: Number },
     officialWebsite: { type: String },
     fees: { type: String },
+    establishedYear: { type: String },
+    managementType: { type: String },
+    universityAisheCode: { type: String },
+    courses: [{
+        programme: String,
+        levelOfCourse: String,
+        course: String,
+        courseType: String,
+        intake: Number,
+        fees: String
+    }],
     avgPackage: { type: String },
     highestPackage: { type: String },
     updates: {
@@ -34,6 +41,22 @@ const collegeSchema = new mongoose.Schema({
             link: String
         }],
         lastUpdated: Date
+    },
+    reviewStats: {
+        external: {
+            google: { rating: { type: Number, default: 0 }, count: { type: Number, default: 0 } },
+            shiksha: { rating: { type: Number, default: 0 }, count: { type: Number, default: 0 } },
+            collegedunia: { rating: { type: Number, default: 0 }, count: { type: Number, default: 0 } }
+        },
+        pros: [String],
+        cons: [String],
+        topReviews: [{
+            author: String,
+            content: String,
+            rating: Number,
+            source: String,
+            date: String
+        }]
     }
 }, {
     timestamps: true

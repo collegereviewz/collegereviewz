@@ -5,7 +5,7 @@ const Reviews = ({ collegeData }) => {
     const collegeId = collegeData?._id || collegeData?.data?._id;
     const name = collegeData?.name || 'College Name';
 
-    return <Review collegeId={collegeId} collegeName={name} />;
+    return <Review collegeId={collegeId} collegeName={name} collegeData={collegeData} />;
 };
 
 export default Reviews;

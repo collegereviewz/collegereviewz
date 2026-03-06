@@ -133,7 +133,7 @@ const CollegePage = ({ college }) => {
             {/* Admission Process */}
             {college.admission && (
               <div style={{ background: '#fff', borderRadius: '16px', padding: '28px', border: '1.5px solid #e2e8f0' }}>
-                <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#1e293b', marginBottom: '16px' }}>Admission 2026</h2>
+                <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#1e293b', marginBottom: '16px' }}>Admission</h2>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {college.admission.map((a, i) => (
                     <li key={i} style={{ display: 'flex', gap: '12px', fontSize: '14px', color: '#475569', fontWeight: 600, alignItems: 'flex-start' }}>

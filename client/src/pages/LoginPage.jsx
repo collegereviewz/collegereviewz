@@ -35,7 +35,8 @@ const LoginPage = () => {
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
-                navigate('/review');
+                window.dispatchEvent(new Event('userLogin'));
+                navigate('/');
             } else {
                 alert(data.message || 'Login failed');
             }
@@ -67,7 +68,7 @@ const LoginPage = () => {
     };
 
     return (
-        <div style={{ background: colors.dark, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <div style={{ background: colors.dark, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 20px 60px' }}>
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}

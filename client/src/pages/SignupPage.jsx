@@ -10,6 +10,7 @@ const SignupPage = () => {
         fullName: '',
         email: '',
         password: '',
+        phoneNumber: '',
         age: 18,
         stream: '',
         currentClass: '',
@@ -61,8 +62,8 @@ const SignupPage = () => {
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
-                window.dispatchEvent(new Event('auth-change'));
-                navigate('/WriteReview/');
+                window.dispatchEvent(new Event('userLogin'));
+                navigate('/');
             } else {
                 alert(data.message || 'Signup failed');
             }
@@ -162,6 +163,20 @@ const SignupPage = () => {
                                 placeholder="john@example.com"
                                 style={inputStyle}
                                 value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        <div style={{ position: 'relative' }}>
+                            <label style={labelStyle}>Phone Number</label>
+                            <Sparkles style={{ position: 'absolute', left: '12px', top: '34px', color: '#64748b' }} size={16} />
+                            <input
+                                type="tel"
+                                name="phoneNumber"
+                                placeholder="+91 9876543210"
+                                style={inputStyle}
+                                value={formData.phoneNumber}
                                 onChange={handleChange}
                                 required
                             />

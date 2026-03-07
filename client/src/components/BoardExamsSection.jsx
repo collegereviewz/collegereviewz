@@ -18,8 +18,8 @@ const BoardExamsSection = () => {
   ];
 
   const admissions = [
-    'B Ed Admission 2026', 'MBA Admission 2026', 'MBBS Admission 2026', 'BA Admission 2026', 'M Tech Admission 2026',
-    'PhD Admission 2026', 'LLB Admission 2026', 'D El Ed Admission 2025', 'BSc Admission 2025', 'B Pharmacy Admission 2025'
+    'B Ed Admission', 'MBA Admission', 'MBBS Admission', 'BA Admission', 'M Tech Admission',
+    'PhD Admission', 'LLB Admission', 'D El Ed Admission', 'BSc Admission', 'B Pharmacy Admission'
   ];
 
   const LinkGroup = ({ title, highlight, links }) => (
@@ -50,30 +50,50 @@ const BoardExamsSection = () => {
   return (
     <section style={{ padding: '80px 32px', background: '#fff' }}>
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-        
+
         <LinkGroup title="Class 12" highlight="Board Examination" links={class12Links} />
         <LinkGroup title="Class 10" highlight="Board Examination" links={class10Links} />
-        
+
         <div style={{ marginTop: '80px' }}>
-             <h3 style={{ textAlign: 'center', fontSize: '32px', fontWeight: 900, color: '#1e293b', marginBottom: '40px' }}>
-                Admission <span style={{ color: '#5b51d8' }}>2026</span>
-              </h3>
-             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '14px', maxWidth: '1100px', margin: '0 auto' }}>
-               {admissions.map((link, i) => (
-                 <motion.a
-                   key={i}
-                   href="#"
-                   whileHover={{ scale: 1.05, background: 'rgba(91,81,216,0.05)', borderColor: '#5b51d8' }}
-                   style={{
-                     padding: '14px 24px', borderRadius: '50px', background: '#f8fafc', border: '1.5px solid #e2e8f0',
-                     color: '#1e293b', fontSize: '13px', fontWeight: 800, textDecoration: 'none',
-                     display: 'flex', alignItems: 'center', gap: '10px', transition: 'all 0.2s ease'
-                   }}
-                 >
-                   {link} <ArrowUpRight size={14} color="#5b51d8" />
-                 </motion.a>
-               ))}
-             </div>
+          <h3 style={{ textAlign: 'center', fontSize: '32px', fontWeight: 900, color: '#1e293b', marginBottom: '40px' }}>
+            Admission <span style={{ color: '#5b51d8' }}>Now Open</span>
+          </h3>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '14px', maxWidth: '1100px', margin: '0 auto' }}>
+            {admissions.map((link, i) => (
+              <motion.a
+                key={i}
+                href="#"
+                whileHover={{ scale: 1.05, background: 'rgba(91,81,216,0.05)', borderColor: '#5b51d8' }}
+                style={{
+                  padding: '14px 24px', borderRadius: '50px', background: '#f8fafc', border: '1.5px solid #e2e8f0',
+                  color: '#1e293b', fontSize: '13px', fontWeight: 800, textDecoration: 'none',
+                  display: 'flex', alignItems: 'center', gap: '10px', transition: 'all 0.2s ease'
+                }}
+              >
+                {link} <ArrowUpRight size={14} color="#5b51d8" />
+              </motion.a>
+            ))}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '48px' }}>
+            <button
+              style={{
+                padding: '18px 60px',
+                background: 'linear-gradient(135deg, #5b51d8, #1e1b4b)',
+                color: '#fff',
+                borderRadius: '50px',
+                border: 'none',
+                fontSize: '18px',
+                fontWeight: 950,
+                cursor: 'pointer',
+                boxShadow: '0 20px 25px -5px rgba(91, 81, 216, 0.2)',
+                transition: 'all 0.3s'
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)'; e.currentTarget.style.boxShadow = '0 25px 30px -5px rgba(91, 81, 216, 0.3)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0) scale(1)'; e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(91, 81, 216, 0.2)'; }}
+            >
+              Apply Now
+            </button>
+          </div>
         </div>
 
       </div>

@@ -1,0 +1,231 @@
+[
+  {
+    "_id": "69a92d4a09c58cb0d5f58008",
+    "state": "West Bengal",
+    "aisheId": "C-16451",
+    "name": "MRCC College of Physiotherapy",
+    "address": "Paschim Medinipur",
+    "district": "Paschim Medinipur",
+    "institutionType": "Affiliated College",
+    "university": "The West Bengal University of Health Sciences, Kolkata",
+    "officialWebsite": "www.mrccedu.in",
+    "establishedYear": "1983",
+    "managementType": "Private Un-Aided",
+    "universityAisheCode": "U-0586",
+    "updates": {
+      "notifications": [],
+      "news": [],
+      "events": []
+    },
+    "courses": [],
+    "createdAt": "2026-03-05T07:14:18.190Z",
+    "updatedAt": "2026-03-05T07:44:00.172Z",
+    "__v": 0
+  },
+  {
+    "_id": "69a9242fad894a064c144d80",
+    "aicteId": "1-44641257347",
+    "__v": 0,
+    "address": "CANAL SOUTH ROAD, BELIAGHATA KOLKATA-700015 WEST BENGAL",
+    "courses": [
+      {
+        "programme": "COMPUTER APPLICATIONS",
+        "course": "MASTERS IN COMPUTER APPLICATIONS",
+        "courseType": "Course Institute-1",
+        "intake": 90,
+        "_id": "69a9242c8357a314be494371"
+      },
+      {
+        "programme": "COMPUTER APPLICATIONS",
+        "course": "BCA",
+        "courseType": "Course Institute-1",
+        "intake": 120,
+        "_id": "69a9242c8357a314be494372"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "COMPUTER SCIENCE AND ENGINEERING",
+        "courseType": "Course Institute-1",
+        "intake": 210,
+        "_id": "69a9242c8357a314be494373"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "INFORMATION TECHNOLOGY",
+        "courseType": "Course Institute-1",
+        "intake": 120,
+        "_id": "69a9242c8357a314be494374"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "ELECTRICAL ENGINEERING",
+        "courseType": "Course Institute-1",
+        "intake": 60,
+        "_id": "69a9242c8357a314be494375"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "ELECTRONICS AND COMMUNICATIONS ENGINEERING",
+        "courseType": "Course Institute-1",
+        "intake": 120,
+        "_id": "69a9242c8357a314be494376"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "COMPUTE SCIENCE AND ENGINEERING",
+        "courseType": "Course Institute-1",
+        "intake": 12,
+        "_id": "69a9242c8357a314be494377"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE)",
+        "courseType": "Course Institute-1",
+        "intake": 12,
+        "_id": "69a9242c8357a314be494378"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "VLSI AND MICROELECTRONICS",
+        "courseType": "Course Institute-1",
+        "intake": 12,
+        "_id": "69a9242c8357a314be494379"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)",
+        "courseType": "Course Institute-1",
+        "intake": 60,
+        "_id": "69a9242c8357a314be49437a"
+      },
+      {
+        "programme": "COMPUTER APPLICATIONS",
+        "course": "MASTERS IN COMPUTER APPLICATIONS",
+        "courseType": "Course Institute-1",
+        "intake": 90,
+        "_id": "69a9242c8357a314be4948d1"
+      },
+      {
+        "programme": "COMPUTER APPLICATIONS",
+        "course": "BCA",
+        "courseType": "Course Institute-1",
+        "intake": 120,
+        "_id": "69a9242c8357a314be4948d2"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "COMPUTER SCIENCE AND ENGINEERING",
+        "courseType": "Course Institute-1",
+        "intake": 210,
+        "_id": "69a9242c8357a314be4948d3"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "INFORMATION TECHNOLOGY",
+        "courseType": "Course Institute-1",
+        "intake": 120,
+        "_id": "69a9242c8357a314be4948d4"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "ELECTRICAL ENGINEERING",
+        "courseType": "Course Institute-1",
+        "intake": 60,
+        "_id": "69a9242c8357a314be4948d5"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "ELECTRONICS AND COMMUNICATIONS ENGINEERING",
+        "courseType": "Course Institute-1",
+        "intake": 120,
+        "_id": "69a9242c8357a314be4948d6"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "COMPUTE SCIENCE AND ENGINEERING",
+        "courseType": "Course Institute-1",
+        "intake": 12,
+        "_id": "69a9242c8357a314be4948d7"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE)",
+        "courseType": "Course Institute-1",
+        "intake": 12,
+        "_id": "69a9242c8357a314be4948d8"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "VLSI AND MICROELECTRONICS",
+        "courseType": "Course Institute-1",
+        "intake": 12,
+        "_id": "69a9242c8357a314be4948d9"
+      },
+      {
+        "programme": "ENGINEERING AND TECHNOLOGY",
+        "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)",
+        "courseType": "Course Institute-1",
+        "intake": 60,
+        "_id": "69a9242c8357a314be4948da"
+      }
+    ],
+    "createdAt": "2026-03-05T06:35:24.600Z",
+    "district": "KOLKATA",
+    "institutionType": "Govt aided",
+    "name": "RCC INSTITUTE OF INFORMATION TECHNOLOGY",
+    "state": "West Bengal(Computer Applications)",
+    "university": "Maulana Abul Kalam Azad University of Technology, West Bengal",
+    "updatedAt": "2026-03-05T06:35:24.673Z",
+    "updates": {
+      "events": [],
+      "news": [],
+      "notifications": []
+    }
+  },
+  {
+    "_id": "69a92d5609c58cb0d5f59963",
+    "state": "West Bengal",
+    "aisheId": "C-69310",
+    "name": "RCC Institute of Information Technology (Non AICTE)",
+    "address": "Kolkata",
+    "district": "Kolkata",
+    "institutionType": "Affiliated College",
+    "university": "Maulana Abul Kalam Azad University of Technology, West Bengal",
+    "officialWebsite": "www.rccinstitute.org",
+    "establishedYear": "-",
+    "managementType": "Private Aided (Government Aided)",
+    "universityAisheCode": "U-0592",
+    "updates": {
+      "notifications": [],
+      "news": [],
+      "events": []
+    },
+    "courses": [],
+    "createdAt": "2026-03-05T07:14:30.014Z",
+    "updatedAt": "2026-03-05T07:44:10.671Z",
+    "__v": 0
+  },
+  {
+    "_id": "69a92d5609c58cb0d5f59962",
+    "state": "West Bengal",
+    "aisheId": "C-6159",
+    "name": "RCC Institute of Information Technology 117",
+    "address": "Kolkata",
+    "district": "Kolkata",
+    "institutionType": "Affiliated College",
+    "university": "Maulana Abul Kalam Azad University of Technology, West Bengal",
+    "officialWebsite": "www.rcciit.org.in",
+    "establishedYear": "1999",
+    "managementType": "Private Aided (Government Aided)",
+    "universityAisheCode": "U-0592",
+    "updates": {
+      "notifications": [],
+      "news": [],
+      "events": []
+    },
+    "courses": [],
+    "createdAt": "2026-03-05T07:14:30.014Z",
+    "updatedAt": "2026-03-05T07:44:10.671Z",
+    "__v": 0
+  }
+]

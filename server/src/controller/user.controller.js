@@ -13,7 +13,8 @@ export const updateProfile = async (req, res) => {
             budget,
             educationalLoanComfort,
             canAffordCoaching,
-            openToAbroad
+            openToAbroad,
+            phoneNumber
         } = req.body;
 
         const updatedUser = await User.findByIdAndUpdate(
@@ -26,7 +27,8 @@ export const updateProfile = async (req, res) => {
                 annualBudget: budget,
                 educationalLoanComfort,
                 canAffordCoaching,
-                openToAbroad
+                openToAbroad,
+                phoneNumber
             },
             { new: true, runValidators: true }
         ).select('-password'); // Exclude password from the returned object

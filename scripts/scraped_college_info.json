@@ -1,0 +1,47 @@
+[
+  {
+    "name": "SYMBIOSIS INSTITUTE OF TECHNOLOGY",
+    "website": "sitpune.edu.in",
+    "fees": null,
+    "avgPackage": null,
+    "highestPackage": null,
+    "scrapedAt": "2026-03-05T05:25:12.011Z",
+    "success": false
+  },
+  {
+    "name": "SYMBIOSIS INTERNATIONAL (DEEMED UNIVERSITY)",
+    "website": "siu.edu.in",
+    "fees": null,
+    "avgPackage": null,
+    "highestPackage": null,
+    "scrapedAt": "2026-03-05T05:25:18.733Z",
+    "success": false
+  },
+  {
+    "name": "MANIPAL INSTITUTE OF TECHNOLOGY",
+    "website": "manipal.edu",
+    "fees": "2026",
+    "avgPackage": null,
+    "highestPackage": null,
+    "scrapedAt": "2026-03-05T05:25:46.575Z",
+    "success": true
+  },
+  {
+    "name": "GOODWILL CHRISTIAN COLLEGE FOR WOMEN",
+    "website": "goodwillchristiancollege.org",
+    "fees": null,
+    "avgPackage": null,
+    "highestPackage": null,
+    "scrapedAt": "2026-03-05T05:25:58.658Z",
+    "success": false
+  },
+  {
+    "name": "CHRIST UNIVERSITY",
+    "website": "christuniversity.in",
+    "fees": null,
+    "avgPackage": null,
+    "highestPackage": null,
+    "scrapedAt": "2026-03-05T05:26:01.677Z",
+    "success": false
+  }
+]

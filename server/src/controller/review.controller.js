@@ -2,7 +2,7 @@ import Review from '../models/Review.model.js';
 
 export const createReview = async (req, res) => {
     try {
-        const { author, role, content, type, mediaUrl, hashtags, userId } = req.body;
+        const { author, role, content, type, mediaUrl, hashtags, userId, collegeId, collegeName, rating } = req.body;
         const review = new Review({
             user: userId || null,
             author,
@@ -10,7 +10,10 @@ export const createReview = async (req, res) => {
             content,
             type,
             mediaUrl,
-            hashtags
+            hashtags,
+            collegeId,
+            collegeName,
+            rating: rating || 0
         });
         const savedReview = await review.save();
         res.status(201).json(savedReview);
@@ -31,8 +34,25 @@ export const getUserReviews = async (req, res) => {
 
 export const getAllReviews = async (req, res) => {
     try {
-        const reviews = await Review.find().sort({ createdAt: -1 });
-        res.status(200).json(reviews);
+        const { page = 1, limit = 10, collegeId } = req.query;
+        const filter = {};
+        if (collegeId && collegeId !== 'undefined') {
+            filter.collegeId = collegeId;
+        }
+
+        const skip = (page - 1) * limit;
+        const total = await Review.countDocuments(filter);
+        const reviews = await Review.find(filter)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        res.status(200).json({
+            reviews,
+            total,
+            page: parseInt(page),
+            pages: Math.ceil(total / limit)
+        });
     } catch (error) {
         res.status(404).json({ message: error.message });
     }

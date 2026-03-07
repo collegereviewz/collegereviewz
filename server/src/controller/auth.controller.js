@@ -8,7 +8,7 @@ export const signup = async (req, res) => {
     try {
         const {
             fullName, email, password, openToAbroad, currentClass,
-            annualBudget, canAffordCoaching, educationalLoanComfort, stream, age
+            annualBudget, canAffordCoaching, educationalLoanComfort, stream, age, phoneNumber
         } = req.body;
 
         const existingUser = await User.findOne({ email });
@@ -28,7 +28,8 @@ export const signup = async (req, res) => {
             canAffordCoaching,
             educationalLoanComfort,
             stream,
-            age
+            age,
+            phoneNumber
         });
 
         await newUser.save();

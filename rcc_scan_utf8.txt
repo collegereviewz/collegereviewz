@@ -1,0 +1,30 @@
+﻿
+Searching for: RCC
+  - DB Record:
+    ID: 69a92d4a09c58cb0d5f58008
+    Name: MRCC College of Physiotherapy
+    State: West Bengal
+    AISHE ID: C-16451
+    Estd: 1983
+    Mgmt: Private Un-Aided
+  - DB Record:
+    ID: 69a9242fad894a064c144d80
+    Name: RCC INSTITUTE OF INFORMATION TECHNOLOGY
+    State: West Bengal(Computer Applications)
+    AISHE ID: undefined
+    Estd: undefined
+    Mgmt: undefined
+  - DB Record:
+    ID: 69a92d5609c58cb0d5f59963
+    Name: RCC Institute of Information Technology (Non AICTE)
+    State: West Bengal
+    AISHE ID: C-69310
+    Estd: -
+    Mgmt: Private Aided (Government Aided)
+  - DB Record:
+    ID: 69a92d5609c58cb0d5f59962
+    Name: RCC Institute of Information Technology 117
+    State: West Bengal
+    AISHE ID: C-6159
+    Estd: 1999
+    Mgmt: Private Aided (Government Aided)

@@ -51,6 +51,26 @@ const reviewSchema = new mongoose.Schema({
     }],
     hashtags: [{
         type: String
+    }],
+    collegeId: {
+        type: String,
+        required: false
+    },
+    collegeName: {
+        type: String,
+        required: false
+    },
+    rating: {
+        type: Number,
+        default: 0
+    },
+    upvotedBy: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    downvotedBy: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }]
 }, { timestamps: true });
 

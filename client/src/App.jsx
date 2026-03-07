@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react'
+import React, { useState, useEffect, Suspense, lazy } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Preloader from './components/Preloader'
 import Header from './components/Header'
@@ -6,33 +6,51 @@ import Footer from './components/Footer'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import CoursesListing from './pages/CoursesListing'
-import ExploreColleges from './pages/ExploreColleges'
+import ExploreColleges from './pages/ExploreColleges/ExploreColleges'
 import Exams from './pages/Exams'
 import Scholarship from './pages/Scholarship'
 import StudyAbroad from './pages/StudyAbroad'
 import Contact from './pages/Contact'
 import Resources from './pages/Resources'
-import WriteReview from './pages/ReviewPage'
+import WriteReview from './pages/WriteAReview'
 import Support from './pages/Support'
-import Login from './pages/LoginPage'
+import LoginPage from './pages/LoginPage'
 import FloatingAskExperts from './components/FloatingAskExperts'
 import SignupPage from './pages/SignupPage'
+import AIVoiceAssistant from './components/AIVoiceAssistant'
 import ProfilePage from './pages/ProfilePage'
+import CollegeProfileWrapper from './pages/CollegeProfileWrapper'
+import AdminLogin from './pages/AdminLogin'
+import AdminDashboard from './pages/AdminDashboard'
+import Swal from 'sweetalert2';
+
+// Global alert override matching the website theme
+window.alert = (msg) => {
+  Swal.fire({
+    text: msg,
+    background: '#1e293b',
+    color: '#fff',
+    confirmButtonColor: '#0096FF',
+    backdrop: 'rgba(15, 23, 42, 0.85)',
+    customClass: {
+      popup: 'rounded-xl',
+      confirmButton: 'rounded-lg px-4 py-2 font-bold'
+    }
+  });
+};
 
 function AppContent() {
   const [loading, setLoading] = useState(true);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
-    // Artificial delay to show the premium loader
     const timer = setTimeout(() => {
       setLoading(false);
     }, 450);
-
     return () => clearTimeout(timer);
   }, []);
 
-  // Determine current view based on pathname
   const getCurrentView = () => {
     if (location.pathname === '/') return 'Home';
     if (location.pathname.startsWith('/Courses')) return 'Courses';
@@ -45,15 +63,22 @@ function AppContent() {
     return 'Home';
   };
 
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
   return (
     <>
       <AnimatePresence>
         {loading && <Preloader />}
       </AnimatePresence>
-
-      <div style={{ minHeight: '100vh', background: '#fff', zoom: 1.1 }}>
-        <Header currentView={getCurrentView()} />
-        <main>
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        background: '#fff',
+        zoom: isAdminRoute ? 1 : 1.1
+      }}>
+        {!isAdminRoute && <Header currentView={getCurrentView()} />}
+        <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
@@ -73,18 +98,22 @@ function AppContent() {
                 <Route path="/Resources/" element={<Resources />} />
                 <Route path="/WriteReview/" element={<WriteReview />} />
                 <Route path="/Support/" element={<Support />} />
-                <Route path="/Login/" element={<Login />} />
+                <Route path="/Login/" element={<LoginPage />} />
                 <Route path="/Signup/" element={<SignupPage />} />
                 <Route path="/Profile/" element={<ProfilePage />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/college/:collegeName" element={<CollegeProfileWrapper />} />
               </Routes>
             </motion.div>
           </AnimatePresence>
         </main>
-        <Footer />
-        <FloatingAskExperts />
+        {!isAdminRoute && <Footer />}
+        {!isAdminRoute && <FloatingAskExperts onClick={() => setIsAssistantOpen(true)} />}
+        {!isAdminRoute && <AIVoiceAssistant isOpen={isAssistantOpen} onClose={() => setIsAssistantOpen(false)} />}
       </div>
     </>
-  )
+  );
 }
 
 function App() {
@@ -94,7 +123,5 @@ function App() {
     </Router>
   )
 }
-
-
 
 export default App

@@ -14,7 +14,7 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
     const type = collegeData?.rankingInfo || 'Institution Type';
     
     // We don't have this data yet, until CSV logic is added
-    const established = '—';
+    const established = collegeData?.establishedYear || '—';
     const averagePackage = '—';
     const highestPackage = '—';
     const entranceExam = '—';
@@ -53,7 +53,7 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
     ];
 
     const viewDetails = [
-        { icon: <Info size={14} />,              label: 'Admission 2026', id: 'Admission 2026' },
+        { icon: <Info size={14} />,              label: 'Admission', id: 'Admission' },
         { icon: <BookOpen size={14} />,          label: 'Fees Structure', id: 'Course & Fees' },
         { icon: <Trophy size={14} />,            label: 'Rankings', id: 'Ranking and Placement' },
         { icon: <SlidersHorizontal size={14} />, label: 'Cutoff Trends', id: 'Cut Off' },
@@ -70,7 +70,7 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
         { id: 'college-info',         label: 'College Info' },
         { id: 'courses-fees',         label: 'Course & Fees' },
         { id: 'cut-off',              label: 'Cut Off' },
-        { id: 'admission',            label: 'Admission 2026' },
+        { id: 'admission',            label: 'Admission' },
         { id: 'reviews',              label: 'Reviews' },
         { id: 'ranking-placement',    label: 'Ranking and Placement' },
         { id: 'result',               label: 'Result' },
@@ -344,9 +344,9 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
                         />
                     </div>
 
-                    {/* 4. Admission 2026 */}
+                    {/* 4. Admission */}
                     <div id="admission" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{name} Admission 2026</h2>
+                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{name} Admission</h2>
                         <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#1e293b' }}>Important Dates</h3>
                         <StyledTable columns={['Events', 'Dates']} rows={dates.map(r => [r.event, r.date])} />
                     </div>

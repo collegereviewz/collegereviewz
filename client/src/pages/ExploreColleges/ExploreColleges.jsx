@@ -154,17 +154,61 @@ const ExploreColleges = () => {
         if (isMounted) {
           if (data.success) {
             // Map the data to the format ExploreColleges expects natively
-             const mapped = data.data.map(col => ({
-                id: col._id,
-                name: col.name,
-                location: `${col.district || ''}, ${col.state || ''}`.replace(/^, | , $/g, ''),
-                fees: col.fees || "Check Website",
-                placement: col.avgPackage || "Check Website",
-                highestPackage: col.highestPackage || (col.avgPackage ? `₹${(parseInt(col.avgPackage.replace(/[^0-9]/g, '') || '0') * 1.5).toLocaleString('en-IN')}` : "Check Website"),
-                rankingInfo: col.institutionType || "AICTE Approved",
-                rating: col.rating || 0,
-                reviews: col.reviewsCount || 0
-             }));
+              const mapped = data.data.map(col => {
+                // Determine fee range or minimum fee from nested courses
+                let displayFees = "Check Website";
+                if (col.fees && isNaN(parseInt(col.fees)) === false && col.fees.length < 15) {
+                    // Try to use the top-level fees field directly if it looks good
+                    displayFees = col.fees.startsWith('₹') || col.fees.toLowerCase().includes('lakh') 
+                        ? col.fees 
+                        : `₹${col.fees}`;
+                } else if (col.courses && col.courses.length > 0) {
+                    // Fallback to older integer parsing if the top-level string is messy
+                    const validFees = col.courses
+                        .map(c => parseInt(c.fees?.replace(/[^0-9]/g, '') || '0'))
+                        .filter(f => f > 0);
+                    if (validFees.length > 0) {
+                        displayFees = `₹${Math.min(...validFees).toLocaleString('en-IN')}`;
+                    }
+                } else if (col.fees) {
+                    displayFees = col.fees;
+                }
+                
+                // Add ₹ symbol if missing but only if not present
+                if (displayFees !== "Check Website" && !displayFees.startsWith('₹')) {
+                    displayFees = `₹${displayFees}`;
+                }
+
+                return {
+                    id: col._id,
+                    name: col.name,
+                    location: `${col.district || ''}, ${col.state || ''}`.replace(/^, | , $/g, ''),
+                    fees: displayFees,
+                    placement: col.avgPackage || "Check Website",
+                    highestPackage: col.highestPackage || null,
+                    rankingInfo: col.institutionType || "AICTE Approved",
+                    rating: col.rating || 0,
+                    reviewsCount: col.reviewsCount || 0,
+                    courses: col.courses || [],
+                    establishedYear: col.establishedYear || "—",
+                    managementType: col.managementType || "Private",
+                    about: col.about,
+                    cutOffs: col.cutOffs,
+                    admissionProcess: col.admissionProcess,
+                    ranking: col.ranking,
+                    resultInfo: col.resultInfo,
+                    scholarships: col.scholarships,
+                    faq: col.faq,
+                    facilities: col.facilities,
+                    studentLife: col.studentLife,
+                    contactDetails: col.contactDetails,
+                    updates: col.updates,
+                    website: col.website,
+                    address: col.address || col.location,
+                    district: col.district,
+                    state: col.state
+                };
+             });
             setDisplayedColleges(mapped);
             setTotalPages(data.totalPages || 1);
             setTotalColleges(data.totalColleges || 0);
@@ -501,7 +545,7 @@ const ExploreColleges = () => {
                                             {col.name}
                                           </h4>
                                           <p style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, marginBottom: '14px' }}>
-                                            {col.location} | Deemed to be University(Pvt) | AICTE, UGC Approved
+                                            {col.location} | Estd: {col.establishedYear} | {col.managementType} | AICTE, UGC Approved
                                           </p>
                                           <div style={{ display: 'flex', gap: '8px' }}>
                                             <button style={{ padding: '7px 14px', background: '#5b51d8', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><ArrowRight size={13} /> Apply</button>
@@ -556,7 +600,7 @@ const ExploreColleges = () => {
                                               {Number(col.rating).toFixed(1)}
                                           </span>
                                           <span style={{ color: '#64748b', fontWeight: 700, fontSize: '12px' }}>
-                                              ({col.reviews} Reviews)
+                                              ({col.reviewsCount} Reviews)
                                           </span>
                                       </div>
                                   </div>

@@ -2,21 +2,54 @@ import mongoose from 'mongoose';
 
 const collegeSchema = new mongoose.Schema({
     state: { type: String, required: true },
-    aicteId: { type: String, required: true, unique: true },
+    aicteId: { type: String, unique: true, sparse: true },
+    aisheId: { type: String, unique: true, sparse: true },
     name: { type: String, required: true },
     address: { type: String },
     district: { type: String },
     institutionType: { type: String },
-    programme: { type: String },
     university: { type: String },
-    levelOfCourse: { type: String },
-    course: { type: String },
-    courseType: { type: String },
-    intake: { type: Number },
     officialWebsite: { type: String },
     fees: { type: String },
+    aisheId: { type: String },
+    establishedYear: { type: String },
+    managementType: { type: String },
+    universityAisheCode: { type: String },
+    courses: [{
+        programme: String,
+        levelOfCourse: String,
+        course: String,
+        courseType: String,
+        intake: Number,
+        fees: String
+    }],
     avgPackage: { type: String },
     highestPackage: { type: String },
+    about: { type: String },
+    cutOffs: { type: String },
+    admissionProcess: { type: String },
+    ranking: { type: String },
+    topRecruiters: [{ type: String }],
+    resultInfo: { type: String },
+    mapLink: { type: String },
+    photos: [{ type: String }],
+    videos: [{ type: String }],
+    scholarships: { type: String },
+    faq: [{
+        question: String,
+        answer: String
+    }],
+    facilities: [{ type: String }],
+    studentLife: { type: String },
+    contactDetails: {
+        phone: String,
+        email: String
+    },
+    commuteIntelligence: [{
+        type: { type: String }, // 'airport', 'railway', 'bus'
+        hubName: { type: String },
+        travelTime: { type: String }
+    }],
     updates: {
         notifications: [{
             title: String,

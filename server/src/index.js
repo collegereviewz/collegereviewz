@@ -61,6 +61,16 @@ app.get('/api/news', (req, res) => {
     ]);
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+});
+
+server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+        console.error(`\n!!! ERROR: Port ${PORT} is already in use.`);
+        console.error(`!!! Try running: npm run kill-port\n`);
+        process.exit(1);
+    } else {
+        throw error;
+    }
 });

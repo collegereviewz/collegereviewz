@@ -1,0 +1,115 @@
+{
+  "fees": "6.04 Lakhs",
+  "avgPackage": "4.2 LPA",
+  "highestPackage": "14.0 LPA",
+  "courses": [
+    {
+      "programme": "B.Tech",
+      "levelOfCourse": "UNDER GRADUATE",
+      "course": "Computer Science & Engineering",
+      "courseType": "FULL TIME",
+      "intake": 210,
+      "fees": "6.04 Lakhs",
+      "_id": "69aa80c0f1f1e19bf61cc1fa"
+    },
+    {
+      "programme": "B.Tech",
+      "levelOfCourse": "UNDER GRADUATE",
+      "course": "Information Technology",
+      "courseType": "FULL TIME",
+      "intake": 120,
+      "fees": "6.04 Lakhs",
+      "_id": "69aa80c0f1f1e19bf61cc1fb"
+    },
+    {
+      "programme": "B.Tech",
+      "levelOfCourse": "UNDER GRADUATE",
+      "course": "Electronics & Communication Engineering",
+      "courseType": "FULL TIME",
+      "intake": 120,
+      "fees": "6.04 Lakhs",
+      "_id": "69aa80c0f1f1e19bf61cc1fc"
+    },
+    {
+      "programme": "B.Tech",
+      "levelOfCourse": "UNDER GRADUATE",
+      "course": "Electrical Engineering",
+      "courseType": "FULL TIME",
+      "intake": 60,
+      "fees": "6.04 Lakhs",
+      "_id": "69aa80c0f1f1e19bf61cc1fd"
+    },
+    {
+      "programme": "B.Tech",
+      "levelOfCourse": "UNDER GRADUATE",
+      "course": "Computer Science and Engineering (Artificial Intelligence and Machine Learning)",
+      "courseType": "FULL TIME",
+      "intake": 60,
+      "fees": "6.04 Lakhs",
+      "_id": "69aa80c0f1f1e19bf61cc1fe"
+    },
+    {
+      "programme": "M.Tech",
+      "levelOfCourse": "POST GRADUATE",
+      "course": "Computer Science and Engineering",
+      "courseType": "FULL TIME",
+      "intake": 18,
+      "fees": "1.82 Lakhs",
+      "_id": "69aa80c0f1f1e19bf61cc1ff"
+    },
+    {
+      "programme": "M.Tech",
+      "levelOfCourse": "POST GRADUATE",
+      "course": "Information Technology",
+      "courseType": "FULL TIME",
+      "intake": 18,
+      "fees": "1.82 Lakhs",
+      "_id": "69aa80c0f1f1e19bf61cc200"
+    },
+    {
+      "programme": "M.Tech",
+      "levelOfCourse": "POST GRADUATE",
+      "course": "Microelectronics and VLSI Design",
+      "courseType": "FULL TIME",
+      "intake": 18,
+      "fees": "1.82 Lakhs",
+      "_id": "69aa80c0f1f1e19bf61cc201"
+    },
+    {
+      "programme": "BCA",
+      "levelOfCourse": "UNDER GRADUATE",
+      "course": "Bachelor of Computer Applications",
+      "courseType": "FULL TIME",
+      "intake": 60,
+      "fees": "2.65 Lakhs",
+      "_id": "69aa80c0f1f1e19bf61cc202"
+    },
+    {
+      "programme": "MCA",
+      "levelOfCourse": "POST GRADUATE",
+      "course": "Master of Computer Applications",
+      "courseType": "FULL TIME",
+      "intake": 60,
+      "fees": "3.20 Lakhs",
+      "_id": "69aa80c0f1f1e19bf61cc203"
+    }
+  ],
+  "about": "RCC Institute of Information Technology (RCCIIT) was established in 1999 as a unique joint venture b...",
+  "cutOffs": "For the 2024 academic session, the WBJEE (Open Category - All India Quota) cutoff ranks for B.Tech p...",
+  "admissionProcess": "Admission to RCC Institute of Information Technology (RCCIIT), Kolkata for the 2024-2025 and 2025-20...",
+  "ranking": "In 2024, RCC Institute of Information Technology (RCCIIT) was ranked 1427 in India and 4437 in Asia by the Scientific Index. Within West Bengal, it secured the 23rd position in the NIRF 2024 rankings. For Engineering, RCCIIT ranks 96 out of 200 in India according to Outlook Rankings 2025. The institute is also considered one of the best engineering institutes under the West Bengal Joint Entrance Examination (WBJEE) and ranks among the top 10 private and government engineering colleges in the state.",
+  "resultInfo": "RCC Institute of Information Technology is affiliated with Maulana Abul Kalam Azad University of Technology (MAKAUT), West Bengal. The institute follows the semester examination system as prescribed by MAKAUT. Semester exams are typically considered to have an 8/10 difficulty level, which can vary based on student preparation. \n\nMAKAUT guidelines also incorporate an Academic Bank of Credits (ABC) system, allowing students to earn additional credit points (up to 20) through participation in online courses from platforms like SWAYAM-NPTEL, Coursera, edX, IIRS-ISRO, and NASSCOM Future Skill Prime. These certificates also contribute to Mandatory Additional Points (MAR), where students can earn a maximum of 40 points over four years. \n\nFor the 2024-2025 academic year, first-semester exams were scheduled from January 6 to January 15, 2025, with results expected around February 20, 2025. Students are required to fill out forms for regular and backlog odd semester examinations, as indicated by recent notices for the 2025-2026 session.",
+  "scholarships": "RCC Institute of Information Technology (RCCIIT) offers various scholarship opportunities and suppor...",
+  "faq": 8,
+  "facilities": 13,
+  "studentLife": "Student life at RCC Institute of Information Technology is vibrant, blending academic rigor with a r...",
+  "contactDetails": {
+    "phone": "+91 6290821297, (033) 23232463",
+    "email": "admission@rcciit.org.in, rcciit1999@gmail.com"
+  },
+  "updates": {
+    "events": [],
+    "news": [],
+    "notifications": []
+  }
+}

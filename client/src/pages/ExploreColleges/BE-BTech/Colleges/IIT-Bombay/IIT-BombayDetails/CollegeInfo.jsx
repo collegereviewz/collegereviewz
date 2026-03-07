@@ -19,7 +19,7 @@ const quickFacts = [
 ];
 
 const viewDetails = [
-    { icon: <Info size={14} />,              label: 'Admission 2026' },
+    { icon: <Info size={14} />,              label: 'Admission' },
     { icon: <BookOpen size={14} />,          label: 'Fees Structure' },
     { icon: <Trophy size={14} />,            label: 'Rankings' },
     { icon: <SlidersHorizontal size={14} />, label: 'Cutoff Trends' },
@@ -34,10 +34,10 @@ const whyChoose = [
 ];
 
 const tableContent = [
-    { id: 'admission-dates', label: 'IIT Bombay Admission 2026 Dates' },
-    { id: 'fees',            label: 'IIT Bombay Fees 2026' },
+    { id: 'admission-dates', label: 'IIT Bombay Admission Dates' },
+    { id: 'fees',            label: 'IIT Bombay Fees' },
     { id: 'ranking',         label: 'IIT Bombay Ranking' },
-    { id: 'admission',       label: 'IIT Bombay Admission 2026' },
+    { id: 'admission',       label: 'IIT Bombay Admission' },
     { id: 'cutoff',          label: 'IIT Bombay Cutoff' },
     { id: 'placement',       label: 'IIT Bombay Placement' },
 ];
@@ -270,9 +270,9 @@ const CollegeInfo = () => {
                 {/* RIGHT: Detailed Sections */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
-                    {/* Admission 2026 Dates */}
+                    {/* Admission Dates */}
                     <div id="admission-dates" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>IIT Bombay Admission 2026 Dates</h2>
+                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>IIT Bombay Admission Dates</h2>
                         <p style={{ fontSize: '13px', lineHeight: 1.7, color: '#64748b', marginBottom: '20px' }}>
                             IIT Bombay also offers M.Tech and MSc as other popular programs. Admission is based on national-level entrance exams including IIT JAM and GATE. Here are the important dates:
                         </p>
@@ -280,14 +280,14 @@ const CollegeInfo = () => {
                         <StyledTable columns={['Events', 'Dates']} rows={jeeMainDates.map(r => [r.event, r.date])} />
                         <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#1e293b', marginTop: '28px' }}>JEE Advanced Dates 2026</h3>
                         <StyledTable columns={['Events', 'Dates']} rows={jeeAdvancedDates.map(r => [r.event, r.date])} />
-                        <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#1e293b', marginTop: '28px' }}>IIT Bombay M.Tech Admission Dates 2026</h3>
+                        <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#1e293b', marginTop: '28px' }}>IIT Bombay M.Tech Admission Dates</h3>
                         <p style={{ fontSize: '13px', color: '#64748b', marginTop: '6px' }}>IIT Bombay M.Tech program is available in the GATE score window from February 7 – February 15, 2026.</p>
                         <StyledTable columns={['Events', 'Dates']} rows={mtechDates.map(r => [r.event, r.date])} />
                     </div>
 
                     {/* Fees 2026 */}
                     <div id="fees" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>IIT Bombay Fees 2026</h2>
+                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>IIT Bombay Fees</h2>
                         <p style={{ fontSize: '13px', lineHeight: 1.7, color: '#64748b', marginBottom: '4px' }}>
                             IIT Bombay offers B.Tech with a total fee of <strong>₹8,82,500</strong>. The details for <span style={{ color: '#5b51d8', fontWeight: 700 }}>IIT Bombay Courses & Fees</span> are mentioned in the table below:
                         </p>
@@ -310,7 +310,7 @@ const CollegeInfo = () => {
 
                     {/* Admission */}
                     <div id="admission" style={{ ...card, padding: '28px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>IIT Bombay Admission 2026</h2>
+                        <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>IIT Bombay Admission</h2>
                         <p style={{ fontSize: '13px', lineHeight: 1.9, color: '#475569' }}>
                             Admission to B.Tech at IIT Bombay is through <strong>JEE Advanced</strong> followed by JoSAA Counselling. For M.Tech, candidates must qualify <strong>GATE</strong>. MSc admissions are via <strong>IIT JAM</strong>. MBA admissions require a valid CAT score.
                         </p>

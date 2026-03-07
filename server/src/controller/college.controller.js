@@ -1,5 +1,6 @@
 import College from '../models/College.model.js';
 import Review from '../models/Review.model.js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const getColleges = async (req, res) => {
     try {
@@ -21,20 +22,27 @@ export const getColleges = async (req, res) => {
             query.state = { $regex: new RegExp(`^${state}$`, 'i') };
         }
 
-        // Filter by course
+        // Filter by course/stream inside the courses array
         if (course && course !== 'All' && course !== 'AICTE Approved') {
+            let courseRegex;
             if (course === 'BE/B.Tech') {
-                query.course = { $regex: /Engineering|B.E.|B.Tech/i };
+                courseRegex = /Engineering|B.E.|B.Tech/i;
             } else if (course === 'MBBS' || course === 'B.Sc (Nursing)') {
-                query.course = { $regex: /Medicine|Nursing|MBBS/i };
+                courseRegex = /Medicine|Nursing|MBBS/i;
             } else {
-                query.course = { $regex: course, $options: 'i' };
+                courseRegex = new RegExp(course, 'i');
             }
+            query.courses = { $elemMatch: { course: courseRegex } };
         }
 
         // Filter by specific program/stream drop-down
         if (stream && stream !== 'All' && stream !== '--All--') {
-            query.programme = { $regex: stream, $options: 'i' };
+            const streamMatch = { $elemMatch: { programme: new RegExp(stream, 'i') } };
+            if (query.courses) {
+                query.courses.$elemMatch.programme = new RegExp(stream, 'i');
+            } else {
+                query.courses = streamMatch;
+            }
         }
 
         const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -131,22 +139,76 @@ export const getCollegeCourses = async (req, res) => {
     try {
         const { name } = req.params;
 
-        // Find all records that exactly match this college's name
-        // This queries the database, which has already been seeded with both aicteall.csv and medicalcolleges.csv
-        const courses = await College.find({ name: { $regex: new RegExp(`^${name}$`, 'i') } })
-            .select('course levelOfCourse intake programme courseType -_id')
+        // Find the single record for this college
+        const college = await College.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } })
+            .select('courses')
             .lean();
 
-        if (!courses || courses.length === 0) {
+        if (!college || !college.courses || college.courses.length === 0) {
             return res.status(404).json({ success: false, message: 'No courses found for this college' });
         }
 
         res.json({
             success: true,
-            data: courses
+            data: college.courses
         });
     } catch (error) {
         console.error('Error fetching college courses:', error);
         res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    }
+};
+
+export const getCollegeCommute = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const college = await College.findById(id);
+
+        if (!college) {
+            return res.status(404).json({ success: false, message: 'College not found' });
+        }
+
+        // Return existing data if available
+        if (college.commuteIntelligence && college.commuteIntelligence.length > 0) {
+            return res.json({ success: true, data: college.commuteIntelligence });
+        }
+
+        // Verify API Key
+        if (!process.env.GEMINI_API_KEY) {
+            return res.status(500).json({ success: false, message: 'Gemini API keys are not configured properly' });
+        }
+
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+
+        const prompt = `
+        Find the nearest airport, railway station, and bus terminal to the following college:
+        College Name: ${college.name}
+        District/Location: ${college.district || ''}
+        State: ${college.state || ''}
+
+        Please provide the average travel time by car from the college to each hub.
+        
+        Return the result EXACTLY as a JSON array of objects with the following format, and nothing else (no markdown blocks, no \`\`\`json, just the raw array).
+        [
+            { "type": "airport", "hubName": "Name of Airport", "travelTime": "XX mins" },
+            { "type": "railway", "hubName": "Name of Railway Station", "travelTime": "XX mins" },
+            { "type": "bus", "hubName": "Name of Bus Terminal", "travelTime": "XX mins" }
+        ]
+        `;
+
+        const result = await model.generateContent(prompt);
+        let responseText = result.response.text();
+        responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+
+        const parsedData = JSON.parse(responseText);
+
+        // Update in database
+        college.commuteIntelligence = parsedData;
+        await college.save();
+
+        res.json({ success: true, data: parsedData });
+    } catch (error) {
+        console.error('Error dynamically fetching commute data:', error);
+        res.status(500).json({ success: false, message: 'Failed to find commute info' });
     }
 };

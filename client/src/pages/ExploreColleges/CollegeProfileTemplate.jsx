@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, lazy, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, Suspense, lazy, useMemo, useCallback, useRef } from 'react';
 import { MapPin, Star } from 'lucide-react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
@@ -10,7 +10,7 @@ const tabToComponentMap = {
     'College Info': 'CollegeInfo',
     'Course & Fees': 'CourseFees',
     'Cut Off': 'CutOff',
-    'Admission 2026': 'Admission2026',
+    'Admission': 'Admission',
     'Reviews': 'Reviews',
     'Ranking and Placement': 'RankingPlacement',
     'Result': 'Result',
@@ -27,6 +27,7 @@ const tabToComponentMap = {
 const CollegeProfileTemplate = ({ collegeInfo }) => {
     const location = useLocation();
     const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'College Info');
+    const contentRef = useRef(null);
     const [stats, setStats] = useState({ 
         rating: collegeInfo.data?.rating || 0, 
         reviewsCount: collegeInfo.data?.reviewsCount || 0 
@@ -68,7 +69,7 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
     }, []);
 
     const tabs = [
-        'College Info', 'Course & Fees', 'Cut Off', 'Admission 2026', 
+        'College Info', 'Course & Fees', 'Cut Off', 'Admission', 
         'Reviews', 'Ranking and Placement', 'Result', 'Location',
         'Photo & Video', 'Scholarship', 'Notification & Upload', 'Q & A',
         'Facility', 'Student Life', 'Contact Details'
@@ -168,7 +169,15 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
                     {tabs.map(tab => (
                         <button 
                             key={tab}
-                            onClick={() => setActiveTab(tab)}
+                            onClick={() => {
+                                setActiveTab(tab);
+                                // Scroll to the top of the content area after a brief tick
+                                setTimeout(() => {
+                                    if (contentRef.current) {
+                                        contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    }
+                                }, 50);
+                            }}
                             style={{ 
                                 padding: '20px 0',
                                 fontSize: '14px',
@@ -189,7 +198,7 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
             </div>
 
             {/* Main Content Area */}
-            <div style={{ ...containerStyle, marginTop: '32px' }}>
+            <div ref={contentRef} style={{ ...containerStyle, marginTop: '32px' }}>
                 <Suspense
                     key={`${collegeInfo.fullName}-${activeTab}`}
                     fallback={<div style={{ padding: '40px', textAlign: 'center', fontWeight: 700, color: '#64748b' }}>Loading content...</div>}

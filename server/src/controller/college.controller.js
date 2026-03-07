@@ -158,6 +158,61 @@ export const getCollegeCourses = async (req, res) => {
     }
 };
 
+export const getCollegeDetails = async (req, res) => {
+    try {
+        const { name } = req.params;
+
+        // Use aggregation to get the college WITH review stats in one go
+        const pipeline = [
+            { $match: { name: { $regex: new RegExp(`^${name}$`, 'i') } } },
+            {
+                $lookup: {
+                    from: 'reviews',
+                    let: { college_id: '$_id', college_name: '$name' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $or: [
+                                        { $eq: ['$collegeId', '$$college_id'] },
+                                        { $eq: ['$collegeName', '$$college_name'] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'collegeReviews'
+                }
+            },
+            {
+                $addFields: {
+                    rating: { $ifNull: [{ $avg: '$collegeReviews.rating' }, 0] },
+                    reviewsCount: { $size: '$collegeReviews' }
+                }
+            },
+            {
+                $project: {
+                    collegeReviews: 0
+                }
+            }
+        ];
+
+        const results = await College.aggregate(pipeline);
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'College not found' });
+        }
+
+        res.json({
+            success: true,
+            data: results[0]
+        });
+    } catch (error) {
+        console.error('Error fetching college details:', error);
+        res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    }
+};
+
 export const getCollegeCommute = async (req, res) => {
     try {
         const { id } = req.params;
@@ -178,7 +233,8 @@ export const getCollegeCommute = async (req, res) => {
         }
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
 
         const prompt = `
         Find the nearest airport, railway station, and bus terminal to the following college:

@@ -1,103 +1,123 @@
-import asyncio
-import random
-import json
 import os
-from playwright.async_api import async_playwright
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlparse
+import pymongo
+import google.generativeai as genai
+from dotenv import load_dotenv
+import json
+import time
+import re
 
-CATEGORIES = [
-    "engineering", "management", "medical", "pharmacy", "law", 
-    "arts", "science", "commerce", "nursing", "architecture"
-]
+# Load configuration
+load_dotenv(os.path.join(os.path.dirname(__file__), '../.env'))
 
-STATES = [
-    "gujarat", "maharashtra", "karnataka", "tamil-nadu", "uttar-pradesh",
-    "delhi", "west-bengal", "punjab", "haryana", "rajasthan", "madhya-pradesh"
-]
+MONGO_URI = os.getenv('DATABASE_URL')
+GEMINI_KEY = os.getenv('GEMINI_API_KEY')
 
-async def scrape_listing(page, category, state):
-    url = f"https://collegedunia.com/{category}/{state}-colleges"
-    print(f"Scraping {category} in {state}...")
+# Initialize AI with Search Tool
+genai.configure(api_key=GEMINI_KEY)
+# Initialize AI with Search Tool
+genai.configure(api_key=GEMINI_KEY)
+
+def init_model():
+    model_names = ["models/gemini-2.0-flash", "models/gemini-flash-latest", "gemini-2.0-flash"]
+    for name in model_names:
+        try:
+            print(f"   > Testing model: {name}")
+            m = genai.GenerativeModel(
+                model_name=name,
+                tools=[{"google_search": {}}]
+            )
+            m.generate_content("test")
+            return m
+        except Exception as e:
+            print(f"   ! Tool init failed for {name}: {e}")
+            try:
+                m = genai.GenerativeModel(model_name=name)
+                m.generate_content("test")
+                return m
+            except:
+                pass
+    return genai.GenerativeModel(model_name="gemini-2.0-flash")
+
+model = init_model()
+
+
+
+# Initialize Database
+client = pymongo.MongoClient(MONGO_URI)
+db = client.get_default_database()
+colleges_col = db['colleges']
+
+def standardize_youtube_url(url):
+    # Standardize to embed format
+    if 'youtu.be' in url:
+        return f"https://www.youtube.com/embed/{url.split('/')[-1]}"
+    if 'watch?v=' in url:
+        match = re.search(r'v=([^&]+)', url)
+        if match: return f"https://www.youtube.com/embed/{match.group(1)}"
+    if 'embed/' in url: return url
+    return url
+
+def get_media_for_college(name, state):
+    print(f"\n[+] Processing: {name}")
+    
+    prompt = f"""
+    Find 5 PUBLICLY ACCESSIBLE campus photo URLs and 3 WORKING YouTube tour links for: "{name}, {state}, India".
+    IMPORTANT: 
+    1. Avoid official website links that block hotlinking (403 errors). 
+    2. Prefer links from Unsplash, Wikimedia, Google User Photos, or highly reliable public hubs.
+    3. Ensure YouTube links are in 'https://www.youtube.com/watch?v=VIDEO_ID' format.
+    
+    Return ONLY a JSON object:
+    {{
+        "photos": ["url1", "url2", ...],
+        "videos": ["url1", "url2", ...]
+    }}
+    """
     
     try:
-        await page.goto(url, wait_until="domcontentloaded", timeout=45000)
-        
-        # Wait for either the table or a 404/no-results indicator
-        try:
-            await page.wait_for_selector("table.listing-table", timeout=10000)
-        except:
-            print(f"  No listing table found for {url}")
-            return []
-
-        # Scroll to load more (some pages are lazy loaded)
-        await page.evaluate("window.scrollTo(0, document.body.scrollHeight/2)")
-        await asyncio.sleep(2)
-        
-        results = []
-        rows = await page.query_selector_all("table.listing-table tbody tr")
-        
-        for row in rows:
-            try:
-                name_el = await row.query_selector("a.college_name")
-                if not name_el: continue
-                name = (await name_el.inner_text()).strip()
-                
-                fee_el = await row.query_selector("td:nth-child(3) span:first-child")
-                fee = (await fee_el.inner_text()).strip() if fee_el else "—"
-                
-                avg_el = await row.query_selector("td:nth-child(4) a:first-of-type span")
-                avg_pkg = (await avg_el.inner_text()).strip() if avg_el else "—"
-
-                high_el = await row.query_selector("td:nth-child(4) a:nth-of-type(2) span")
-                high_pkg = (await high_el.inner_text()).strip() if high_el else "—"
-
-                results.append({
-                    "name": name,
-                    "fees": fee,
-                    "avg_placement": avg_pkg,
-                    "highest_placement": high_pkg,
-                    "category": category,
-                    "state": state
-                })
-            except Exception:
-                continue
-        
-        print(f"  Extracted {len(results)} colleges.")
-        return results
+        response = model.generate_content(prompt)
+        text = response.text.strip()
+        json_match = re.search(r'\{.*\}', text, re.DOTALL)
+        if json_match:
+            data = json.loads(json_match.group())
+            photos = data.get('photos', [])
+            videos = [standardize_youtube_url(v) for v in data.get('videos', [])]
+            return photos, videos
     except Exception as e:
-        print(f"  Error scraping {url}: {e}")
-        return []
+        print(f"   ! AI Error: {e}")
+    return [], []
 
-async def main():
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-            viewport={'width': 1920, 'height': 1200}
-        )
-        page = await context.new_page()
-        
-        all_results = []
-        
-        # We'll run a subset for this demonstration, then the user can expand
-        # Let's do Engineering and Management for top 3 states
-        task_list = []
-        for cat in CATEGORIES[:2]: # Engineering, Management
-            for state in STATES[:3]: # Gujarat, Maharashtra, Karnataka
-                task_list.append((cat, state))
-        
-        for cat, state in task_list:
-            # Human-like pacing
-            await asyncio.sleep(random.uniform(5, 10))
-            batch = await scrape_listing(page, cat, state)
-            all_results.extend(batch)
-            
-            # Progressive saving
-            if all_results:
-                with open("universal_results.json", "w", encoding="utf-8") as f:
-                    json.dump(all_results, f, indent=2, ensure_ascii=False)
+def run_universal_scraper(batch_size=10):
+    query = {
+        "$or": [
+            {"photos": {"$exists": False}}, {"photos": {"$size": 0}},
+            {"videos": {"$exists": False}}, {"videos": {"$size": 0}}
+        ]
+    }
+    
+    total = colleges_col.count_documents(query)
+    print(f"--- Universal Media Scraper Starting for {total} colleges ---")
+    
+    # Process RCC first to fix the user's issue
+    rcc = colleges_col.find_one({'name': {'$regex': 'RCC INSTITUTE OF INFORMATION', '$options': 'i'}})
+    if rcc:
+        p, v = get_media_for_college(rcc['name'], rcc.get('state', 'West Bengal'))
+        if p or v:
+            colleges_col.update_one({'_id': rcc['_id']}, {'$set': {'photos': p, 'videos': v, 'updates.lastUpdated': time.strftime('%Y-%m-%d')}})
+            print(f"   > RCC Updated successfully.")
 
-        await browser.close()
-        print(f"\nDone! Total colleges extracted: {len(all_results)}")
+    # Continue with batch
+    cursor = colleges_col.find(query).limit(batch_size)
+    for college in cursor:
+        if "RCC" in college['name']: continue # Skip RCC as handled
+        p, v = get_media_for_college(college['name'], college.get('state', ''))
+        if p or v:
+            colleges_col.update_one({'_id': college['_id']}, {'$set': {'photos': p, 'videos': v, 'updates.lastUpdated': time.strftime('%Y-%m-%d')}})
+            print(f"   > Updated {college['name']} with {len(p)} photos.")
+        time.sleep(3) # Throttle
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    run_universal_scraper(10)

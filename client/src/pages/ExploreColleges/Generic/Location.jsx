@@ -4,12 +4,12 @@ import HowToReach from './HowToReach.jsx';
 
 const Location = ({ collegeData }) => {
     const name = collegeData?.name || 'College';
-    const address = collegeData?.address || 'Address information is being updated.';
-    const district = collegeData?.district || 'Kolkata';
-    const state = collegeData?.state || 'West Bengal';
-    const mapLink = collegeData?.mapLink || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.094595874249!2d88.39655557530018!3d22.5755672794931!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a0276634ad2cdad%3A0xc3928df776fa2e7!2sRCC%20Institute%20of%20Information%20Technology!5e0!3m2!1sen!2sin!4v1709400000000!5m2!1sen!2sin';
+    const address = collegeData?.address && !collegeData.address.includes('updated') ? collegeData.address : '';
+    const district = collegeData?.district || '';
+    const state = collegeData?.state || 'India';
     const phone = collegeData?.contactDetails?.phone || 'N/A';
     const email = collegeData?.contactDetails?.email || 'N/A';
+
 
     const cardStyle = {
         background: '#fff',
@@ -21,9 +21,11 @@ const Location = ({ collegeData }) => {
     };
 
     // Create query string for free embed map
-    const searchQuery = `${name}, ${address}`;
-    const defaultMapLink = `https://maps.google.com/maps?q=${encodeURIComponent(searchQuery)}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
-    const finalMapLink = collegeData?.mapLink || defaultMapLink;
+    // If address is missing, use Name + District + State
+    const searchQuery = address ? `${name}, ${address}` : `${name}, ${district}, ${state}`;
+    const defaultMapLink = `https://maps.google.com/maps?q=${encodeURIComponent(searchQuery)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+    const finalMapLink = (collegeData?.mapLink && collegeData.mapLink.includes('embed')) ? collegeData.mapLink : defaultMapLink;
+
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -109,14 +111,19 @@ const Location = ({ collegeData }) => {
                             Registered Address
                         </h3>
                         <p style={{ fontSize: '15px', color: '#64748b', lineHeight: 1.8, marginBottom: 0 }}>
-                            {address}
-                            <br />
-                            <span style={{ display: 'inline-block', marginTop: '8px' }}>
-                                <strong style={{color: '#334155'}}>District:</strong> {district}
-                            </span>
-                            <br />
-                            <strong style={{color: '#334155'}}>State:</strong> {state}
+                            {address || 'Official registered address is being updated for this college.'}
+                            {(district || state) && (
+                                <>
+                                    <br />
+                                    <span style={{ display: 'inline-block', marginTop: '8px' }}>
+                                        {district && <><strong style={{color: '#334155'}}>District:</strong> {district}</>}
+                                        {district && state && ' | '}
+                                        {state && <><strong style={{color: '#334155'}}>State:</strong> {state}</>}
+                                    </span>
+                                </>
+                            )}
                         </p>
+
                     </div>
 
                     <div style={{ ...cardStyle, gap: '24px', flex: 1 }}>

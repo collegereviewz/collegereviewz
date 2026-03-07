@@ -6,48 +6,40 @@ import { useLocation } from 'react-router-dom';
 import CollegeLogo from '../../components/CollegeLogo.jsx';
 import Review from './Review';
 
-const tabToComponentMap = {
-    'College Info': 'CollegeInfo',
-    'Course & Fees': 'CourseFees',
-    'Cut Off': 'CutOff',
-    'Admission': 'Admission',
-    'Reviews': 'Reviews',
-    'Ranking and Placement': 'RankingPlacement',
-    'Result': 'Result',
-    'Location': 'Location',
-    'Photo & Video': 'PhotoVideo',
-    'Scholarship': 'Scholarship',
-    'Notification & Upload': 'NotificationUpload',
-    'Q & A': 'QA',
-    'Facility': 'Facility',
-    'Student Life': 'StudentLife',
-    'Contact Details': 'ContactDetails'
-};
+import sectionsConfig from '../../constants/collegeSections.json';
 
 const CollegeProfileTemplate = ({ collegeInfo }) => {
     const location = useLocation();
-    const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'College Info');
+    const [activeTab, setActiveTab ] = useState(location.state?.activeTab || 'College Info');
     const contentRef = useRef(null);
+    const [collegeData, setCollegeData] = useState(collegeInfo.data);
     const [stats, setStats] = useState({ 
         rating: collegeInfo.data?.rating || 0, 
         reviewsCount: collegeInfo.data?.reviewsCount || 0 
     });
 
+    // Fetch full college data to get latest photos/videos/stats
+
     useEffect(() => {
-        const fetchStats = async () => {
+        const fetchDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/colleges/${encodeURIComponent(collegeInfo.fullName)}/stats`);
+                const response = await axios.get(`http://localhost:5000/api/colleges/${encodeURIComponent(collegeInfo.fullName)}`);
                 if (response.data.success) {
-                    setStats(response.data.data);
+                    setCollegeData(response.data.data);
+                    setStats({
+                        rating: response.data.data.rating,
+                        reviewsCount: response.data.data.reviewsCount
+                    });
                 }
             } catch (error) {
-                console.error("Error fetching stats:", error);
+                console.error("Error fetching college details:", error);
             }
         };
-        fetchStats();
+        fetchDetails();
     }, [collegeInfo.fullName]);
 
     const handleStatsUpdate = useCallback((newStats) => {
+
         setStats(prev => {
             if (prev.rating === newStats.average && prev.reviewsCount === newStats.total) {
                 return prev;
@@ -68,21 +60,14 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, []);
 
-    const tabs = [
-        'College Info', 'Course & Fees', 'Cut Off', 'Admission', 
-        'Reviews', 'Ranking and Placement', 'Result', 'Location',
-        'Photo & Video', 'Scholarship', 'Notification & Upload', 'Q & A',
-        'Facility', 'Student Life', 'Contact Details'
-    ];
-
     // useMemo ensures a stable lazy reference per college+tab combination
-    // This prevents React from treating it as a new component on every render
     const ActiveComponent = useMemo(() => {
         if (activeTab === 'Reviews') {
             return Review;
         }
 
-        const componentName = tabToComponentMap[activeTab];
+        const section = sectionsConfig.find(s => s.title === activeTab);
+        const componentName = section ? section.component : 'CollegeInfo';
         
         if (collegeInfo.isGeneric) {
             // Check if we have a generic/MBBS version, else show a placeholder
@@ -101,6 +86,7 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [collegeInfo.folderName, activeTab, collegeInfo.isGeneric]);
 
+
     const containerStyle = {
         maxWidth: '1440px',
         margin: '0 auto',
@@ -113,9 +99,10 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
             <div style={{ 
                 position: 'relative', 
                 height: '400px', 
-                background: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url("${collegeInfo.heroImage}")`,
+                backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url("${(collegeInfo.isGeneric && collegeData?.photos?.length > 0) ? collegeData.photos[0] : collegeInfo.heroImage}")`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
                 display: 'flex',
                 alignItems: 'flex-end',
                 color: '#fff'
@@ -166,11 +153,12 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
             {/* Sticky Tabs Navigation */}
             <div style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', position: 'sticky', top: '0', zIndex: 100, boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
                 <div style={{ ...containerStyle, display: 'flex', overflowX: 'auto', gap: '32px', padding: '0 40px' }} className="no-scrollbar">
-                    {tabs.map(tab => (
+                    {sectionsConfig.map(s => (
                         <button 
-                            key={tab}
+                            key={s.id}
                             onClick={() => {
-                                setActiveTab(tab);
+                                setActiveTab(s.title);
+
                                 // Scroll to the top of the content area after a brief tick
                                 setTimeout(() => {
                                     if (contentRef.current) {
@@ -181,18 +169,19 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
                             style={{ 
                                 padding: '20px 0',
                                 fontSize: '14px',
-                                fontWeight: activeTab === tab ? 800 : 600,
-                                color: activeTab === tab ? '#5b51d8' : '#64748b',
+                                fontWeight: activeTab === s.title ? 800 : 600,
+                                color: activeTab === s.title ? '#5b51d8' : '#64748b',
                                 border: 'none',
                                 background: 'none',
-                                borderBottom: activeTab === tab ? '3px solid #5b51d8' : '3px solid transparent',
+                                borderBottom: activeTab === s.title ? '3px solid #5b51d8' : '3px solid transparent',
                                 cursor: 'pointer',
                                 whiteSpace: 'nowrap',
                                 transition: 'all 0.2s ease'
                             }}
                         >
-                            {tab}
+                            {s.title}
                         </button>
+
                     ))}
                 </div>
             </div>
@@ -203,20 +192,82 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
                     key={`${collegeInfo.fullName}-${activeTab}`}
                     fallback={<div style={{ padding: '40px', textAlign: 'center', fontWeight: 700, color: '#64748b' }}>Loading content...</div>}
                 >
-                    {activeTab === 'Reviews' ? (
-                        <div style={{ background: '#fff', borderRadius: '20px', padding: '28px', border: '1px solid #e2e8f0' }}>
-                                <ActiveComponent 
-                                    collegeId={collegeInfo.data?._id || collegeInfo.data?.data?._id} 
-                                    collegeName={collegeInfo.fullName || collegeInfo.data?.name} 
-                                    isEmbedded={true}
-                                    onStatsUpdate={handleStatsUpdate}
-                                />
-                        </div>
-                    ) : (
-                        <ActiveComponent collegeData={collegeInfo.data} onTabChange={setActiveTab} />
-                    )}
+                    {(() => {
+                        const section = sectionsConfig.find(s => s.title === activeTab);
+                        const requiredField = section?.requiredField;
+                        const dataValue = requiredField ? collegeData?.[requiredField] : true;
+                        
+                        // Check if data is empty (null, undefined, empty array, or empty string)
+                        const isEmpty = !dataValue || (Array.isArray(dataValue) && dataValue.length === 0);
+
+                        if (isEmpty && activeTab !== 'Reviews' && activeTab !== 'College Info') {
+                            return (
+                                <div style={{ 
+                                    background: '#fff', 
+                                    borderRadius: '20px', 
+                                    padding: '60px 40px', 
+                                    border: '1px solid #e2e8f0',
+                                    textAlign: 'center',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: '20px'
+                                }}>
+                                    <div style={{ 
+                                        width: '80px', 
+                                        height: '80px', 
+                                        background: '#f1f5f9', 
+                                        borderRadius: '50%', 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center',
+                                        color: '#64748b'
+                                    }}>
+                                        <Star size={40} opacity={0.2} />
+                                    </div>
+                                    <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#1e293b', margin: 0 }}>
+                                        {activeTab} Coming Soon!
+                                    </h3>
+                                    <p style={{ maxWidth: '500px', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
+                                        {section.emptyMessage || `We're currently gathering the most accurate ${activeTab} data for ${collegeInfo.fullName}. Check back soon for updates!`}
+                                    </p>
+                                    <button 
+                                        onClick={() => setActiveTab('College Info')}
+                                        style={{ 
+                                            marginTop: '10px',
+                                            padding: '10px 24px', 
+                                            background: '#5b51d8', 
+                                            color: '#fff', 
+                                            border: 'none', 
+                                            borderRadius: '12px', 
+                                            fontWeight: 700,
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Back to Overview
+                                    </button>
+                                </div>
+                            );
+                        }
+
+                        if (activeTab === 'Reviews') {
+                            return (
+                                <div style={{ background: '#fff', borderRadius: '20px', padding: '28px', border: '1px solid #e2e8f0' }}>
+                                    <ActiveComponent 
+                                        collegeId={collegeData?._id || collegeInfo.data?._id || collegeInfo.data?.data?._id} 
+                                        collegeName={collegeInfo.fullName || collegeData?.name} 
+                                        isEmbedded={true}
+                                        onStatsUpdate={handleStatsUpdate}
+                                    />
+                                </div>
+                            );
+                        }
+
+                        return <ActiveComponent collegeData={collegeData} onTabChange={setActiveTab} />;
+                    })()}
                 </Suspense>
             </div>
+
 
             <style>{`.no-scrollbar::-webkit-scrollbar { display: none; }`}</style>
         </div>

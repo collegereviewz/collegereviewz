@@ -2,6 +2,13 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import College from '../models/College.model.js';
 
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+
 /**
  * Heuristic to guess official website domain from college name
  */
@@ -133,6 +140,40 @@ export const scrapeUpdates = async (domain) => {
 };
 
 /**
+ * AI-powered fetching of photos and videos using Gemini Google Search
+ */
+export const fetchMediaWithAI = async (collegeName, state) => {
+    try {
+        if (!process.env.GEMINI_API_KEY) return null;
+
+        const model = genAI.getGenerativeModel({
+            model: "gemini-2.0-flash",
+            tools: [{ googleSearch: {} }]
+        });
+
+        const prompt = `Find 3-5 high-quality YouTube video URLs and 4-6 high-quality campus photo URLs (Unsplash or official) for "${collegeName}, ${state}".
+        Return ONLY a JSON object with "photos" and "videos" arrays. 
+        Example: {"photos": ["url1", "url2"], "videos": ["url1", "url2"]}
+        Respond with raw JSON only.`;
+
+        const result = await model.generateContent(prompt);
+        let text = result.response.text();
+
+        // Clean up markdown
+        if (text.includes('```')) {
+            text = text.replace(/```json|```/g, '').trim();
+        }
+
+        const media = JSON.parse(text);
+        return media;
+    } catch (error) {
+        console.error(`AI Media fetching error for ${collegeName}:`, error.message);
+        return null;
+    }
+};
+
+
+/**
  * Update a specific college by ID
  */
 export const updateCollegeData = async (collegeId) => {
@@ -145,13 +186,28 @@ export const updateCollegeData = async (collegeId) => {
     if (!college.officialWebsite) college.officialWebsite = domain;
 
     const scrapedData = await scrapeUpdates(domain);
+
+    // AI Media Fetching (If missing or sparse)
+    if (!college.videos || college.videos.length < 2 || !college.photos || college.photos.length < 2) {
+        console.log(`Auto-fetching AI media for ${college.name}...`);
+        const aiMedia = await fetchMediaWithAI(college.name, college.state);
+        if (aiMedia) {
+            if (aiMedia.videos && aiMedia.videos.length > 0) college.videos = aiMedia.videos;
+            if (aiMedia.photos && aiMedia.photos.length > 0) college.photos = aiMedia.photos;
+        }
+    }
+
     if (scrapedData) {
         college.updates = scrapedData;
         if (scrapedData.fees) college.fees = scrapedData.fees;
         if (scrapedData.avgPackage) college.avgPackage = scrapedData.avgPackage;
         if (scrapedData.highestPackage) college.highestPackage = scrapedData.highestPackage;
         await college.save();
-        return scrapedData;
+        return { updates: scrapedData, mediaFetched: true };
     }
-    return null;
+
+    // Save college even if scraping fails but AI media was found
+    await college.save();
+    return { updates: null, mediaFetched: true };
 };
+

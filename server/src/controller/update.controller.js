@@ -16,13 +16,14 @@ export const getCollegeUpdates = async (req, res) => {
             return res.json(college.updates);
         }
 
-        const scrapedData = await updateCollegeData(id);
+        const result = await updateCollegeData(id);
 
-        if (scrapedData) {
-            return res.json(scrapedData);
+        if (result && result.updates) {
+            return res.json(result.updates);
         }
 
         res.json(college.updates || { notifications: [], news: [], events: [] });
+
 
     } catch (error) {
         res.status(500).json({ message: error.message });

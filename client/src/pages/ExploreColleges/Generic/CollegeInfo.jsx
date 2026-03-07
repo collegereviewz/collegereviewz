@@ -11,16 +11,26 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
     // collegeData comes from ExploreColleges when "View Details" or Name is clicked.
     // We default to it, but fallback if not perfectly formed.
     // Map data from collegeData
+    const s = (val) => (val && typeof val === 'object' ? '—' : (val || '—'));
+
     const name = collegeData?.name || 'College Name';
-    const location = collegeData?.location || 'Location Not Available';
-    const type = collegeData?.rankingInfo || 'Institution Type';
-    
+    const location = s(collegeData?.city || collegeData?.location || collegeData?.district);
+    const type = s(collegeData?.institutionType || collegeData?.managementType);
     // We get these from the grouped collegeData
-    const established = collegeData?.establishedYear || '—';
-    const averagePackage = collegeData?.placement || collegeData?.avgPackage || '—';
-    const highestPackage = collegeData?.highestPackage || '—';
-    const entranceExam = collegeData?.entranceExam || '—';
-    const rankingStr = collegeData?.rankingInfo || '—';
+    const established = s(collegeData?.establishedYear);
+    // Robustly extract placement data (handles objects or direct values)
+
+    const averagePackage = (collegeData?.placement && typeof collegeData.placement === 'object') 
+        ? s(collegeData.placement.avgPackage) 
+        : s(collegeData?.avgPackage || collegeData?.placement);
+
+    const highestPackage = (collegeData?.placement && typeof collegeData.placement === 'object')
+        ? s(collegeData.placement.highestPackage)
+        : s(collegeData?.highestPackage);
+
+    const entranceExam = s(collegeData?.entranceExam);
+    const rankingStr = s(collegeData?.ranking || collegeData?.rankingInfo);
+
 
     // ─── DYNAMIC UPDATES LOGIC ──────────────────────────────────────────────
     const [dynamicUpdates, setDynamicUpdates] = useState({ notifications: [], news: [], events: [] });

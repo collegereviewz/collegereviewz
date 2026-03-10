@@ -40,7 +40,9 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
     useEffect(() => {
         const fetchDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/colleges/${encodeURIComponent(collegeInfo.fullName)}`);
+                // Use a cleaner name for API requests to avoid 404s from descriptive titles
+                const searchName = collegeInfo.fullName.split(' - ')[0];
+                const response = await axios.get(`http://localhost:5000/api/colleges/${encodeURIComponent(searchName)}/stats`);
                 if (response.data.success) {
                     setCollegeData(response.data.data);
                     setStats({
@@ -227,34 +229,25 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
 
             {/* Main Content Area */}
             <div ref={contentRef} style={{ ...containerStyle, marginTop: '32px' }}>
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={activeTab}
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -15 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <Suspense
-                            key={`${collegeInfo.fullName}-${activeTab}`}
-                            fallback={<div style={{ padding: '40px', textAlign: 'center', fontWeight: 700, color: '#64748b' }}>Loading content...</div>}
-                        >
-                            {activeTab === 'Reviews' ? (
-                                <div style={{ background: '#fff', borderRadius: '20px', padding: '28px', border: '1px solid #e2e8f0' }}>
-                                    <ActiveComponent
-                                        collegeId={collegeData?._id || collegeData?.data?._id}
-                                        collegeName={collegeInfo.fullName || collegeData?.name}
-                                        collegeData={collegeData}
-                                        isEmbedded={true}
-                                        onStatsUpdate={handleStatsUpdate}
-                                    />
-                                </div>
-                            ) : (
-                                <ActiveComponent collegeData={collegeData} onTabChange={setActiveTab} />
-                            )}
-                        </Suspense>
-                    </motion.div>
-                </AnimatePresence>
+                <Suspense
+                    key={`${collegeInfo.fullName}-${activeTab}`}
+                    fallback={<div style={{ padding: '40px', textAlign: 'center', fontWeight: 700, color: '#64748b' }}>Loading content...</div>}
+                >
+                    {activeTab === 'Reviews' ? (
+                        <div style={{ background: '#fff', borderRadius: '20px', padding: '28px', border: '1px solid #e2e8f0' }}>
+                            <ActiveComponent
+                                collegeId={collegeInfo.data?._id || collegeInfo.data?.data?._id}
+                                collegeName={collegeInfo.fullName || collegeInfo.data?.name}
+                                collegeData={collegeInfo.data}
+                                collegeStats={stats}
+                                isEmbedded={true}
+                                onStatsUpdate={handleStatsUpdate}
+                            />
+                        </div>
+                    ) : (
+                        <ActiveComponent collegeData={collegeInfo.data} onTabChange={setActiveTab} />
+                    )}
+                </Suspense>
             </div>
 
 

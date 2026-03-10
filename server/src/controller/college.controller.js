@@ -116,22 +116,29 @@ export const getCollegeStats = async (req, res) => {
             return res.status(404).json({ success: false, message: 'College not found' });
         }
 
-        // If reviewStats is missing or user requested a fresh scrape, trigger Gemini
+        // If reviewStats is missing or user requested a fresh scrape, trigger Gemini in background (non-blocking)
         if (triggerScrape === 'true' || !college.reviewStats || !college.reviewStats.external || !college.reviewStats.external.google.rating) {
-            try {
-                const { extractCollegeInfo } = await import('../services/gemini.service.js');
-                const aiData = await extractCollegeInfo(college.name);
-                if (aiData && aiData.reviewStats) {
-                    college.reviewStats = aiData.reviewStats;
-                    if (aiData.fees) college.fees = aiData.fees;
-                    if (aiData.courses) college.courses = aiData.courses;
-                    if (aiData.avgPackage) college.avgPackage = aiData.avgPackage;
-                    if (aiData.highestPackage) college.highestPackage = aiData.highestPackage;
-                    await college.save();
+            // FIRE AND FORGET - Do not await here
+            (async () => {
+                try {
+                    const { extractCollegeInfo } = await import('../services/gemini.service.js');
+                    const aiData = await extractCollegeInfo(college.name);
+                    if (aiData && aiData.reviewStats) {
+                        const freshCollege = await College.findById(college._id);
+                        if (freshCollege) {
+                            freshCollege.reviewStats = aiData.reviewStats;
+                            if (aiData.fees) freshCollege.fees = aiData.fees;
+                            if (aiData.courses) freshCollege.courses = aiData.courses;
+                            if (aiData.avgPackage) freshCollege.avgPackage = aiData.avgPackage;
+                            if (aiData.highestPackage) freshCollege.highestPackage = aiData.highestPackage;
+                            await freshCollege.save();
+                            console.log(`AI background update successful for: ${college.name}`);
+                        }
+                    }
+                } catch (aiErr) {
+                    console.error('Failed to trigger background AI scrape:', aiErr.message);
                 }
-            } catch (aiErr) {
-                console.error('Failed to trigger AI scrape:', aiErr.message);
-            }
+            })();
         }
 
         const statsPipeline = [

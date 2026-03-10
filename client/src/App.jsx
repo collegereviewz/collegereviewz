@@ -22,6 +22,7 @@ import ProfilePage from './pages/ProfilePage'
 import CollegeProfileWrapper from './pages/CollegeProfileWrapper'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
+import NotFoundPage from './pages/NotFoundPage'
 import Swal from 'sweetalert2';
 import AuthModal from './components/AuthModal'
 
@@ -117,6 +118,8 @@ function AppContent() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+              style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+              className="flex-grow flex flex-col"
             >
               <Routes location={location}>
                 <Route path="/" element={<Home />} />
@@ -133,6 +136,7 @@ function AppContent() {
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/college/:collegeName" element={<CollegeProfileWrapper />} />
+                <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </motion.div>
           </AnimatePresence>

@@ -27,6 +27,79 @@ const LoadingSpinner = () => (
     </div>
 );
 
+const WaterfallLoader = () => (
+    <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 99999,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backdropFilter: 'blur(12px)',
+            backgroundColor: 'rgba(15, 23, 42, 0.85)',
+        }}
+    >
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '32px', alignItems: 'center', height: '60px' }}>
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+                <motion.div
+                    key={i}
+                    animate={{
+                        height: [15, 60, 15],
+                        backgroundColor: ['#3b4eba', '#51c1ef', '#3b4eba', '#f26a21', '#3b4eba']
+                    }}
+                    transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        delay: i * 0.15,
+                        ease: "easeInOut"
+                    }}
+                    style={{
+                        width: '10px',
+                        borderRadius: '20px',
+                        boxShadow: '0 0 15px rgba(81, 193, 239, 0.3)'
+                    }}
+                />
+            ))}
+        </div>
+        <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            style={{ textAlign: 'center' }}
+        >
+            <h3 style={{
+                color: '#fff',
+                fontSize: '24px',
+                fontWeight: 800,
+                margin: '0 0 8px 0',
+                fontFamily: "'Outfit', sans-serif",
+                letterSpacing: '-0.02em',
+                background: 'linear-gradient(135deg, #fff 0%, #cbd5e1 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+            }}>
+                Uploading Your Experience
+            </h3>
+            <p style={{
+                color: '#94a3b8',
+                fontSize: '16px',
+                margin: 0,
+                fontFamily: "'Outfit', sans-serif"
+            }}>
+                High-quality media takes a moment to process...
+            </p>
+        </motion.div>
+    </motion.div>
+);
+
 const MediaControls = ({ id, current, total, percentage, speed, onSeek, onSpeedChange, color, windowWidth }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', marginTop: '4px' }}>
         <div
@@ -298,6 +371,7 @@ const WriteAReview = ({ collegeId: propCollegeId, collegeName: propCollegeName, 
     const [showVideoOptions, setShowVideoOptions] = useState(false);
     const [isVideoRecording, setIsVideoRecording] = useState(false);
     const [videoPreviewStream, setVideoPreviewStream] = useState(null);
+    const [isPosting, setIsPosting] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
     const [commentVideoBlobs, setCommentVideoBlobs] = useState({});
     const [isRecordingVideoComment, setIsRecordingVideoComment] = useState(null);
@@ -787,72 +861,68 @@ const WriteAReview = ({ collegeId: propCollegeId, collegeName: propCollegeName, 
     };
 
     const handlePost = async () => {
-        if (rating === 0) {
-            alert("Please provide a rating (1-5 stars) before posting.");
+        if ((collegeId || collegeName) && rating === 0) {
+            alert("Please provide a rating (1-5 stars) before posting this college review.");
             return;
         }
+
         if (!newPostContent && !audioBlob && !selectedGif && !videoFile) return;
 
-        let mediaUrl = selectedGif;
-        if (audioBlob) {
-            // In a real app we'd upload to S3. For now, we'll store as base64 or a blob-ready URL
-            // Since we're using a real (but local) server, object URLs won't persist after refresh.
-            // For demo, we'll use a data URL.
-            mediaUrl = await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(audioBlob);
-                reader.onloadend = () => resolve(reader.result);
-            });
-        }
-        if (videoFile) {
-            mediaUrl = await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                if (videoFile instanceof Blob) {
-                    reader.readAsDataURL(videoFile);
-                } else {
-                    // It's already a base64 string or something else
-                    resolve(videoFile);
-                }
-            });
-        }
-
-        // Detect hashtags in content automatically
-        let hashtagList = newPostContent.match(/#[\w-]+/g)?.map(tag => tag.slice(1)) || [];
-        if (defaultTag && !hashtagList.some(h => h.toLowerCase() === defaultTag.toLowerCase())) {
-            hashtagList.push(defaultTag);
-        }
-
-        // Ensure we send the correct type based on what is actually attached
-        let finalType = postType;
-        if (videoFile) finalType = 'video';
-        else if (audioBlob) finalType = 'voice';
-        else if (selectedGif) finalType = 'gif';
-
-        let finalContent = deduplicateHashtagsStr(newPostContent);
-        if (defaultTag && !finalContent.toLowerCase().includes(`#${defaultTag.toLowerCase()}`)) {
-            finalContent = `#${defaultTag} \n${finalContent}`.trim();
-        }
-
-        const reviewData = {
-            userId: user?._id,
-            author: user?.fullName || "Anonymous Student",
-            role: user?.role || "Student",
-            content: finalContent,
-            type: finalType,
-            mediaUrl: mediaUrl,
-            hashtags: hashtagList,
-            collegeId: collegeId,
-            collegeName: collegeName,
-            rating: rating
-        };
-
+        setIsPosting(true);
         try {
+            let mediaUrl = selectedGif;
+            if (audioBlob) {
+                mediaUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => resolve(reader.result);
+                });
+            }
+            if (videoFile) {
+                mediaUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    if (videoFile instanceof Blob) {
+                        reader.readAsDataURL(videoFile);
+                    } else {
+                        resolve(videoFile);
+                    }
+                });
+            }
+
+            let hashtagList = newPostContent.match(/#[\w-]+/g)?.map(tag => tag.slice(1)) || [];
+            if (defaultTag && !hashtagList.some(h => h.toLowerCase() === defaultTag.toLowerCase())) {
+                hashtagList.push(defaultTag);
+            }
+
+            let finalType = postType;
+            if (videoFile) finalType = 'video';
+            else if (audioBlob) finalType = 'voice';
+            else if (selectedGif) finalType = 'gif';
+
+            let finalContent = deduplicateHashtagsStr(newPostContent);
+            if (defaultTag && !finalContent.toLowerCase().includes(`#${defaultTag.toLowerCase()}`)) {
+                finalContent = `#${defaultTag} \n${finalContent}`.trim();
+            }
+
+            const reviewData = {
+                author: "Anonymous Student",
+                role: "Student",
+                content: finalContent,
+                type: finalType,
+                mediaUrl: mediaUrl,
+                hashtags: hashtagList,
+                collegeId: collegeId,
+                collegeName: collegeName,
+                rating: rating
+            };
+
             const response = await fetch(API_BASE, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(reviewData)
             });
+
             if (response.ok) {
                 const savedReview = await response.json();
                 setPosts([savedReview, ...posts]);
@@ -864,7 +934,6 @@ const WriteAReview = ({ collegeId: propCollegeId, collegeName: propCollegeName, 
                 setRating(0);
                 setShowGifPicker(false);
 
-                // Trigger Unique Blue Smiley Animated Alert
                 Swal.fire({
                     html: `
                         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 20px;">
@@ -882,7 +951,7 @@ const WriteAReview = ({ collegeId: propCollegeId, collegeName: propCollegeName, 
                             <p style="color: #94a3b8; margin: 0; font-size: 15px; font-family: 'Inter', sans-serif; line-height: 1.5;">Your insights are making <br/> our community stronger.</p>
                         </div>
                     `,
-                    background: '#1e293b', // Matches colors.card / dark mode theme
+                    background: '#1e293b',
                     showConfirmButton: false,
                     timer: 2800,
                     timerProgressBar: true,
@@ -898,7 +967,6 @@ const WriteAReview = ({ collegeId: propCollegeId, collegeName: propCollegeName, 
                 }
             } else {
                 const errorData = await response.json().catch(() => ({}));
-                console.error("Post failed with status:", response.status, errorData);
                 if (response.status === 413) {
                     alert("The file you are trying to post is too large for the server. Try a shorter clip.");
                 } else {
@@ -908,6 +976,8 @@ const WriteAReview = ({ collegeId: propCollegeId, collegeName: propCollegeName, 
         } catch (err) {
             console.error("Error posting review:", err);
             alert("Could not connect to the server. Please ensure the backend is running.");
+        } finally {
+            setIsPosting(false);
         }
     };
 
@@ -1350,21 +1420,23 @@ const WriteAReview = ({ collegeId: propCollegeId, collegeName: propCollegeName, 
                                     <User size={24} color={colors.accent} />
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
-                                        {[1, 2, 3, 4, 5].map((star) => (
-                                            <Star
-                                                key={star}
-                                                size={20}
-                                                fill={star <= rating ? "#f59e0b" : "transparent"}
-                                                color={star <= rating ? "#f59e0b" : "#cbd5e1"}
-                                                style={{ cursor: 'pointer', transition: 'all 0.2s' }}
-                                                onClick={() => setRating(star)}
-                                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.15)'}
-                                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                            />
-                                        ))}
-                                        {rating === 0 && <span style={{ fontSize: '12px', color: '#ef4444', marginLeft: '8px', fontWeight: 600 }}>* Required</span>}
-                                    </div>
+                                    {(collegeId || collegeName) && (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <Star
+                                                    key={star}
+                                                    size={20}
+                                                    fill={star <= rating ? "#f59e0b" : "transparent"}
+                                                    color={star <= rating ? "#f59e0b" : "#cbd5e1"}
+                                                    style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                                                    onClick={() => setRating(star)}
+                                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.15)'}
+                                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                                />
+                                            ))}
+                                            {rating === 0 && <span style={{ fontSize: '12px', color: '#ef4444', marginLeft: '8px', fontWeight: 600 }}>* Required</span>}
+                                        </div>
+                                    )}
                                     <div style={{ position: 'relative', width: '100%' }}>
                                         <textarea
                                             ref={textareaRef}
@@ -1772,570 +1844,573 @@ const WriteAReview = ({ collegeId: propCollegeId, collegeName: propCollegeName, 
                                             </button>
                                         )}
                                     </div>
-                                ) : sortedPosts
-                                    .filter(post => {
-                                        if (filterTag && filterTag !== 'Home Feed') {
-                                            const hasTagStr = post.content?.toLowerCase().includes(`#${filterTag.toLowerCase()}`);
-                                            const hasTagArr = post.hashtags?.some(t => t.toLowerCase() === filterTag.toLowerCase());
-                                            if (!hasTagStr && !hasTagArr) return false;
-                                        }
-                                        if (filterAuthor) {
-                                            const currentAuthor = post.author || 'Anonymous';
-                                            if (currentAuthor.trim().toLowerCase() !== filterAuthor.trim().toLowerCase()) return false;
-                                        }
-                                        return true;
-                                    })
-                                    .map(post => (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            layout
-                                            key={post._id}
-                                            style={{
-                                                background: isEmbedded ? '#f8fafc' : colors.card,
-                                                padding: '24px',
-                                                marginBottom: (isEmbedded || collegeId) ? '12px' : '20px',
-                                                border: `1px solid ${colors.border}`,
-                                                color: colors.textDark,
-                                                boxShadow: isEmbedded ? '0 4px 15px rgba(0,0,0,0.03)' : '0 2px 10px rgba(0,0,0,0.02)'
-                                            }}
-                                        >
-                                            <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
-                                                <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: colors.secondary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', fontWeight: 800, color: colors.primary, flexShrink: 0 }}>
-                                                    {post.author?.[0] || 'A'}
-                                                </div>
-                                                <div style={{ flex: 1 }}>
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                                        <div>
-                                                            <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800, color: '#000000' }}>{post.author}</h4>
-                                                            <span style={{ fontSize: '12px', color: '#64748b' }}>{new Date(post.createdAt).toLocaleDateString()}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div style={{ display: 'flex', gap: '8px' }}>
-                                                    <button
-                                                        onClick={() => {
-                                                            setEditingPostId(post._id);
-                                                            setEditContent(post.content);
-                                                            setEditAudioBlob(null);
-                                                            setEditVideoFile(null);
-                                                            setEditSelectedGif(null);
-                                                            setEditPostType(null);
-                                                        }}
-                                                        style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: '4px' }}
-                                                        className="hover-primary"
-                                                    >
-                                                        <Edit3 size={16} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(post._id)}
-                                                        style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
-                                                        className="hover-downvote"
-                                                    >
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <div style={{ marginBottom: '4px' }}>
-                                                {editingPostId === post._id ? (
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', background: colors.secondary, padding: '16px', borderRadius: '12px', border: `1px solid ${colors.border}` }}>
-                                                        <textarea
-                                                            value={editContent}
-                                                            onChange={(e) => setEditContent(e.target.value)}
-                                                            style={{ width: '100%', background: '#fff', border: `1px solid ${colors.primary}44`, borderRadius: '10px', padding: '12px', color: colors.textDark, outline: 'none', resize: 'none', minHeight: '80px', fontSize: '15px' }}
-                                                        />
-
-                                                        {/* Previews for newly selected media during edit */}
-                                                        {(editAudioBlob || editVideoFile || editSelectedGif) && (
-                                                            <motion.div
-                                                                initial={{ opacity: 0, y: 10 }}
-                                                                animate={{ opacity: 1, y: 0 }}
-                                                                style={{ background: 'rgba(0, 150, 255, 0.1)', padding: '12px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}
-                                                            >
-                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                                        <span style={{ fontSize: '12px', fontWeight: 700, color: colors.primary }}>NEW MEDIA READY</span>
-                                                                        <button
-                                                                            onClick={() => { setEditAudioBlob(null); setEditVideoFile(null); setEditSelectedGif(null); setEditPostType(null); }}
-                                                                            style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer' }}
-                                                                        >
-                                                                            <Trash2 size={14} />
-                                                                        </button>
-                                                                    </div>
-
-                                                                    {editAudioBlob && (
-                                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '10px', border: `1px solid ${colors.border}` }}>
-                                                                            <button
-                                                                                onClick={() => handlePlayAudio('preview-edit', URL.createObjectURL(editAudioBlob))}
-                                                                                style={{ background: colors.primary, border: 'none', width: '28px', height: '28px', borderRadius: '50%', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
-                                                                            >
-                                                                                {playingAudioId === 'preview-edit' ? <Pause size={12} fill="currentColor" /> : <Play size={12} fill="currentColor" />}
-                                                                            </button>
-                                                                            <div style={{ flex: 1 }}>
-                                                                                <MediaControls
-                                                                                    id="preview-edit"
-                                                                                    current={mediaProgress['preview-edit']?.current || 0}
-                                                                                    total={mediaProgress['preview-edit']?.total || 0}
-                                                                                    percentage={mediaProgress['preview-edit']?.percentage || 0}
-                                                                                    speed={playbackSpeed}
-                                                                                    onSeek={(pos) => handleSeek('preview-edit', pos)}
-                                                                                    onSpeedChange={(s) => handleSpeedChange('preview-edit', s)}
-                                                                                    color={colors.primary}
-                                                                                    windowWidth={windowWidth}
-                                                                                />
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                                {editSelectedGif && <img src={editSelectedGif} alt="new-gif" style={{ width: '80px', borderRadius: '6px', marginBottom: '10px' }} />}
-                                                                {editVideoFile && (
-                                                                    <div style={{ borderRadius: '8px', overflow: 'hidden', background: '#000', maxHeight: '100px', marginTop: '10px' }}>
-                                                                        <video src={editVideoFile instanceof Blob ? URL.createObjectURL(editVideoFile) : editVideoFile} controls style={{ width: '100%', maxHeight: '100px' }} />
-                                                                    </div>
-                                                                )}
-
-                                                                {/* Smart Categorization Pills in Edit Mode */}
-                                                                <div style={{ marginTop: '16px', borderTop: `1px solid ${colors.border}`, paddingTop: '12px' }}>
-                                                                    <span style={{ fontSize: '11px', fontWeight: 800, color: colors.accent, display: 'block', marginBottom: '8px' }}>CATEGORIZE YOUR NOTE</span>
-                                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                                                        {categories.map(cat => (
-                                                                            <button
-                                                                                key={cat}
-                                                                                onClick={() => handleToggleCategory(cat, true)}
-                                                                                style={{
-                                                                                    padding: '6px 12px',
-                                                                                    borderRadius: '20px',
-                                                                                    fontSize: '10px',
-                                                                                    background: editContent.toLowerCase().includes(`#${cat.toLowerCase()}`) ? colors.primary : 'rgba(255,255,255,0.05)',
-                                                                                    color: editContent.toLowerCase().includes(`#${cat.toLowerCase()}`) ? '#fff' : '#94a3b8',
-                                                                                    border: `1px solid ${editContent.toLowerCase().includes(`#${cat.toLowerCase()}`) ? colors.primary : colors.border}`,
-                                                                                    cursor: 'pointer',
-                                                                                    fontWeight: 700,
-                                                                                    transition: 'all 0.2s'
-                                                                                }}
-                                                                            >
-                                                                                {cat}
-                                                                            </button>
-                                                                        ))}
-                                                                    </div>
-                                                                </div>
-                                                            </motion.div>
-                                                        )}
-
-                                                        {showEditGifPicker && (
-                                                            <div style={{ background: '#0f172a', padding: '12px', borderRadius: '10px', border: `1px solid ${colors.border}` }}>
-                                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                                                                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#fff' }}>Select New GIF</span>
-                                                                    <button onClick={() => setShowEditGifPicker(false)} style={{ background: 'none', border: 'none', color: '#64748b' }}><X size={14} /></button>
-                                                                </div>
-                                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', maxHeight: '150px', overflowY: 'auto' }}>
-                                                                    {trendingGifs.map((url, i) => (
-                                                                        <img
-                                                                            key={i} src={url}
-                                                                            alt="gif"
-                                                                            style={{ width: '100%', borderRadius: '6px', cursor: 'pointer', border: editSelectedGif === url ? `2px solid ${colors.primary}` : 'none' }}
-                                                                            onClick={() => { setEditSelectedGif(url); setEditPostType('gif'); setShowEditGifPicker(false); }}
-                                                                        />
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                        )}
-
-                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                                                            <div style={{ display: 'flex', gap: '12px' }}>
-                                                                <button onClick={() => startRecording(true)} style={{ background: 'none', border: 'none', color: editPostType === 'voice' ? colors.primary : '#64748b', cursor: 'pointer' }}><Mic size={18} /></button>
-                                                                <div style={{ position: 'relative' }}>
-                                                                    <button onClick={() => setShowEditVideoOptions(!showEditVideoOptions)} style={{ background: 'none', border: 'none', color: editPostType === 'video' ? colors.primary : '#64748b', cursor: 'pointer' }}><Video size={18} /></button>
-                                                                    {showEditVideoOptions && (
-                                                                        <div style={{ position: 'absolute', bottom: '100%', left: 0, background: '#1e293b', border: `1px solid ${colors.border}`, borderRadius: '10px', padding: '8px', zIndex: 100, display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '140px' }}>
-                                                                            <div onClick={() => { startVideoRecording(true); setShowEditVideoOptions(false); }} style={{ padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', color: '#fff' }} className="hover-bg">Record New</div>
-                                                                            <div onClick={() => { editVideoInputRef.current?.click(); setShowEditVideoOptions(false); }} style={{ padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', color: '#fff' }} className="hover-bg">Upload New</div>
-                                                                        </div>
-                                                                    )}
-                                                                    <input type="file" ref={editVideoInputRef} style={{ display: 'none' }} accept="video/*" onChange={(e) => handleVideoUpload(e, true)} />
-                                                                </div>
-                                                                <button onClick={() => setShowEditGifPicker(!showEditGifPicker)} style={{ background: 'none', border: 'none', color: editPostType === 'gif' ? colors.primary : '#64748b', cursor: 'pointer' }}><ImageIcon size={18} /></button>
-                                                            </div>
-                                                            <div style={{ display: 'flex', gap: '8px' }}>
-                                                                <button onClick={() => { setEditingPostId(null); setEditPostType(null); setEditAudioBlob(null); setEditVideoFile(null); setEditSelectedGif(null); }} style={{ background: 'transparent', border: `1px solid ${colors.border}`, color: '#64748b', padding: '8px 16px', borderRadius: '10px', cursor: 'pointer', fontSize: '14px', fontWeight: 600 }}>Cancel</button>
-                                                                <button onClick={() => handleUpdate(post._id)} style={{ background: colors.primary, border: 'none', color: '#fff', padding: '8px 20px', borderRadius: '10px', cursor: 'pointer', fontSize: '14px', fontWeight: 700, boxShadow: `0 4px 12px ${colors.primary}44` }}>Save Changes</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div style={{ marginBottom: '16px' }}>
-                                                        <p style={{ margin: 0, fontSize: '15px', lineHeight: '1.6', color: colors.textDark, whiteSpace: 'pre-wrap' }}>
-                                                            {renderContentWithHashtags(post.content)}
-                                                        </p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            {post.type === 'gif' && post.mediaUrl && (
-                                                <img src={post.mediaUrl} alt="gif" style={{ width: '100%', borderRadius: '12px', marginTop: '12px', maxHeight: '400px', objectFit: 'cover' }} />
-                                            )}
-
-                                            {post.type === 'voice' && post.mediaUrl && (
-                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(0,150,255,0.03)', padding: '24px', borderRadius: '16px', border: `1px solid ${colors.border}`, width: '100%' }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                                        <motion.button
-                                                            whileHover={{ scale: 1.1 }}
-                                                            whileTap={{ scale: 0.9 }}
-                                                            onClick={() => handlePlayAudio(post._id, post.mediaUrl)}
-                                                            style={{ background: colors.primary, color: '#fff', border: 'none', width: '56px', height: '56px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,150,255,0.3)' }}
-                                                        >
-                                                            {playingAudioId === post._id ? <Pause size={28} fill="currentColor" /> : <Play size={28} fill="currentColor" style={{ marginLeft: '4px' }} />}
-                                                        </motion.button>
-                                                        <div style={{ flex: 1 }}>
-                                                            <MediaControls
-                                                                id={post._id}
-                                                                current={mediaProgress[post._id]?.current || 0}
-                                                                total={mediaProgress[post._id]?.total || 0}
-                                                                percentage={mediaProgress[post._id]?.percentage || 0}
-                                                                speed={playbackSpeed}
-                                                                onSeek={(pos) => handleSeek(post._id, pos)}
-                                                                onSpeedChange={(s) => handleSpeedChange(post._id, s)}
-                                                                color={colors.primary}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    {playingAudioId === post._id && (
-                                                        <div style={{ display: 'flex', gap: '3px', height: '30px', alignItems: 'center' }}>
-                                                            {[...Array(30)].map((_, i) => (
-                                                                <motion.div
-                                                                    key={i}
-                                                                    animate={{ height: [10, Math.random() * 30 + 5, 10] }}
-                                                                    transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.05 }}
-                                                                    style={{ width: '3px', background: colors.primary, borderRadius: '1px' }}
-                                                                />
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                            {post.type === 'video' && post.mediaUrl && (
-                                                <div style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', border: `1px solid ${colors.border}`, background: '#000' }}>
-                                                    <video
-                                                        id={`video-${post._id}`}
-                                                        src={post.mediaUrl}
-                                                        controls={false}
-                                                        playsInline
-                                                        preload="metadata"
-                                                        style={{ width: '100%', display: 'block' }}
-                                                        onTimeUpdate={(e) => {
-                                                            const el = e.currentTarget;
-                                                            setMediaProgress(prev => ({
-                                                                ...prev,
-                                                                [post._id]: {
-                                                                    current: el.currentTime,
-                                                                    total: el.duration,
-                                                                    percentage: (el.currentTime / el.duration) * 100
-                                                                }
-                                                            }));
-                                                        }}
-                                                        onClick={(e) => {
-                                                            const el = e.currentTarget;
-                                                            if (el.paused) el.play(); else el.pause();
-                                                        }}
-                                                    />
-                                                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.8))', padding: '16px' }}>
-                                                        <MediaControls
-                                                            id={post._id}
-                                                            current={mediaProgress[post._id]?.current || 0}
-                                                            total={mediaProgress[post._id]?.total || 0}
-                                                            percentage={mediaProgress[post._id]?.percentage || 0}
-                                                            speed={playbackSpeed}
-                                                            onSeek={(pos) => handleSeek(post._id, pos, true, document.getElementById(`video-${post._id}`))}
-                                                            onSpeedChange={(s) => handleSpeedChange(post._id, s, true, document.getElementById(`video-${post._id}`))}
-                                                            color={colors.accent}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Engagement */}
-                                            <div style={{ display: 'flex', gap: '24px', alignItems: 'center', borderTop: `1px solid ${colors.border}`, paddingTop: '16px' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                    <div style={{ display: 'flex', gap: '4px' }}>
-                                                        <button
-                                                            onClick={() => handleUpvote(post._id)}
-                                                            style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', padding: '6px', borderRadius: '8px', transition: 'all 0.2s' }}
-                                                            className="hover-primary"
-                                                        >
-                                                            <ThumbsUp size={20} fill={post.upvotedBy?.includes(JSON.parse(localStorage.getItem('user') || '{}')?._id) ? '#f59e0b' : 'none'} color={post.upvotedBy?.includes(JSON.parse(localStorage.getItem('user') || '{}')?._id) ? '#f59e0b' : 'currentColor'} />
-                                                            <span style={{ fontWeight: 800, fontSize: '14px', color: post.upvotedBy?.includes(JSON.parse(localStorage.getItem('user') || '{}')?._id) ? '#f59e0b' : 'inherit' }}>{post.upvotes || 0}</span>
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDownvote(post._id)}
-                                                            style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: '6px', borderRadius: '8px', transition: 'all 0.2s' }}
-                                                            className="hover-downvote"
-                                                        >
-                                                            <ThumbsDown size={20} fill={post.downvotedBy?.includes(JSON.parse(localStorage.getItem('user') || '{}')?._id) ? '#f59e0b' : 'none'} color={post.downvotedBy?.includes(JSON.parse(localStorage.getItem('user') || '{}')?._id) ? '#f59e0b' : 'currentColor'} />
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                <button
-                                                    onClick={() => setShowComments({ ...showComments, [post._id]: !showComments[post._id] })}
-                                                    style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 700 }}
-                                                    className="hover-primary"
+                                ) : (
+                                    <>
+                                        {sortedPosts
+                                            .filter(post => {
+                                                if (filterTag && filterTag !== 'Home Feed') {
+                                                    const hasTagStr = post.content?.toLowerCase().includes(`#${filterTag.toLowerCase()}`);
+                                                    const hasTagArr = post.hashtags?.some(t => t.toLowerCase() === filterTag.toLowerCase());
+                                                    if (!hasTagStr && !hasTagArr) return false;
+                                                }
+                                                if (filterAuthor) {
+                                                    const currentAuthor = post.author || 'Anonymous';
+                                                    if (currentAuthor.trim().toLowerCase() !== filterAuthor.trim().toLowerCase()) return false;
+                                                }
+                                                return true;
+                                            })
+                                            .map(post => (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    layout
+                                                    key={post._id}
+                                                    style={{
+                                                        background: isEmbedded ? '#f8fafc' : colors.card,
+                                                        padding: '24px',
+                                                        marginBottom: (isEmbedded || collegeId) ? '12px' : '20px',
+                                                        border: `1px solid ${colors.border}`,
+                                                        color: colors.textDark,
+                                                        boxShadow: isEmbedded ? '0 4px 15px rgba(0,0,0,0.03)' : '0 2px 10px rgba(0,0,0,0.02)'
+                                                    }}
                                                 >
-                                                    <MessageSquare size={18} /> {post.comments?.length || 0} Comments
-                                                </button>
-                                            </div>
-
-                                            {/* Comment Section */}
-                                            {showComments[post._id] && (
-                                                <div style={{ marginTop: '6px', borderTop: `1px solid ${colors.border}`, paddingTop: '4px' }}>
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                                        {post.comments?.map((comment, idx) => (
-                                                            <div key={idx} style={{ display: 'flex', gap: '10px', marginBottom: '4px' }}>
-                                                                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: colors.secondary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700, color: colors.accent, flexShrink: 0 }}>
-                                                                    {comment.author?.[0] || 'S'}
+                                                    <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                                                        <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: colors.secondary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', fontWeight: 800, color: colors.primary, flexShrink: 0 }}>
+                                                            {post.author?.[0] || 'A'}
+                                                        </div>
+                                                        <div style={{ flex: 1 }}>
+                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                                <div>
+                                                                    <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800, color: '#000000' }}>{post.author}</h4>
+                                                                    <span style={{ fontSize: '12px', color: '#64748b' }}>{new Date(post.createdAt).toLocaleDateString()}</span>
                                                                 </div>
-                                                                <div style={{ flex: 1 }}>
-                                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                                                        <div>
-                                                                            <h5 style={{ margin: 0, fontSize: '13px', fontWeight: 800, color: colors.textDark }}>{comment.author || 'Anonymous'}</h5>
-                                                                            <span style={{ fontSize: '11px', color: colors.textLight }}>{new Date(comment.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                                                        </div>
-                                                                        <div style={{ display: 'flex', gap: '4px' }}>
-                                                                            <button
-                                                                                onClick={() => { setEditingCommentId(comment._id); setEditCommentContent(comment.content); }}
-                                                                                style={{ background: 'none', border: 'none', color: colors.textLight, cursor: 'pointer', padding: '4px' }}
-                                                                                className="hover-primary"
-                                                                                title="Edit"
-                                                                            >
-                                                                                <Edit3 size={14} />
-                                                                            </button>
-                                                                            <button
-                                                                                onClick={() => handleDeleteComment(post._id, comment._id)}
-                                                                                style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: '4px' }}
-                                                                                className="hover-downvote"
-                                                                                title="Delete"
-                                                                            >
-                                                                                <Trash2 size={14} />
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
+                                                            </div>
+                                                        </div>
+                                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setEditingPostId(post._id);
+                                                                    setEditContent(post.content);
+                                                                    setEditAudioBlob(null);
+                                                                    setEditVideoFile(null);
+                                                                    setEditSelectedGif(null);
+                                                                    setEditPostType(null);
+                                                                }}
+                                                                style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: '4px' }}
+                                                                className="hover-primary"
+                                                            >
+                                                                <Edit3 size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDelete(post._id)}
+                                                                style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
+                                                                className="hover-downvote"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
 
-                                                                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
-                                                                        <div style={{ flex: 1 }}>
-                                                                            {editingCommentId === comment._id ? (
-                                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                                                    <textarea
-                                                                                        value={editCommentContent}
-                                                                                        onChange={(e) => setEditCommentContent(e.target.value)}
-                                                                                        style={{ width: '100%', background: '#fff', border: `1px solid ${colors.primary}`, borderRadius: '8px', padding: '12px', color: colors.textDark, outline: 'none', resize: 'none', fontSize: '14px', minHeight: '60px' }}
-                                                                                    />
-                                                                                    <div style={{ display: 'flex', gap: '8px' }}>
-                                                                                        <button onClick={() => handleUpdateComment(post._id, comment._id)} style={{ padding: '4px 12px', background: colors.primary, color: '#fff', border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Save</button>
-                                                                                        <button onClick={() => setEditingCommentId(null)} style={{ padding: '4px 12px', background: colors.border, color: colors.textDark, border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+                                                    <div style={{ marginBottom: '4px' }}>
+                                                        {editingPostId === post._id ? (
+                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', background: colors.secondary, padding: '16px', borderRadius: '12px', border: `1px solid ${colors.border}` }}>
+                                                                <textarea
+                                                                    value={editContent}
+                                                                    onChange={(e) => setEditContent(e.target.value)}
+                                                                    style={{ width: '100%', background: '#fff', border: `1px solid ${colors.primary}44`, borderRadius: '10px', padding: '12px', color: colors.textDark, outline: 'none', resize: 'none', minHeight: '80px', fontSize: '15px' }}
+                                                                />
+
+                                                                {/* Previews for newly selected media during edit */}
+                                                                {(editAudioBlob || editVideoFile || editSelectedGif) && (
+                                                                    <motion.div
+                                                                        initial={{ opacity: 0, y: 10 }}
+                                                                        animate={{ opacity: 1, y: 0 }}
+                                                                        style={{ background: 'rgba(0, 150, 255, 0.1)', padding: '12px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}
+                                                                    >
+                                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                                                <span style={{ fontSize: '12px', fontWeight: 700, color: colors.primary }}>NEW MEDIA READY</span>
+                                                                                <button
+                                                                                    onClick={() => { setEditAudioBlob(null); setEditVideoFile(null); setEditSelectedGif(null); setEditPostType(null); }}
+                                                                                    style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer' }}
+                                                                                >
+                                                                                    <Trash2 size={14} />
+                                                                                </button>
+                                                                            </div>
+
+                                                                            {editAudioBlob && (
+                                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '10px', border: `1px solid ${colors.border}` }}>
+                                                                                    <button
+                                                                                        onClick={() => handlePlayAudio('preview-edit', URL.createObjectURL(editAudioBlob))}
+                                                                                        style={{ background: colors.primary, border: 'none', width: '28px', height: '28px', borderRadius: '50%', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+                                                                                    >
+                                                                                        {playingAudioId === 'preview-edit' ? <Pause size={12} fill="currentColor" /> : <Play size={12} fill="currentColor" />}
+                                                                                    </button>
+                                                                                    <div style={{ flex: 1 }}>
+                                                                                        <MediaControls
+                                                                                            id="preview-edit"
+                                                                                            current={mediaProgress['preview-edit']?.current || 0}
+                                                                                            total={mediaProgress['preview-edit']?.total || 0}
+                                                                                            percentage={mediaProgress['preview-edit']?.percentage || 0}
+                                                                                            speed={playbackSpeed}
+                                                                                            onSeek={(pos) => handleSeek('preview-edit', pos)}
+                                                                                            onSpeedChange={(s) => handleSpeedChange('preview-edit', s)}
+                                                                                            color={colors.primary}
+                                                                                            windowWidth={windowWidth}
+                                                                                        />
                                                                                     </div>
-                                                                                </div>
-                                                                            ) : (
-                                                                                <div style={{ width: '100%' }}>
-                                                                                    {comment.type === 'voice' ? (
-                                                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '12px', border: `1px solid ${colors.border}`, width: '100%', maxWidth: '300px' }}>
-                                                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                                                                <button
-                                                                                                    onClick={() => handlePlayAudio(`${post._id}-comment-${idx}`, comment.mediaUrl)}
-                                                                                                    style={{ background: colors.primary, border: 'none', width: '32px', height: '32px', borderRadius: '50%', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                                                                                                >
-                                                                                                    {playingAudioId === `${post._id}-comment-${idx}` ? <Pause size={14} fill="currentColor" /> : <Play size={14} fill="currentColor" />}
-                                                                                                </button>
-                                                                                                <div style={{ flex: 1 }}>
-                                                                                                    <MediaControls
-                                                                                                        id={`${post._id}-comment-${idx}`}
-                                                                                                        current={mediaProgress[`${post._id}-comment-${idx}`]?.current || 0}
-                                                                                                        total={mediaProgress[`${post._id}-comment-${idx}`]?.total || 0}
-                                                                                                        percentage={mediaProgress[`${post._id}-comment-${idx}`]?.percentage || 0}
-                                                                                                        speed={playbackSpeed}
-                                                                                                        onSeek={(pos) => handleSeek(`${post._id}-comment-${idx}`, pos)}
-                                                                                                        onSpeedChange={(s) => handleSpeedChange(`${post._id}-comment-${idx}`, s)}
-                                                                                                        color={colors.primary}
-                                                                                                        windowWidth={windowWidth}
-                                                                                                    />
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    ) : comment.type === 'video' ? (
-                                                                                        <div style={{ borderRadius: '12px', overflow: 'hidden', background: '#000', maxWidth: '400px', border: `1px solid ${colors.border}` }}>
-                                                                                            <video src={comment.mediaUrl} controls style={{ width: '100%', maxHeight: '300px' }} />
-                                                                                        </div>
-                                                                                    ) : (
-                                                                                        <p style={{ fontSize: '14px', color: colors.textDark, margin: 0, lineHeight: '1.5' }}>{comment.content}</p>
-                                                                                    )}
                                                                                 </div>
                                                                             )}
                                                                         </div>
-                                                                    </div>
+                                                                        {editSelectedGif && <img src={editSelectedGif} alt="new-gif" style={{ width: '80px', borderRadius: '6px', marginBottom: '10px' }} />}
+                                                                        {editVideoFile && (
+                                                                            <div style={{ borderRadius: '8px', overflow: 'hidden', background: '#000', maxHeight: '100px', marginTop: '10px' }}>
+                                                                                <video src={editVideoFile instanceof Blob ? URL.createObjectURL(editVideoFile) : editVideoFile} controls style={{ width: '100%', maxHeight: '100px' }} />
+                                                                            </div>
+                                                                        )}
 
-                                                                    <div style={{ display: 'flex', gap: '12px', marginTop: '0px' }}>
-                                                                        <button style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '12px', fontWeight: 600, cursor: 'pointer', padding: 0 }} className="hover-primary">Like</button>
-                                                                        <button style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '12px', fontWeight: 600, cursor: 'pointer', padding: 0 }} className="hover-primary">Reply</button>
+                                                                        {/* Smart Categorization Pills in Edit Mode */}
+                                                                        <div style={{ marginTop: '16px', borderTop: `1px solid ${colors.border}`, paddingTop: '12px' }}>
+                                                                            <span style={{ fontSize: '11px', fontWeight: 800, color: colors.accent, display: 'block', marginBottom: '8px' }}>CATEGORIZE YOUR NOTE</span>
+                                                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                                                                {categories.map(cat => (
+                                                                                    <button
+                                                                                        key={cat}
+                                                                                        onClick={() => handleToggleCategory(cat, true)}
+                                                                                        style={{
+                                                                                            padding: '6px 12px',
+                                                                                            borderRadius: '20px',
+                                                                                            fontSize: '10px',
+                                                                                            background: editContent.toLowerCase().includes(`#${cat.toLowerCase()}`) ? colors.primary : 'rgba(255,255,255,0.05)',
+                                                                                            color: editContent.toLowerCase().includes(`#${cat.toLowerCase()}`) ? '#fff' : '#94a3b8',
+                                                                                            border: `1px solid ${editContent.toLowerCase().includes(`#${cat.toLowerCase()}`) ? colors.primary : colors.border}`,
+                                                                                            cursor: 'pointer',
+                                                                                            fontWeight: 700,
+                                                                                            transition: 'all 0.2s'
+                                                                                        }}
+                                                                                    >
+                                                                                        {cat}
+                                                                                    </button>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    </motion.div>
+                                                                )}
+
+                                                                {showEditGifPicker && (
+                                                                    <div style={{ background: '#0f172a', padding: '12px', borderRadius: '10px', border: `1px solid ${colors.border}` }}>
+                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                                                            <span style={{ fontSize: '12px', fontWeight: 700, color: '#fff' }}>Select New GIF</span>
+                                                                            <button onClick={() => setShowEditGifPicker(false)} style={{ background: 'none', border: 'none', color: '#64748b' }}><X size={14} /></button>
+                                                                        </div>
+                                                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', maxHeight: '150px', overflowY: 'auto' }}>
+                                                                            {trendingGifs.map((url, i) => (
+                                                                                <img
+                                                                                    key={i} src={url}
+                                                                                    alt="gif"
+                                                                                    style={{ width: '100%', borderRadius: '6px', cursor: 'pointer', border: editSelectedGif === url ? `2px solid ${colors.primary}` : 'none' }}
+                                                                                    onClick={() => { setEditSelectedGif(url); setEditPostType('gif'); setShowEditGifPicker(false); }}
+                                                                                />
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+
+                                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                                                                    <div style={{ display: 'flex', gap: '12px' }}>
+                                                                        <button onClick={() => startRecording(true)} style={{ background: 'none', border: 'none', color: editPostType === 'voice' ? colors.primary : '#64748b', cursor: 'pointer' }}><Mic size={18} /></button>
+                                                                        <div style={{ position: 'relative' }}>
+                                                                            <button onClick={() => setShowEditVideoOptions(!showEditVideoOptions)} style={{ background: 'none', border: 'none', color: editPostType === 'video' ? colors.primary : '#64748b', cursor: 'pointer' }}><Video size={18} /></button>
+                                                                            {showEditVideoOptions && (
+                                                                                <div style={{ position: 'absolute', bottom: '100%', left: 0, background: '#1e293b', border: `1px solid ${colors.border}`, borderRadius: '10px', padding: '8px', zIndex: 100, display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '140px' }}>
+                                                                                    <div onClick={() => { startVideoRecording(true); setShowEditVideoOptions(false); }} style={{ padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', color: '#fff' }} className="hover-bg">Record New</div>
+                                                                                    <div onClick={() => { editVideoInputRef.current?.click(); setShowEditVideoOptions(false); }} style={{ padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', color: '#fff' }} className="hover-bg">Upload New</div>
+                                                                                </div>
+                                                                            )}
+                                                                            <input type="file" ref={editVideoInputRef} style={{ display: 'none' }} accept="video/*" onChange={(e) => handleVideoUpload(e, true)} />
+                                                                        </div>
+                                                                        <button onClick={() => setShowEditGifPicker(!showEditGifPicker)} style={{ background: 'none', border: 'none', color: editPostType === 'gif' ? colors.primary : '#64748b', cursor: 'pointer' }}><ImageIcon size={18} /></button>
+                                                                    </div>
+                                                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                                                        <button onClick={() => { setEditingPostId(null); setEditPostType(null); setEditAudioBlob(null); setEditVideoFile(null); setEditSelectedGif(null); }} style={{ background: 'transparent', border: `1px solid ${colors.border}`, color: '#64748b', padding: '8px 16px', borderRadius: '10px', cursor: 'pointer', fontSize: '14px', fontWeight: 600 }}>Cancel</button>
+                                                                        <button onClick={() => handleUpdate(post._id)} style={{ background: colors.primary, border: 'none', color: '#fff', padding: '8px 20px', borderRadius: '10px', cursor: 'pointer', fontSize: '14px', fontWeight: 700, boxShadow: `0 4px 12px ${colors.primary}44` }}>Save Changes</button>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        ))}
-
-                                                        {/* Comment Form */}
-                                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: '#f8fafc', padding: '2px 8px', borderRadius: '12px', border: `1px solid ${colors.border}`, marginTop: '2px' }}>
-                                                            <div style={{ flex: 1 }}>
-                                                                <input
-                                                                    type="text"
-                                                                    placeholder={isRecordingComment === post._id || isRecordingVideoComment === post._id ? "Recording media..." : "Add a comment..."}
-                                                                    value={commentTexts[post._id] || ''}
-                                                                    onChange={(e) => setCommentTexts({ ...commentTexts, [post._id]: e.target.value })}
-                                                                    disabled={isRecordingComment === post._id || isRecordingVideoComment === post._id}
-                                                                    style={{ width: '100%', background: 'transparent', border: 'none', color: colors.textDark, fontSize: '13px', outline: 'none' }}
-                                                                />
-                                                                {commentAudioBlobs[post._id] && (
-                                                                    <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px', color: colors.primary, fontSize: '12px' }}>
-                                                                        <Mic size={14} /> Voice note attached
-                                                                        <button
-                                                                            onClick={() => setCommentAudioBlobs({ ...commentAudioBlobs, [post._id]: null })}
-                                                                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}
-                                                                        ><Trash2 size={12} /></button>
-                                                                    </div>
-                                                                )}
-                                                                {commentVideoBlobs[post._id] && (
-                                                                    <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: colors.primary, fontSize: '12px' }}>
-                                                                            <Video size={14} /> {commentVideoBlobs[post._id] instanceof Blob && 'Media Attached'}
-                                                                            <button
-                                                                                onClick={() => setCommentVideoBlobs({ ...commentVideoBlobs, [post._id]: null })}
-                                                                                style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}
-                                                                            ><Trash2 size={12} /></button>
-                                                                        </div>
-                                                                        <div style={{ borderRadius: '8px', overflow: 'hidden', background: '#000', maxHeight: '100px', maxWidth: '150px' }}>
-                                                                            <video
-                                                                                src={URL.createObjectURL(commentVideoBlobs[post._id])}
-                                                                                controls
-                                                                                style={{ width: '100%', maxHeight: '100px' }}
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-                                                                {isRecordingVideoComment === post._id && (
-                                                                    <div style={{ marginTop: '12px', borderRadius: '8px', overflow: 'hidden', background: '#000' }}>
-                                                                        <video ref={commentVideoPreviewRef} autoPlay muted playsInline style={{ width: '100%', maxHeight: '150px' }} />
-                                                                    </div>
-                                                                )}
-                                                                {(isRecordingComment === post._id || isRecordingVideoComment === post._id) && (
-                                                                    <div style={{ marginTop: '8px', display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                                                        <motion.div
-                                                                            animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
-                                                                            transition={{ repeat: Infinity, duration: 1 }}
-                                                                            style={{ width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%' }}
-                                                                        />
-                                                                        <span style={{ fontSize: '12px', color: '#ef4444', fontWeight: 600 }}>Recording...</span>
-                                                                    </div>
-                                                                )}
+                                                        ) : (
+                                                            <div style={{ marginBottom: '16px' }}>
+                                                                <p style={{ margin: 0, fontSize: '15px', lineHeight: '1.6', color: colors.textDark, whiteSpace: 'pre-wrap' }}>
+                                                                    {renderContentWithHashtags(post.content)}
+                                                                </p>
                                                             </div>
-                                                            <div style={{ display: 'flex', gap: '8px', position: 'relative' }}>
-                                                                <input
-                                                                    type="file"
-                                                                    ref={commentVideoInputRef}
-                                                                    accept="video/*"
-                                                                    style={{ display: 'none' }}
-                                                                    onChange={(e) => handleCommentVideoUpload(post._id, e)}
+                                                        )}
+                                                    </div>
+                                                    {post.type === 'gif' && post.mediaUrl && (
+                                                        <img src={post.mediaUrl} alt="gif" style={{ width: '100%', borderRadius: '12px', marginTop: '12px', maxHeight: '400px', objectFit: 'cover' }} />
+                                                    )}
+
+                                                    {post.type === 'voice' && post.mediaUrl && (
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(0,150,255,0.03)', padding: '24px', borderRadius: '16px', border: `1px solid ${colors.border}`, width: '100%' }}>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                                                <motion.button
+                                                                    whileHover={{ scale: 1.1 }}
+                                                                    whileTap={{ scale: 0.9 }}
+                                                                    onClick={() => handlePlayAudio(post._id, post.mediaUrl)}
+                                                                    style={{ background: colors.primary, color: '#fff', border: 'none', width: '56px', height: '56px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,150,255,0.3)' }}
+                                                                >
+                                                                    {playingAudioId === post._id ? <Pause size={28} fill="currentColor" /> : <Play size={28} fill="currentColor" style={{ marginLeft: '4px' }} />}
+                                                                </motion.button>
+                                                                <div style={{ flex: 1 }}>
+                                                                    <MediaControls
+                                                                        id={post._id}
+                                                                        current={mediaProgress[post._id]?.current || 0}
+                                                                        total={mediaProgress[post._id]?.total || 0}
+                                                                        percentage={mediaProgress[post._id]?.percentage || 0}
+                                                                        speed={playbackSpeed}
+                                                                        onSeek={(pos) => handleSeek(post._id, pos)}
+                                                                        onSpeedChange={(s) => handleSpeedChange(post._id, s)}
+                                                                        color={colors.primary}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            {playingAudioId === post._id && (
+                                                                <div style={{ display: 'flex', gap: '3px', height: '30px', alignItems: 'center' }}>
+                                                                    {[...Array(30)].map((_, i) => (
+                                                                        <motion.div
+                                                                            key={i}
+                                                                            animate={{ height: [10, Math.random() * 30 + 5, 10] }}
+                                                                            transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.05 }}
+                                                                            style={{ width: '3px', background: colors.primary, borderRadius: '1px' }}
+                                                                        />
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    {post.type === 'video' && post.mediaUrl && (
+                                                        <div style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', border: `1px solid ${colors.border}`, background: '#000' }}>
+                                                            <video
+                                                                id={`video-${post._id}`}
+                                                                src={post.mediaUrl}
+                                                                controls={false}
+                                                                playsInline
+                                                                preload="metadata"
+                                                                style={{ width: '100%', display: 'block' }}
+                                                                onTimeUpdate={(e) => {
+                                                                    const el = e.currentTarget;
+                                                                    setMediaProgress(prev => ({
+                                                                        ...prev,
+                                                                        [post._id]: {
+                                                                            current: el.currentTime,
+                                                                            total: el.duration,
+                                                                            percentage: (el.currentTime / el.duration) * 100
+                                                                        }
+                                                                    }));
+                                                                }}
+                                                                onClick={(e) => {
+                                                                    const el = e.currentTarget;
+                                                                    if (el.paused) el.play(); else el.pause();
+                                                                }}
+                                                            />
+                                                            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.8))', padding: '16px' }}>
+                                                                <MediaControls
+                                                                    id={post._id}
+                                                                    current={mediaProgress[post._id]?.current || 0}
+                                                                    total={mediaProgress[post._id]?.total || 0}
+                                                                    percentage={mediaProgress[post._id]?.percentage || 0}
+                                                                    speed={playbackSpeed}
+                                                                    onSeek={(pos) => handleSeek(post._id, pos, true, document.getElementById(`video-${post._id}`))}
+                                                                    onSpeedChange={(s) => handleSpeedChange(post._id, s, true, document.getElementById(`video-${post._id}`))}
+                                                                    color={colors.accent}
                                                                 />
-                                                                {isRecordingComment === post._id ? (
-                                                                    <button onClick={() => handleStopCommentRecording(post._id)} style={{ background: '#ef4444', border: 'none', color: '#fff', width: '26px', height: '26px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                                                                        <Pause size={14} />
-                                                                    </button>
-                                                                ) : isRecordingVideoComment === post._id ? (
-                                                                    <button onClick={stopCommentVideoRecording} style={{ background: '#ef4444', border: 'none', color: '#fff', width: '26px', height: '26px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                                                                        <Pause size={14} />
-                                                                    </button>
-                                                                ) : (
-                                                                    <>
-                                                                        <button onClick={() => handleStartCommentRecording(post._id)} style={{ background: '#fff', border: `1px solid ${colors.border}`, color: colors.textLight, width: '26px', height: '26px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} className="hover-bg-light">
-                                                                            <Mic size={14} />
-                                                                        </button>
-                                                                        <div style={{ position: 'relative' }}>
-                                                                            <button
-                                                                                onClick={() => setShowCommentVideoOptions(showCommentVideoOptions === post._id ? null : post._id)}
-                                                                                style={{ background: '#fff', border: `1px solid ${colors.border}`, color: showCommentVideoOptions === post._id ? colors.primary : colors.textLight, width: '26px', height: '26px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                                                                                className="hover-bg-light"
-                                                                            >
-                                                                                <Video size={14} />
-                                                                            </button>
-                                                                            <AnimatePresence>
-                                                                                {showCommentVideoOptions === post._id && (
-                                                                                    <motion.div
-                                                                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                                                        style={{ position: 'absolute', bottom: '40px', right: 0, background: '#fff', border: `1px solid ${colors.border}`, borderRadius: '10px', padding: '6px', zIndex: 50, minWidth: '140px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }}
-                                                                                    >
-                                                                                        <button
-                                                                                            onClick={() => { startCommentVideoRecording(post._id); setShowCommentVideoOptions(null); }}
-                                                                                            style={{ width: '100%', padding: '8px 12px', background: 'none', border: 'none', color: colors.textDark, fontSize: '13px', textAlign: 'left', cursor: 'pointer', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}
-                                                                                            className="hover-bg-light"
-                                                                                        >
-                                                                                            <Mic size={14} /> Record Video
-                                                                                        </button>
-                                                                                        <button
-                                                                                            onClick={() => commentVideoInputRef.current?.click()}
-                                                                                            style={{ width: '100%', padding: '8px 12px', background: 'none', border: 'none', color: colors.textDark, fontSize: '13px', textAlign: 'left', cursor: 'pointer', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}
-                                                                                            className="hover-bg-light"
-                                                                                        >
-                                                                                            <ImageIcon size={14} /> Upload Video
-                                                                                        </button>
-                                                                                    </motion.div>
-                                                                                )}
-                                                                            </AnimatePresence>
-                                                                        </div>
-                                                                    </>
-                                                                )}
-                                                                <button onClick={() => handleAddComment(post._id)} style={{ background: colors.primary, border: 'none', color: '#fff', width: '26px', height: '26px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                                                                    <Send size={14} />
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Engagement */}
+                                                    <div style={{ display: 'flex', gap: '24px', alignItems: 'center', borderTop: `1px solid ${colors.border}`, paddingTop: '16px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                            <div style={{ display: 'flex', gap: '4px' }}>
+                                                                <button
+                                                                    onClick={() => handleUpvote(post._id)}
+                                                                    style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', padding: '6px', borderRadius: '8px', transition: 'all 0.2s' }}
+                                                                    className="hover-primary"
+                                                                >
+                                                                    <ThumbsUp size={20} fill={post.upvotedBy?.includes(JSON.parse(localStorage.getItem('user') || '{}')?._id) ? '#f59e0b' : 'none'} color={post.upvotedBy?.includes(JSON.parse(localStorage.getItem('user') || '{}')?._id) ? '#f59e0b' : 'currentColor'} />
+                                                                    <span style={{ fontWeight: 800, fontSize: '14px', color: post.upvotedBy?.includes(JSON.parse(localStorage.getItem('user') || '{}')?._id) ? '#f59e0b' : 'inherit' }}>{post.upvotes || 0}</span>
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDownvote(post._id)}
+                                                                    style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: '6px', borderRadius: '8px', transition: 'all 0.2s' }}
+                                                                    className="hover-downvote"
+                                                                >
+                                                                    <ThumbsDown size={20} fill={post.downvotedBy?.includes(JSON.parse(localStorage.getItem('user') || '{}')?._id) ? '#f59e0b' : 'none'} color={post.downvotedBy?.includes(JSON.parse(localStorage.getItem('user') || '{}')?._id) ? '#f59e0b' : 'currentColor'} />
                                                                 </button>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </motion.div>
-                                    ))}
 
-                                {hasMore && (
-                                    <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0' }}>
-                                        <button
-                                            onClick={handleLoadMore}
-                                            disabled={loadingMore}
-                                            style={{
-                                                padding: '10px 24px',
-                                                background: colors.primary,
-                                                color: '#fff',
-                                                border: 'none',
-                                                borderRadius: '12px',
-                                                fontWeight: 700,
-                                                cursor: 'pointer',
-                                                boxShadow: '0 4px 15px rgba(0, 150, 255, 0.2)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '8px',
-                                                transition: 'all 0.2s'
-                                            }}
-                                            onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                                            onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                                        >
-                                            {loadingMore ? (
-                                                <>
-                                                    <motion.div
-                                                        animate={{ rotate: 360 }}
-                                                        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                                                    >
-                                                        <Loader2 size={18} />
-                                                    </motion.div>
-                                                    Loading More...
-                                                </>
-                                            ) : 'Load More Reviews'}
-                                        </button>
-                                    </div>
+                                                        <button
+                                                            onClick={() => setShowComments({ ...showComments, [post._id]: !showComments[post._id] })}
+                                                            style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 700 }}
+                                                            className="hover-primary"
+                                                        >
+                                                            <MessageSquare size={18} /> {post.comments?.length || 0} Comments
+                                                        </button>
+                                                    </div>
+
+                                                    {/* Comment Section */}
+                                                    {showComments[post._id] && (
+                                                        <div style={{ marginTop: '6px', borderTop: `1px solid ${colors.border}`, paddingTop: '4px' }}>
+                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                                                {post.comments?.map((comment, idx) => (
+                                                                    <div key={idx} style={{ display: 'flex', gap: '10px', marginBottom: '4px' }}>
+                                                                        <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: colors.secondary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700, color: colors.accent, flexShrink: 0 }}>
+                                                                            {comment.author?.[0] || 'S'}
+                                                                        </div>
+                                                                        <div style={{ flex: 1 }}>
+                                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                                                <div>
+                                                                                    <h5 style={{ margin: 0, fontSize: '13px', fontWeight: 800, color: colors.textDark }}>{comment.author || 'Anonymous'}</h5>
+                                                                                    <span style={{ fontSize: '11px', color: colors.textLight }}>{new Date(comment.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                                                </div>
+                                                                                <div style={{ display: 'flex', gap: '4px' }}>
+                                                                                    <button
+                                                                                        onClick={() => { setEditingCommentId(comment._id); setEditCommentContent(comment.content); }}
+                                                                                        style={{ background: 'none', border: 'none', color: colors.textLight, cursor: 'pointer', padding: '4px' }}
+                                                                                        className="hover-primary"
+                                                                                        title="Edit"
+                                                                                    >
+                                                                                        <Edit3 size={14} />
+                                                                                    </button>
+                                                                                    <button
+                                                                                        onClick={() => handleDeleteComment(post._id, comment._id)}
+                                                                                        style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: '4px' }}
+                                                                                        className="hover-downvote"
+                                                                                        title="Delete"
+                                                                                    >
+                                                                                        <Trash2 size={14} />
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
+                                                                                <div style={{ flex: 1 }}>
+                                                                                    {editingCommentId === comment._id ? (
+                                                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                                                            <textarea
+                                                                                                value={editCommentContent}
+                                                                                                onChange={(e) => setEditCommentContent(e.target.value)}
+                                                                                                style={{ width: '100%', background: '#fff', border: `1px solid ${colors.primary}`, borderRadius: '8px', padding: '12px', color: colors.textDark, outline: 'none', resize: 'none', fontSize: '14px', minHeight: '60px' }}
+                                                                                            />
+                                                                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                                                                <button onClick={() => handleUpdateComment(post._id, comment._id)} style={{ padding: '4px 12px', background: colors.primary, color: '#fff', border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Save</button>
+                                                                                                <button onClick={() => setEditingCommentId(null)} style={{ padding: '4px 12px', background: colors.border, color: colors.textDark, border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        <div style={{ width: '100%' }}>
+                                                                                            {comment.type === 'voice' ? (
+                                                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '12px', border: `1px solid ${colors.border}`, width: '100%', maxWidth: '300px' }}>
+                                                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                                                                        <button
+                                                                                                            onClick={() => handlePlayAudio(`${post._id}-comment-${idx}`, comment.mediaUrl)}
+                                                                                                            style={{ background: colors.primary, border: 'none', width: '32px', height: '32px', borderRadius: '50%', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                                                                                        >
+                                                                                                            {playingAudioId === `${post._id}-comment-${idx}` ? <Pause size={14} fill="currentColor" /> : <Play size={14} fill="currentColor" />}
+                                                                                                        </button>
+                                                                                                        <div style={{ flex: 1 }}>
+                                                                                                            <MediaControls
+                                                                                                                id={`${post._id}-comment-${idx}`}
+                                                                                                                current={mediaProgress[`${post._id}-comment-${idx}`]?.current || 0}
+                                                                                                                total={mediaProgress[`${post._id}-comment-${idx}`]?.total || 0}
+                                                                                                                percentage={mediaProgress[`${post._id}-comment-${idx}`]?.percentage || 0}
+                                                                                                                speed={playbackSpeed}
+                                                                                                                onSeek={(pos) => handleSeek(`${post._id}-comment-${idx}`, pos)}
+                                                                                                                onSpeedChange={(s) => handleSpeedChange(`${post._id}-comment-${idx}`, s)}
+                                                                                                                color={colors.primary}
+                                                                                                                windowWidth={windowWidth}
+                                                                                                            />
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            ) : comment.type === 'video' ? (
+                                                                                                <div style={{ borderRadius: '12px', overflow: 'hidden', background: '#000', maxWidth: '400px', border: `1px solid ${colors.border}` }}>
+                                                                                                    <video src={comment.mediaUrl} controls style={{ width: '100%', maxHeight: '300px' }} />
+                                                                                                </div>
+                                                                                            ) : (
+                                                                                                <p style={{ fontSize: '14px', color: colors.textDark, margin: 0, lineHeight: '1.5' }}>{comment.content}</p>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div style={{ display: 'flex', gap: '12px', marginTop: '0px' }}>
+                                                                                <button style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '12px', fontWeight: 600, cursor: 'pointer', padding: 0 }} className="hover-primary">Like</button>
+                                                                                <button style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '12px', fontWeight: 600, cursor: 'pointer', padding: 0 }} className="hover-primary">Reply</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+
+                                                                {/* Comment Form */}
+                                                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: '#f8fafc', padding: '2px 8px', borderRadius: '12px', border: `1px solid ${colors.border}`, marginTop: '2px' }}>
+                                                                    <div style={{ flex: 1 }}>
+                                                                        <input
+                                                                            type="text"
+                                                                            placeholder={isRecordingComment === post._id || isRecordingVideoComment === post._id ? "Recording media..." : "Add a comment..."}
+                                                                            value={commentTexts[post._id] || ''}
+                                                                            onChange={(e) => setCommentTexts({ ...commentTexts, [post._id]: e.target.value })}
+                                                                            disabled={isRecordingComment === post._id || isRecordingVideoComment === post._id}
+                                                                            style={{ width: '100%', background: 'transparent', border: 'none', color: colors.textDark, fontSize: '13px', outline: 'none' }}
+                                                                        />
+                                                                        {commentAudioBlobs[post._id] && (
+                                                                            <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px', color: colors.primary, fontSize: '12px' }}>
+                                                                                <Mic size={14} /> Voice note attached
+                                                                                <button
+                                                                                    onClick={() => setCommentAudioBlobs({ ...commentAudioBlobs, [post._id]: null })}
+                                                                                    style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}
+                                                                                ><Trash2 size={12} /></button>
+                                                                            </div>
+                                                                        )}
+                                                                        {commentVideoBlobs[post._id] && (
+                                                                            <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: colors.primary, fontSize: '12px' }}>
+                                                                                    <Video size={14} /> {commentVideoBlobs[post._id] instanceof Blob && 'Media Attached'}
+                                                                                    <button
+                                                                                        onClick={() => setCommentVideoBlobs({ ...commentVideoBlobs, [post._id]: null })}
+                                                                                        style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}
+                                                                                    ><Trash2 size={12} /></button>
+                                                                                </div>
+                                                                                <div style={{ borderRadius: '8px', overflow: 'hidden', background: '#000', maxHeight: '100px', maxWidth: '150px' }}>
+                                                                                    <video
+                                                                                        src={URL.createObjectURL(commentVideoBlobs[post._id])}
+                                                                                        controls
+                                                                                        style={{ width: '100%', maxHeight: '100px' }}
+                                                                                    />
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                        {isRecordingVideoComment === post._id && (
+                                                                            <div style={{ marginTop: '12px', borderRadius: '8px', overflow: 'hidden', background: '#000' }}>
+                                                                                <video ref={commentVideoPreviewRef} autoPlay muted playsInline style={{ width: '100%', maxHeight: '150px' }} />
+                                                                            </div>
+                                                                        )}
+                                                                        {(isRecordingComment === post._id || isRecordingVideoComment === post._id) && (
+                                                                            <div style={{ marginTop: '8px', display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                                                                <motion.div
+                                                                                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                                                                                    transition={{ repeat: Infinity, duration: 1 }}
+                                                                                    style={{ width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%' }}
+                                                                                />
+                                                                                <span style={{ fontSize: '12px', color: '#ef4444', fontWeight: 600 }}>Recording...</span>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                    <div style={{ display: 'flex', gap: '8px', position: 'relative' }}>
+                                                                        <input
+                                                                            type="file"
+                                                                            ref={commentVideoInputRef}
+                                                                            accept="video/*"
+                                                                            style={{ display: 'none' }}
+                                                                            onChange={(e) => handleCommentVideoUpload(post._id, e)}
+                                                                        />
+                                                                        {isRecordingComment === post._id ? (
+                                                                            <button onClick={() => handleStopCommentRecording(post._id)} style={{ background: '#ef4444', border: 'none', color: '#fff', width: '26px', height: '26px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                                                                                <Pause size={14} />
+                                                                            </button>
+                                                                        ) : isRecordingVideoComment === post._id ? (
+                                                                            <button onClick={stopCommentVideoRecording} style={{ background: '#ef4444', border: 'none', color: '#fff', width: '26px', height: '26px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                                                                                <Pause size={14} />
+                                                                            </button>
+                                                                        ) : (
+                                                                            <>
+                                                                                <button onClick={() => handleStartCommentRecording(post._id)} style={{ background: '#fff', border: `1px solid ${colors.border}`, color: colors.textLight, width: '26px', height: '26px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} className="hover-bg-light">
+                                                                                    <Mic size={14} />
+                                                                                </button>
+                                                                                <div style={{ position: 'relative' }}>
+                                                                                    <button
+                                                                                        onClick={() => setShowCommentVideoOptions(showCommentVideoOptions === post._id ? null : post._id)}
+                                                                                        style={{ background: '#fff', border: `1px solid ${colors.border}`, color: showCommentVideoOptions === post._id ? colors.primary : colors.textLight, width: '26px', height: '26px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                                                                        className="hover-bg-light"
+                                                                                    >
+                                                                                        <Video size={14} />
+                                                                                    </button>
+                                                                                    <AnimatePresence>
+                                                                                        {showCommentVideoOptions === post._id && (
+                                                                                            <motion.div
+                                                                                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                                                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                                                                style={{ position: 'absolute', bottom: '40px', right: 0, background: '#fff', border: `1px solid ${colors.border}`, borderRadius: '10px', padding: '6px', zIndex: 50, minWidth: '140px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }}
+                                                                                            >
+                                                                                                <button
+                                                                                                    onClick={() => { startCommentVideoRecording(post._id); setShowCommentVideoOptions(null); }}
+                                                                                                    style={{ width: '100%', padding: '8px 12px', background: 'none', border: 'none', color: colors.textDark, fontSize: '13px', textAlign: 'left', cursor: 'pointer', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                                                                                    className="hover-bg-light"
+                                                                                                >
+                                                                                                    <Mic size={14} /> Record Video
+                                                                                                </button>
+                                                                                                <button
+                                                                                                    onClick={() => commentVideoInputRef.current?.click()}
+                                                                                                    style={{ width: '100%', padding: '8px 12px', background: 'none', border: 'none', color: colors.textDark, fontSize: '13px', textAlign: 'left', cursor: 'pointer', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                                                                                    className="hover-bg-light"
+                                                                                                >
+                                                                                                    <ImageIcon size={14} /> Upload Video
+                                                                                                </button>
+                                                                                            </motion.div>
+                                                                                        )}
+                                                                                    </AnimatePresence>
+                                                                                </div>
+                                                                            </>
+                                                                        )}
+                                                                        <button onClick={() => handleAddComment(post._id)} style={{ background: colors.primary, border: 'none', color: '#fff', width: '26px', height: '26px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                                                                            <Send size={14} />
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </motion.div>
+                                            ))}
+                                        {hasMore && (
+                                            <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0' }}>
+                                                <button
+                                                    onClick={handleLoadMore}
+                                                    disabled={loadingMore}
+                                                    style={{
+                                                        padding: '10px 24px',
+                                                        background: colors.primary,
+                                                        color: '#fff',
+                                                        border: 'none',
+                                                        borderRadius: '12px',
+                                                        fontWeight: 700,
+                                                        cursor: 'pointer',
+                                                        boxShadow: '0 4px 15px rgba(0, 150, 255, 0.2)',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '8px',
+                                                        transition: 'all 0.2s'
+                                                    }}
+                                                    onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                                                    onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                                >
+                                                    {loadingMore ? (
+                                                        <>
+                                                            <motion.div
+                                                                animate={{ rotate: 360 }}
+                                                                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                                                            >
+                                                                <Loader2 size={18} />
+                                                            </motion.div>
+                                                            Loading More...
+                                                        </>
+                                                    ) : 'Load More Reviews'}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
                                 )}
                             </div>
                         </div>
@@ -2343,87 +2418,84 @@ const WriteAReview = ({ collegeId: propCollegeId, collegeName: propCollegeName, 
                 </main>
 
                 {/* Right Sidebar - Hidden in embedded or college mode */}
-                {/* Right Sidebar - Hidden in embedded or college mode */}
-                {
-                    windowWidth >= 1150 && !isEmbedded && !collegeId && !formOnly && (
-                        <aside style={{ position: 'sticky', top: '160px', height: 'fit-content', width: '280px', flexShrink: 0 }} className="hidden-mobile">
-                            <div style={{ background: colors.card, borderRadius: '16px', padding: '24px', border: `1px solid ${colors.border}` }}>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                                    <TrendingUp size={24} color={colors.primary} />
-                                    {trendingTags.length > 0 ? trendingTags.map((trend, i) => (
-                                        <div
-                                            key={i}
-                                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '16px', borderBottom: i < 3 ? `1px solid ${colors.border}` : 'none' }}
-                                        >
-                                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                                                <div style={{ width: '16px', height: '16px', background: colors.secondary, borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    <div style={{ width: '6px', height: '6px', background: colors.primary, borderRadius: '50%' }}></div>
-                                                </div>
-                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <span onClick={() => setFilterTag(trend.tag)} style={{ fontWeight: 600, fontSize: '13px', color: colors.primary, cursor: 'pointer', wordBreak: 'break-all' }}>#{trend.tag}</span>
-                                                    <span style={{ fontSize: '12px', color: colors.textDark }}>{trend.count} posts</span>
-                                                </div>
+                {windowWidth >= 1150 && !isEmbedded && !collegeId && !formOnly && (
+                    <aside style={{ position: 'sticky', top: '160px', height: 'fit-content', width: '280px', flexShrink: 0 }} className="hidden-mobile">
+                        <div style={{ background: colors.card, borderRadius: '16px', padding: '24px', border: `1px solid ${colors.border}` }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                <TrendingUp size={24} color={colors.primary} />
+                                {trendingTags.length > 0 ? trendingTags.map((trend, i) => (
+                                    <div
+                                        key={i}
+                                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '16px', borderBottom: i < 3 ? `1px solid ${colors.border}` : 'none' }}
+                                    >
+                                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                                            <div style={{ width: '16px', height: '16px', background: colors.secondary, borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <div style={{ width: '6px', height: '6px', background: colors.primary, borderRadius: '50%' }}></div>
                                             </div>
-                                            {i === 0 && <span style={{ fontSize: '10px', color: colors.primary, fontWeight: 700 }}>Trending</span>}
-                                            {i === 1 && <span style={{ fontSize: '10px', color: '#0ebc7f', fontWeight: 700 }}>New</span>}
+                                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                <span onClick={() => setFilterTag(trend.tag)} style={{ fontWeight: 600, fontSize: '13px', color: colors.primary, cursor: 'pointer', wordBreak: 'break-all' }}>#{trend.tag}</span>
+                                                <span style={{ fontSize: '12px', color: colors.textDark }}>{trend.count} posts</span>
+                                            </div>
                                         </div>
-                                    )) : (
-                                        <div style={{ fontSize: '13px', color: colors.textLight, paddingBottom: '16px' }}>No trending tags yet.</div>
-                                    )}
-                                </div>
-                                <button style={{
-                                    width: '100%',
-                                    marginTop: '16px',
-                                    background: colors.primary,
-                                    color: '#fff',
-                                    border: 'none',
-                                    padding: '12px',
-                                    borderRadius: '12px',
-                                    fontWeight: 700,
-                                    cursor: 'pointer',
-                                    boxShadow: `0 4px 12px ${colors.primary}33`
-                                }}>Explore Trends</button>
+                                        {i === 0 && <span style={{ fontSize: '10px', color: colors.primary, fontWeight: 700 }}>Trending</span>}
+                                        {i === 1 && <span style={{ fontSize: '10px', color: '#0ebc7f', fontWeight: 700 }}>New</span>}
+                                    </div>
+                                )) : (
+                                    <div style={{ fontSize: '13px', color: colors.textLight, paddingBottom: '16px' }}>No trending tags yet.</div>
+                                )}
                             </div>
+                            <button style={{
+                                width: '100%',
+                                marginTop: '16px',
+                                background: colors.primary,
+                                color: '#fff',
+                                border: 'none',
+                                padding: '12px',
+                                borderRadius: '12px',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                boxShadow: `0 4px 12px ${colors.primary}33`
+                            }}>Explore Trends</button>
+                        </div>
 
-                            <div style={{ background: colors.card, borderRadius: '16px', padding: '24px', border: `1px solid ${colors.border}`, marginTop: '24px' }}>
-                                <h4 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '20px', color: colors.primary }}>Top Reviewers</h4>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                    {topReviewers.length > 0 ? topReviewers.map((user, idx) => (
-                                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: colors.secondary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: colors.primary }}>
-                                                {user.avatar}
-                                            </div>
-                                            <div style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{ fontSize: '13px', fontWeight: 700, color: colors.textDark, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</div>
-                                                <div style={{ fontSize: '12px', color: colors.textLight }}>{user.points} points</div>
-                                            </div>
-                                            <button
-                                                onClick={() => setFilterAuthor(filterAuthor === user.name ? null : user.name)}
-                                                style={{
-                                                    padding: '6px 16px',
-                                                    borderRadius: '8px',
-                                                    background: filterAuthor === user.name ? colors.primary : 'transparent',
-                                                    border: `1px solid ${filterAuthor === user.name ? colors.primary : colors.border}`,
-                                                    color: filterAuthor === user.name ? '#fff' : colors.textDark,
-                                                    fontSize: '12px',
-                                                    fontWeight: 600,
-                                                    cursor: 'pointer',
-                                                    transition: 'all 0.2s'
-                                                }}
-                                                className={filterAuthor === user.name ? "" : "hover-bg-light"}
-                                            >
-                                                {filterAuthor === user.name ? 'Following' : 'Follow'}
-                                            </button>
+                        <div style={{ background: colors.card, borderRadius: '16px', padding: '24px', border: `1px solid ${colors.border}`, marginTop: '24px' }}>
+                            <h4 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '20px', color: colors.primary }}>Top Reviewers</h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                {topReviewers.length > 0 ? topReviewers.map((user, idx) => (
+                                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: colors.secondary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: colors.primary }}>
+                                            {user.avatar}
                                         </div>
-                                    )) : (
-                                        <div style={{ fontSize: '13px', color: colors.textLight }}>No reviewers yet.</div>
-                                    )}
-                                </div>
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{ fontSize: '13px', fontWeight: 700, color: colors.textDark, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</div>
+                                            <div style={{ fontSize: '12px', color: colors.textLight }}>{user.points} points</div>
+                                        </div>
+                                        <button
+                                            onClick={() => setFilterAuthor(filterAuthor === user.name ? null : user.name)}
+                                            style={{
+                                                padding: '6px 16px',
+                                                borderRadius: '8px',
+                                                background: filterAuthor === user.name ? colors.primary : 'transparent',
+                                                border: `1px solid ${filterAuthor === user.name ? colors.primary : colors.border}`,
+                                                color: filterAuthor === user.name ? '#fff' : colors.textDark,
+                                                fontSize: '12px',
+                                                fontWeight: 600,
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s'
+                                            }}
+                                            className={filterAuthor === user.name ? "" : "hover-bg-light"}
+                                        >
+                                            {filterAuthor === user.name ? 'Following' : 'Follow'}
+                                        </button>
+                                    </div>
+                                )) : (
+                                    <div style={{ fontSize: '13px', color: colors.textLight }}>No reviewers yet.</div>
+                                )}
                             </div>
-                        </aside>
-                    )
-                }
-            </div >
+                        </div>
+                    </aside>
+                )}
+            </div>
 
             <style>{`
         .pulse {
@@ -2447,12 +2519,14 @@ const WriteAReview = ({ collegeId: propCollegeId, collegeName: propCollegeName, 
           }
         }
       `}</style>
-            {/* Modal Portal */}
             <CustomModal
                 {...modalConfig}
                 onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
             />
-        </div >
+            <AnimatePresence>
+                {isPosting && <WaterfallLoader />}
+            </AnimatePresence>
+        </div>
     );
 };
 

@@ -1,0 +1,40 @@
+Exam Name,Category ID,Level,State/UT,Purpose,Conducting Body,Eligibility Level,Official Website,Current Status,Notes
+CAT (Common Admission Test),CAT_07,National,All India,Admission,IIMs (Rotational),UG,iimcat.ac.in,Active,"Premier MBA entrance for IIMs, IITs (DoMS), and top-tier B-Schools."
+CMAT (Common Management Admission Test),CAT_07,National,All India,Admission,National Testing Agency (NTA),UG,exams.nta.ac.in/CMAT/,Active,"Accepted by over 1,000 AICTE-approved B-Schools pan-India."
+XAT (Xavier Aptitude Test),CAT_07,National,All India,Admission,XLRI Jamshedpur,UG,xatonline.in,Active,"Gateway for XLRI, XIMB, IMT, and 160+ other B-schools. Features a unique Decision Making section."
+MAT (Management Aptitude Test),CAT_07,National,All India,Admission,All India Management Association (AIMA),UG,mat.aima.in,Active,"Conducted 4 times a year in CBT, PBT, and IBT modes."
+ATMA (AIMS Test for Management Admissions),CAT_07,National,All India,Admission,Association of Indian Management Schools,UG,atmaaims.com,Active,Recognized by MoE and AICTE; widely accepted by private B-Schools.
+NMAT by GMAC,CAT_07,National,All India,Admission,Graduate Management Admission Council,UG,mba.com,Active,Adaptive test primarily used for NMIMS and several other private universities.
+CUET PG (Common University Entrance Test),CAT_07,National,All India,Admission,NTA,UG,exams.nta.ac.in/CUET-PG/,Active,"Massive umbrella exam for MA, M.Com, LLM, and MBA across Central & State Universities (absorbed BHU PET, DU PG, TISSNET)."
+CLAT PG (Common Law Admission Test),CAT_07,National,All India,Admission / Recruitment,Consortium of NLUs,Professional (LLB),consortiumofnlus.ac.in,Active,"Standardized test for LLM at 24 NLUs. Also used by PSUs (like ONGC, BHEL) for hiring Law Officers."
+AILET PG (All India Law Entrance Test),CAT_07,National,All India,Admission,NLU Delhi,Professional (LLB),nationallawuniversitydelhi.in,Active,Separate and highly competitive entrance exclusively for LLM at NLU Delhi.
+LSAT—India,CAT_07,National,All India,Admission,Law School Admission Council (LSAC),UG / Professional,lsatindia.in,Active,"Widely accepted by top private law schools (e.g., Jindal Global Law School) for 3-Year LLB and LLM."
+NIFT Entrance Exam (PG),CAT_07,National,All India,Admission,NTA / NIFT,UG,exams.nta.nic.in/niftee/,Active,"Gateway for Master of Design (M.Des), Fashion Management (MFM), and Fashion Tech (MFTech)."
+NID DAT (M.Des),CAT_07,National,All India,Admission,National Institute of Design (NID),UG,admissions.nid.edu,Active,Two-stage test (Prelims & Studio Mains) for M.Des across NID campuses.
+CEED (Common Entrance Exam for Design),CAT_07,National,All India,Admission,IIT Bombay,UG,ceed.iitb.ac.in,Active,Cross-listed here due to Design focus; gateway for M.Des at IITs and IISc.
+TG ICET (Telangana State ICET),CAT_07,State-UT,Telangana,Admission,Kakatiya University (for TGCHE),UG,icet.tgche.ac.in,Active,Formerly TS ICET. Mandatory for state quota MBA and MCA seats in Telangana.
+TS PGLCET & TS LAWCET (3-Yr),CAT_07,State-UT,Telangana,Admission,TGCHE,UG / Professional,lawcet.tsche.ac.in,Active,Official entrance for 3-Year LLB and LLM degrees in Telangana.
+CPGET (Common Post Graduate Entrance Test),CAT_07,State-UT,Telangana,Admission,Osmania University,UG,cpget.tsche.ac.in,Active,"For admission to MA, M.Sc, M.Com, and PG Diploma courses across state universities."
+AP ICET,CAT_07,State-UT,Andhra Pradesh,Admission,Sri Krishnadevaraya University (for APSCHE),UG,cets.apsche.ap.gov.in,Active,Mandatory for state quota MBA and MCA seats in Andhra Pradesh.
+AP PGLCET & AP LAWCET (3-Yr),CAT_07,State-UT,Andhra Pradesh,Admission,APSCHE,UG / Professional,cets.apsche.ap.gov.in,Active,Official entrance for 3-Year LLB and LLM degrees in Andhra Pradesh.
+AP PGCET,CAT_07,State-UT,Andhra Pradesh,Admission,APSCHE,UG,cets.apsche.ap.gov.in,Active,"State-wide test for M.A., M.Com, M.Sc, and other humanities PG programs."
+MAH-MBA / MMS CET,CAT_07,State-UT,Maharashtra,Admission,"State CET Cell, Maharashtra",UG,cetcell.mahacet.org,Active,"Highly competitive state exam for JBIMS, SIMSREE, PUMBA, and 300+ colleges."
+MAH-LLB (3 Years) CET,CAT_07,State-UT,Maharashtra,Admission,"State CET Cell, Maharashtra",UG,cetcell.mahacet.org,Active,Mandatory state exam for the 3-Year postgraduate LLB program.
+Karnataka PGCET,CAT_07,State-UT,Karnataka,Admission,Karnataka Examinations Authority (KEA),UG,cetonline.karnataka.gov.in/kea/,Active,Mandatory for government quota MBA seats in Karnataka.
+KMAT (Karnataka),CAT_07,State-UT,Karnataka,Admission,KPPGCA,UG,kmatindia.com,Active,Supervised by Govt of Karnataka for the management quota seats in private B-schools.
+KMAT Kerala,CAT_07,State-UT,Kerala,Admission,"Commissioner for Entrance Examinations (CEE), Kerala",UG,cee.kerala.gov.in,Active,Official state-level MBA entrance test for Kerala.
+KLEE (3-Yr LLB & LLM),CAT_07,State-UT,Kerala,Admission,CEE Kerala,UG / Professional,cee.kerala.gov.in,Active,Conducted separately for 3-Year LLB and LLM admissions in Kerala.
+TANCET (MBA),CAT_07,State-UT,Tamil Nadu,Admission,Anna University,UG,tancet.annauniv.edu,Active,State exam for MBA admissions across Tamil Nadu government and private colleges.
+JEMAT,CAT_07,State-UT,West Bengal,Admission,MAKAUT,UG,makautwb.ac.in,Active,State-level entrance for MBA/MHA/AICTE-approved PG diploma programs.
+OJEE (MBA & LLM),CAT_07,State-UT,Odisha,Admission,OJEE Cell,UG / Professional,ojee.nic.in,Active,"Odisha conducts its own test for MBA, LLM, and M.Arch state quotas."
+HPCET (MBA),CAT_07,State-UT,Himachal Pradesh,Admission,HP Technical University,UG,himtu.ac.in,Active,State entrance for MBA programs; gives first preference to CMAT/MAT scorers though.
+URATPG,CAT_07,State-UT,Rajasthan,Admission,University of Rajasthan,UG,uniraj.ac.in,Active,"Gateway for MA, M.Com, and LLM across the state university system."
+PU CET (PG),CAT_07,State-UT,Chandigarh / Punjab,Admission,Panjab University,UG,cetpg.puchd.ac.in,Active,"Primary test for MA, M.Com, and LLM at PU and regional centers."
+SNAP (Symbiosis National Aptitude Test),CAT_07,Institute,All India,Admission,Symbiosis International,UG,snaptest.org,Active,Mandatory for MBA programs across all Symbiosis campuses.
+IBSAT,CAT_07,Institute,All India,Admission,ICFAI Foundation,UG,ibsindia.org,Active,Gateway for MBA/PGPM at ICFAI Business Schools (IBS).
+MICAT,CAT_07,Institute,All India,Admission,MICA Ahmedabad,UG,mica.ac.in,Active,Must be taken in addition to CAT/XAT/GMAT for MICA's PGDM in Communications.
+X-GMT,CAT_07,Institute,All India,Admission,XIM University,UG,xim.edu.in,Active,University-specific test alternative to CAT/XAT for XIMB and other XIM schools.
+ILI CAT,CAT_07,Institute,All India,Admission,Indian Law Institute,Professional (LLB),ili.ac.in,Active,Standalone highly reputed test strictly for the LLM program at ILI Delhi.
+JMI Entrance Exam (PG),CAT_07,Institute,Delhi,Admission,Jamia Millia Islamia,UG,jmicoe.in,Active,"JMI retains its own entrance for high-demand MA, M.Com, and LLM programs."
+TISSNET,CAT_07,Institute,All India,Admission,Tata Institute of Social Sciences,UG,tiss.edu,Discontinued,Scrapped completely. TISS now uses CUET PG (for MA) and CAT (for HRM & ODCL).
+IIFT Exam,CAT_07,Institute,All India,Admission,Indian Institute of Foreign Trade,UG,iift.ac.in,,

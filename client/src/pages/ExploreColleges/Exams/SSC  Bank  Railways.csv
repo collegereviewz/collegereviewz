@@ -1,0 +1,39 @@
+Exam Name,Category ID,Level,State/UT,Purpose,Conducting Body,Eligibility Level,Official Website,Current Status,Notes
+SSC CGL (Combined Graduate Level),CAT_09,National,All India,Recruitment,Staff Selection Commission (SSC),UG,ssc.gov.in,Active,"Gateway to Group B & C officer posts in central ministries (e.g., Inspector, Assistant Section Officer)."
+SSC CHSL (Combined Higher Secondary Level),CAT_09,National,All India,Recruitment,SSC,Class 12,ssc.gov.in,Active,"Recruits Lower Divisional Clerks (LDC), Postal Assistants, and Data Entry Operators (DEO)."
+SSC MTS (Multi-Tasking Staff) & Havaldar,CAT_09,National,All India,Recruitment,SSC,Class 10,ssc.gov.in,Active,Largest central recruitment for non-technical Group C personnel and CBIC/CBN Havaldars.
+SSC GD (General Duty) Constable,CAT_09,National,All India,Recruitment,SSC,Class 10,ssc.gov.in,Active,"Recruits constables for CAPFs (BSF, CRPF, CISF, ITBP, SSB, SSF, Assam Rifles)."
+SSC CPO (Central Police Organization),CAT_09,National,All India,Recruitment,SSC,UG,ssc.gov.in,Active,Recruits Sub-Inspectors (SI) for Delhi Police and Central Armed Police Forces.
+SSC JE (Junior Engineer),CAT_09,National,All India,Recruitment,SSC,UG / Diploma,ssc.gov.in,Active,"Recruits engineering staff for CPWD, MES, BRO, and Central Water Commission."
+SSC Stenographer (Grade C & D),CAT_09,National,All India,Recruitment,SSC,Class 12,ssc.gov.in,Active,Candidates must pass a rigorous shorthand skill test alongside the CBT.
+IBPS PO (Probationary Officer),CAT_09,National,All India,Recruitment,IBPS,UG,ibps.in,Active,Standardized common recruitment for officer posts across 11 major Public Sector Banks.
+IBPS Clerk,CAT_09,National,All India,Recruitment,IBPS,UG,ibps.in,Active,Centralized recruitment for clerical cadre; features state-wise vacancy distribution and cut-offs.
+IBPS SO (Specialist Officer),CAT_09,National,All India,Recruitment,IBPS,UG / PG,ibps.in,Active,"Recruits IT, Agriculture, Rajbhasha, Law, HR, and Marketing officers."
+IBPS RRB (Officers & Office Assistants),CAT_09,National,All India,Recruitment,IBPS,UG,ibps.in,Active,Recruits for Regional Rural Banks (Gramin Banks); allows candidates to take the exam in regional languages.
+SBI PO (Probationary Officer),CAT_09,Institute,All India,Recruitment,State Bank of India,UG,sbi.co.in/careers,Active,Regarded as the most prestigious and competitive public sector bank exam.
+SBI Clerk (Junior Associates),CAT_09,Institute,All India,Recruitment,State Bank of India,UG,sbi.co.in/careers,Active,Recruits customer support and sales staff across SBI branches nationwide.
+RBI Grade B Officer,CAT_09,Institute,All India,Recruitment,Reserve Bank of India,UG / PG,opportunities.rbi.org.in,Active,High-level regulatory banking exam featuring descriptive economics and finance papers.
+RBI Assistant,CAT_09,Institute,All India,Recruitment,Reserve Bank of India,UG,opportunities.rbi.org.in,Active,Highly competitive clerical-level gateway into the central bank.
+NABARD Grade A & B Officer,CAT_09,Institute,All India,Recruitment,NABARD,UG / PG,nabard.org,Active,Premium regulatory exam focusing heavily on Agriculture and Rural Development (ARD).
+SEBI Grade A Officer,CAT_09,Institute,All India,Recruitment,SEBI,UG / PG,sebi.gov.in,Active,"Recruits Assistant Managers in General, Legal, IT, and Research streams."
+RRB NTPC (Non-Technical Popular Categories),CAT_09,National,All India,Recruitment,Railway Recruitment Board (RRB),Class 12 / UG,indianrailways.gov.in,Active,"Massive recruitment drive for Station Masters, Goods Guards, Commercial Clerks, etc."
+RRB Group D (Level 1),CAT_09,National,All India,Recruitment,RRB / RRC,Class 10 / ITI,indianrailways.gov.in,Active,"Historically one of the largest global recruitment exams for Track Maintainers, Pointsmen, and Helpers."
+RRB ALP & Technician,CAT_09,National,All India,Recruitment,RRB,Class 10 / ITI / Diploma,indianrailways.gov.in,Active,For Assistant Loco Pilots and Technical staff; requires strict vision and medical standards.
+APSSB CSLE / CGLE,CAT_09,State-UT,Arunachal Pradesh,Recruitment,Arunachal Pradesh SSB,Class 12 / UG,apssb.nic.in,Active,State-level Combined Secondary and Combined Graduate Level exams.
+ADRE (Assam Direct Recruitment),CAT_09,State-UT,Assam,Recruitment,State Level Recruitment Commission,Class 10/12/UG,assam.gov.in,Active,Consolidated massive recruitment for Class III and Class IV state government posts.
+BSSC Inter Level & CGL,CAT_09,State-UT,Bihar,Recruitment,Bihar Staff Selection Commission,Class 12 / UG,bssc.bihar.gov.in,Active,"Official state exam for Secretariat Assistants, Revenue Workers, and Panchayat Secretaries."
+CG Vyapam Subordinate Exams,CAT_09,State-UT,Chhattisgarh,Recruitment,CG Professional Examination Board,Class 12 / UG,vyapam.cgstate.gov.in,Active,"Conducts exams for Patwari, RI, Mandi Inspector, and state clerical cadres."
+DSSSB Subordinate Exams,CAT_09,State-UT,Delhi,Recruitment,Delhi Subordinate Services Selection Board,Class 12 / UG,dsssb.delhi.gov.in,Active,"Key gateway for LDC, DASS Grade II/IV, and other Group B/C jobs in the Delhi Government."
+GSSSB Subordinate Exams,CAT_09,State-UT,Gujarat,Recruitment,Gujarat Subordinate Service Selection Board,Class 12 / UG,gsssb.gujarat.gov.in,Active,"Conducts exams for Bin Sachivalay Clerk, Head Clerk, and Senior Clerk."
+HSSC CET (Group C & D),CAT_09,State-UT,Haryana,Recruitment,Haryana SSC,Class 10/12/UG,hssc.gov.in,Active,Standardized Common Eligibility Test required for all state Group C and D recruitments.
+JKSSB Subordinate Exams,CAT_09,State-UT,Jammu & Kashmir,Recruitment,J&K Services Selection Board,Class 12 / UG,jkssb.nic.in,Active,"Official body for Panchayat Accounts Assistant, Class IV, and Junior Assistant recruitment."
+JSSC CGL & CHSL,CAT_09,State-UT,Jharkhand,Recruitment,Jharkhand SSC,Class 12 / UG,jssc.nic.in,Active,Known as JGGLCCE and JISCKCE; gateway for state secretarial and clerical positions.
+Kerala PSC (LDC & LGS),CAT_09,State-UT,Kerala,Recruitment,Kerala PSC,Class 10 / Class 12,keralapsc.gov.in,Active,Kerala operates without a distinct SSC; the PSC conducts massive Lower Division Clerk (LDC) and Last Grade Servant (LGS) exams.
+MP ESB Group Exams,CAT_09,State-UT,Madhya Pradesh,Recruitment,MP Employees Selection Board,Class 10/12/UG,esb.mp.gov.in,Active,"Formerly Vyapam. Group 4 (Assistant Grade 3, Steno) and Group 2 (Patwari) are the SSC equivalents."
+OSSC & OSSSC Exams,CAT_09,State-UT,Odisha,Recruitment,Odisha SSC / Sub-ordinate SSC,Class 10/12/UG,ossc.gov.in,Active,"OSSC handles Group B/C (CGL, CHSL); OSSSC specifically handles massive Group C/D multi-post drives."
+PSSSB Recruitment Exams,CAT_09,State-UT,Punjab,Recruitment,Punjab SSSB,UG,[suspicious link removed],Active,"Key gateway for Clerk, VDO, and Patwari recruitment in Punjab."
+RSMSSB / RSSB CET,CAT_09,State-UT,Rajasthan,Recruitment,Rajasthan Staff Selection Board,Class 12 / UG,rsmssb.rajasthan.gov.in,Active,Candidates must clear the state CET (Senior Secondary or Graduate level) to sit for specific main exams like Patwari or LDC.
+UPSSSC PET & Main Exams,CAT_09,State-UT,Uttar Pradesh,Recruitment,UP Subordinate Services Selection Commission,Class 10/12/UG,[suspicious link removed],Active,UPSSSC Preliminary Eligibility Test (PET) score is legally mandatory to appear for main exams like Lekhpal or VDO.
+UKSSSC Subordinate Exams,CAT_09,State-UT,Uttarakhand,Recruitment,Uttarakhand SSC,Class 12 / UG,sssc.uk.gov.in,Active,"Separate Graduate-level (VDO, Assistant) and Intermediate-level examinations."
+WBPSC Clerkship,CAT_09,State-UT,West Bengal,Recruitment,West Bengal PSC,Class 10,psc.wb.gov.in,Active,West Bengal dissolved its SSC for civil posts; WBPSC now handles this massive clerkship recruitment.
+State Cooperative Bank Exams,CAT_09,State-UT,Respective States,Recruitment,State Cooperative Apex Banks / IBPS,UG,ibps.in,,

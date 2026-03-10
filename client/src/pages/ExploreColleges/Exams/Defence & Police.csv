@@ -1,0 +1,51 @@
+Exam Name,Category ID,Level,State/UT,Purpose,Conducting Body,Eligibility Level,Official Website,Current Status,Notes
+UPSC NDA (National Defence Academy),CAT_10,National,All India,Recruitment,UPSC,Class 12,upsconline.nic.in,Active,"Gateway for Army, Navy, and Air Force wings (Male & Female)."
+UPSC CDS (Combined Defence Services),CAT_10,National,All India,Recruitment,UPSC,UG,upsconline.nic.in,Active,"For IMA, INA, AFA, and Officers Training Academy (OTA)."
+UPSC CAPF (Assistant Commandant),CAT_10,National,All India,Recruitment,UPSC,UG,upsconline.nic.in,Active,"Recruits Assistant Commandants for BSF, CRPF, CISF, ITBP, and SSB."
+AFCAT (Air Force Common Admission Test),CAT_10,National,All India,Recruitment,Indian Air Force (C-DAC),UG,afcat.cdac.in,Active,"For Flying, Technical, and Ground Duty Branches."
+INET (Indian Navy Entrance Test),CAT_10,National,All India,Recruitment,Indian Navy,UG,joinindiannavy.gov.in,Active,Standardized entry for Indian Navy officer cadres.
+Indian Coast Guard (CGEPT),CAT_10,National,All India,Recruitment,Indian Coast Guard,Class 10/12/Diploma,joinindiancoastguard.cdac.in,Active,Recruits Navik (General Duty/Domestic Branch) and Yantrik.
+Indian Army Agniveer CEE,CAT_10,National,All India,Recruitment,Indian Army,Class 10/12,joinindianarmy.nic.in,Active,Standardized online Common Entrance Exam (CEE) for the 4-year Agniveer scheme.
+Indian Navy Agniveer (SSR/MR),CAT_10,National,All India,Recruitment,Indian Navy,Class 10/12,joinindiannavy.gov.in,Active,Recruits Senior Secondary Recruits (SSR) and Matric Recruits (MR).
+IAF Agniveer Vayu,CAT_10,National,All India,Recruitment,Indian Air Force,Class 10/12,agnipathvayu.cdac.in,Active,Air Force recruitment under the Agnipath scheme.
+SSC GD Constable,CAT_10,National,All India,Recruitment,Staff Selection Commission (SSC),Class 10,ssc.gov.in,Active,"Massive recruitment for Constables in CAPFs, SSF, and Rifleman in Assam Rifles."
+SSC CPO (Central Police Organization),CAT_10,National,All India,Recruitment,SSC,UG,ssc.gov.in,Active,Recruits Sub-Inspectors (SI) for Delhi Police and CAPFs.
+Territorial Army Officer Exam,CAT_10,National,All India,Recruitment,Territorial Army,UG,jointerritorialarmy.gov.in,Active,Unique gateway for gainfully employed citizens to serve in uniform part-time.
+APSLPRB Constable & SI,CAT_10,State-UT,Andhra Pradesh,Recruitment,AP State Level Police Recruitment Board,Class 12 / UG,slprb.ap.gov.in,Active,Official test for AP civil police and APSP battalions.
+Arunachal Pradesh Police Recruitment,CAT_10,State-UT,Arunachal Pradesh,Recruitment,APSSB / APP,Class 10 / Class 12,apssb.nic.in,Active,Subordinate board conducts combined police and allied recruitment.
+SLPRB Assam Police,CAT_10,State-UT,Assam,Recruitment,State Level Police Recruitment Board,Class 10/12/UG,slprbassam.in,Active,"Conducts SI, Constable, and Assam Commando Battalion exams."
+CSBC Bihar Police Constable,CAT_10,State-UT,Bihar,Recruitment,Central Selection Board of Constables,Class 12,csbc.bihar.gov.in,Active,Conducts high-volume recruitment purely for constable ranks.
+BPSSC Bihar Police SI,CAT_10,State-UT,Bihar,Recruitment,Bihar Police Sub-ordinate Services Commission,UG,bpssc.bih.nic.in,Active,Dedicated commission for recruiting Sub-Inspectors and Sergeants.
+CG Police Constable & SI,CAT_10,State-UT,Chhattisgarh,Recruitment,Chhattisgarh Police / CG Vyapam,Class 12 / UG,cgpolice.gov.in,Active,Usually conducted via the state police portal or the Vyapam board.
+Goa Police Recruitment,CAT_10,State-UT,Goa,Recruitment,Goa Police,Class 10/12/UG,goapolice.gov.in,Active,Direct recruitment via the official police headquarters mechanism.
+Gujarat Police Lokrakshak & PSI,CAT_10,State-UT,Gujarat,Recruitment,GPRB / Lokrakshak Recruitment Board,Class 12 / UG,[suspicious link removed],Active,High volume state exam for unarmed and armed cadres.
+Haryana Police Constable & SI,CAT_10,State-UT,Haryana,Recruitment,Haryana SSC (HSSC),Class 12 / UG,hssc.gov.in,Active,Conducted via the Common Eligibility Test (CET) structure.
+HP Police Constable Exam,CAT_10,State-UT,Himachal Pradesh,Recruitment,HP Police,Class 12,hppolice.gov.in,Active,Standardized state police test including rigorous physical standards.
+Jharkhand Police Constable/SI (JCCE),CAT_10,State-UT,Jharkhand,Recruitment,JSSC,Class 10 / UG,jssc.nic.in,Active,Handled under the state's central selection commission umbrella.
+KSP Constable (CPC) & PSI,CAT_10,State-UT,Karnataka,Recruitment,Karnataka State Police,Class 12 / UG,ksp.karnataka.gov.in,Active,"Robust, frequent recruitment cycles for Civil and Armed Reserve Police."
+Kerala Police Constable / SI,CAT_10,State-UT,Kerala,Recruitment,Kerala PSC,Class 12 / UG,keralapsc.gov.in,Active,Recruited centrally through the state Public Service Commission.
+MP Police Constable & SI,CAT_10,State-UT,Madhya Pradesh,Recruitment,MP ESB (formerly Vyapam),Class 10 / UG,esb.mp.gov.in,Active,Handled by the state's Employee Selection Board.
+Maharashtra Police Bharti,CAT_10,State-UT,Maharashtra,Recruitment,Maharashtra State Police,Class 12,mahapolice.gov.in,Active,Massive district-wise recruitment drives for constabulary ranks.
+Manipur Police Recruitment,CAT_10,State-UT,Manipur,Recruitment,Manipur Police,Class 10/12/UG,manipurpolice.gov.in,Active,"Recruits for civil police, MR, and IRB battalions."
+Meghalaya Police Recruitment,CAT_10,State-UT,Meghalaya,Recruitment,"Central Recruitment Board (CRB), Meghalaya",Class 10/12/UG,megpolice.gov.in,Active,Includes Unarmed Branch (UB) and Armed Branch (AB) recruitment.
+Mizoram Police Recruitment,CAT_10,State-UT,Mizoram,Recruitment,Mizoram Police / MSSB,Class 10/12/UG,police.mizoram.gov.in,Active,Standard physical and written examination under MSSB guidelines.
+Nagaland Police Recruitment,CAT_10,State-UT,Nagaland,Recruitment,NSSB / PHQ Nagaland,Class 10/12/UG,police.nagaland.gov.in,Active,Subordinate posts are routed through the Nagaland Staff Selection Board.
+Odisha Police Constable & SI,CAT_10,State-UT,Odisha,Recruitment,SSB Odisha Police / OSSC,Class 12 / UG,[suspicious link removed],Active,SI posts are generally routed through OSSC; Constabulary by SSB.
+Punjab Police Recruitment,CAT_10,State-UT,Punjab,Recruitment,Punjab Police Recruitment Board,Class 12 / UG,punjabpolice.gov.in,Active,Standard exams for District and Armed cadres.
+Rajasthan Police Constable,CAT_10,State-UT,Rajasthan,Recruitment,Rajasthan Police / RSMSSB,Class 12,police.rajasthan.gov.in,Active,High volume state exam testing extensive local regional knowledge.
+RPSC Sub-Inspector Exam,CAT_10,State-UT,Rajasthan,Recruitment,Rajasthan Public Service Commission,UG,rpsc.rajasthan.gov.in,Active,Sub-Inspector ranks are conducted via the tier-1 state PSC.
+Sikkim Police Recruitment,CAT_10,State-UT,Sikkim,Recruitment,Sikkim Police,Class 10/12/UG,police.sikkim.gov.in,Active,Routine recruitment specific to state domicile holders.
+TNUSRB Constable & SI,CAT_10,State-UT,Tamil Nadu,Recruitment,TN Uniformed Services Recruitment Board,Class 10 / UG,tnusrb.tn.gov.in,Active,"Highly structured, centralized board specifically for uniformed services."
+TSLPRB Constable & SI,CAT_10,State-UT,Telangana,Recruitment,Telangana State Level Police Recruitment Board,Class 12 / UG,tslprb.in,Active,"Dedicated board for Civil, AR, and TSSP battalions in Telangana."
+Tripura Police Recruitment,CAT_10,State-UT,Tripura,Recruitment,Tripura Police,Class 10/12/UG,tripurapolice.gov.in,Active,Includes recruitment for specialized Tripura State Rifles (TSR).
+UPPRPB Constable & SI,CAT_10,State-UT,Uttar Pradesh,Recruitment,UP Police Recruitment and Promotion Board,Class 12 / UG,uppbpb.gov.in,Active,One of the largest recruitment boards in the world by candidate volume.
+Uttarakhand Police Constable & SI,CAT_10,State-UT,Uttarakhand,Recruitment,UKSSSC / UKPSC,Class 12 / UG,sssc.uk.gov.in,Active,Frequently transitions recruitment duties between the SSC and PSC boards.
+WBPRB Police Constable & SI,CAT_10,State-UT,West Bengal,Recruitment,West Bengal Police Recruitment Board,Class 10 / UG,[suspicious link removed],Active,Separate wings for West Bengal Police and Kolkata Police.
+Delhi Police Constable/Head Constable,CAT_10,State-UT,Delhi,Recruitment,SSC / Delhi Police,Class 12,delhipolice.gov.in,Active,"While Delhi is a UT, its massive recruitment is outsourced largely to the national SSC."
+JKSSB Police Constable & SI,CAT_10,State-UT,Jammu & Kashmir,Recruitment,J&K Services Selection Board,Class 10 / UG,jkssb.nic.in,Active,Official subordinate board for the UT's police recruitment.
+Chandigarh Police Recruitment,CAT_10,State-UT,Chandigarh,Recruitment,Chandigarh Police,Class 12 / UG,chandigarhpolice.gov.in,Active,Direct mechanism for UT's internal police force.
+Puducherry Police Recruitment,CAT_10,State-UT,Puducherry,Recruitment,Puducherry Police,Class 12 / UG,police.py.gov.in,Active,Direct recruitment via the UT's official police headquarters.
+A&N Police Recruitment,CAT_10,State-UT,Andaman & Nicobar,Recruitment,A&N Police,Class 12 / UG,police.andaman.gov.in,Active,Direct mechanism for UT's internal police force.
+Lakshadweep Police Recruitment,CAT_10,State-UT,Lakshadweep,Recruitment,Lakshadweep Police,Class 10 / Class 12,lakshadweep.gov.in,Active,Direct mechanism routed through the UT administration.
+DNH & DD Police Recruitment,CAT_10,State-UT,"Daman & Diu, DNH",Recruitment,DNH & DD Police / SSC,Class 12,dddpol.gov.in,Active,Often utilizes the national SSC or conducts localized internal tests.
+Ladakh Police Recruitment,CAT_10,State-UT,Ladakh,Recruitment,Ladakh Police Subordinate Services,Class 10 / 12,police.ladakh.gov.in,,

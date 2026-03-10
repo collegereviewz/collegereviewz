@@ -1,22 +1,29 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ArrowRight, Sparkles, LogIn } from 'lucide-react';
+import { Mail, Lock, ArrowRight, LogIn, X, Eye, EyeOff } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import logoImg from '../assets/logo6.png';
 
 const LoginPage = () => {
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         email: '',
         password: ''
     });
 
     const colors = {
-        primary: '#0096FF',
-        secondary: '#002D62',
-        accent: '#5CE1FF',
-        dark: '#0f172a',
-        card: '#1e293b',
-        border: 'rgba(255,255,255,0.1)'
+        primary: '#3b51d8', // Deep Indigo/Blue
+        secondary: '#0ea5e9', // Cyan
+        gradientStart: '#4457e5',
+        gradientEnd: '#4ec7ed',
+        bg: '#e2e8f0', // Light grey background for the page
+        card: '#ffffff',
+        inputBg: '#f8fafc',
+        border: '#e2e8f0',
+        text: '#1e293b', // Dark slate
+        muted: '#64748b',
+        label: '#0f172a'
     };
 
     const handleChange = (e) => {
@@ -48,115 +55,169 @@ const LoginPage = () => {
 
     const inputStyle = {
         width: '100%',
-        background: 'rgba(255,255,255,0.03)',
-        border: `1px solid ${colors.border}`,
-        borderRadius: '12px',
-        padding: '14px 16px',
-        paddingLeft: '44px',
-        color: '#fff',
+        background: colors.inputBg,
+        border: '1px solid #e5e7eb',
+        borderRadius: '16px',
+        padding: '16px 20px',
+        color: '#1e293b',
         fontSize: '15px',
+        fontWeight: '500',
         outline: 'none',
-        transition: 'all 0.2s'
+        transition: 'all 0.2s ease'
     };
 
     const labelStyle = {
-        fontSize: '14px',
-        fontWeight: 600,
-        color: '#94a3b8',
-        marginBottom: '8px',
+        fontSize: '15px',
+        fontWeight: '800',
+        color: colors.label,
+        marginBottom: '10px',
         display: 'block'
     };
 
     return (
-        <div style={{ background: colors.dark, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 20px 60px' }}>
+        <div style={{ 
+            background: colors.bg, 
+            minHeight: '100vh', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            padding: '40px 24px',
+            fontFamily: "'Outfit', 'Inter', sans-serif"
+        }}>
             <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                 style={{
                     width: '100%',
-                    maxWidth: '450px',
+                    maxWidth: '520px',
                     background: colors.card,
-                    borderRadius: '24px',
-                    padding: '40px',
-                    border: `1px solid ${colors.border}`,
-                    boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
-                    backdropFilter: 'blur(10px)'
+                    borderRadius: '32px',
+                    boxShadow: '0 40px 100px -20px rgba(0,0,0,0.1)',
+                    overflow: 'hidden',
+                    position: 'relative'
                 }}
             >
-                <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-                    <motion.div
-                        initial={{ rotate: -10 }}
-                        animate={{ rotate: 0 }}
-                        style={{ display: 'inline-block', padding: '12px', background: 'rgba(92, 225, 255, 0.1)', borderRadius: '16px', marginBottom: '16px' }}
-                    >
-                        <LogIn size={32} color={colors.accent} />
-                    </motion.div>
-                    <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>Welcome Back</h1>
-                    <p style={{ color: '#94a3b8', fontSize: '15px' }}>Continue your exploration of top colleges.</p>
+                {/* Header Gradient */}
+                <div style={{ 
+                    background: `linear-gradient(135deg, ${colors.gradientStart}, ${colors.gradientEnd})`,
+                    padding: '24px 32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <img src={logoImg} alt="Logo" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
+                        <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#fff', margin: 0 }}>Sign In to College Review</h2>
+                    </div>
+                    <button 
+                        onClick={() => navigate('/')}
+                        style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%', padding: '6px', cursor: 'pointer', color: '#fff' }}>
+                        <X size={20} />
+                    </button>
                 </div>
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    <div style={{ position: 'relative' }}>
-                        <label style={labelStyle}>Email Address</label>
-                        <Mail style={{ position: 'absolute', left: '16px', top: '42px', color: '#64748b' }} size={18} />
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="your@email.com"
-                            style={inputStyle}
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div style={{ position: 'relative' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <label style={{ ...labelStyle, marginBottom: 0 }}>Password</label>
-                            <span style={{ fontSize: '12px', color: colors.primary, cursor: 'pointer', fontWeight: 600 }}>Forgot?</span>
-                        </div>
-                        <Lock style={{ position: 'absolute', left: '16px', top: '42px', color: '#64748b' }} size={18} />
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="••••••••"
-                            style={inputStyle}
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        style={{
-                            width: '100%',
-                            padding: '16px',
-                            borderRadius: '14px',
-                            background: `linear-gradient(45deg, ${colors.primary}, ${colors.accent})`,
-                            color: '#fff',
-                            border: 'none',
-                            fontSize: '16px',
-                            fontWeight: 800,
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            marginTop: '10px',
-                            boxShadow: '0 4px 15px rgba(0, 150, 255, 0.3)'
+                <div style={{ padding: '40px 48px' }}>
+                    <motion.form 
+                        initial="hidden"
+                        animate="visible"
+                        variants={{
+                            hidden: { opacity: 0 },
+                            visible: {
+                                opacity: 1,
+                                transition: {
+                                    staggerChildren: 0.1
+                                }
+                            }
                         }}
+                        onSubmit={handleSubmit} 
+                        style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}
                     >
-                        Sign In Now <ArrowRight size={20} />
-                    </button>
-                </form>
+                        <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0 } }}>
+                            <label style={labelStyle}>Email ID Or Phone Number</label>
+                            <input
+                                type="text"
+                                name="email"
+                                placeholder="Enter email id or phone number"
+                                style={inputStyle}
+                                onFocus={(e) => { e.target.style.borderColor = '#3b51d8'; e.target.style.background = '#fff'; }}
+                                onBlur={(e) => { e.target.style.borderColor = '#e5e7eb'; e.target.style.background = colors.inputBg; }}
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
+                        </motion.div>
 
-                <div style={{ textAlign: 'center', marginTop: '32px' }}>
-                    <p style={{ color: '#64748b', fontSize: '14px' }}>
-                        New to CollegeReviewz? <Link to="/signup" style={{ color: colors.accent, fontWeight: 700, textDecoration: 'none' }}>Create Account</Link>
-                    </p>
+                        <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0 } }}>
+                            <label style={labelStyle}>Password</label>
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    placeholder="Enter your password"
+                                    style={{ ...inputStyle, paddingRight: '52px' }}
+                                    onFocus={(e) => { e.target.style.borderColor = '#3b51d8'; e.target.style.background = '#fff'; }}
+                                    onBlur={(e) => { e.target.style.borderColor = '#e5e7eb'; e.target.style.background = colors.inputBg; }}
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <button 
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}>
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
+                            </div>
+                        </motion.div>
+
+                        <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0 } }} style={{ marginTop: '-8px' }}>
+                            <Link to="/forgot-password" style={{ fontSize: '15px', color: '#3b82f6', fontWeight: 700, textDecoration: 'none' }}>
+                                Forgot Password?
+                            </Link>
+                        </motion.div>
+
+                        <motion.div variants={{ hidden: { opacity: 0, scale: 0.9 }, visible: { opacity: 1, scale: 1 } }}>
+                            <button
+                                type="submit"
+                                style={{
+                                    width: '100%',
+                                    padding: '18px',
+                                    borderRadius: '16px',
+                                    background: `linear-gradient(90deg, #4457e5, #4ec7ed)`,
+                                    color: '#fff',
+                                    border: 'none',
+                                    fontSize: '17px',
+                                    fontWeight: 800,
+                                    cursor: 'pointer',
+                                    marginTop: '8px',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                            >
+                                Sign In
+                            </button>
+                        </motion.div>
+                    </motion.form>
+
+                    <div style={{ textAlign: 'center', marginTop: '40px' }}>
+                        <p style={{ color: colors.muted, fontSize: '15px', fontWeight: 600 }}>
+                            Don't have an account? <Link to="/signup" style={{ 
+                                color: '#4457e5', 
+                                fontWeight: '800', 
+                                textDecoration: 'none',
+                                marginLeft: '6px'
+                            }}>Create Account</Link>
+                        </p>
+                    </div>
                 </div>
             </motion.div>
+
+            <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+                input::placeholder { color: #94a3b8; font-weight: 500; }
+            `}</style>
         </div>
     );
 };

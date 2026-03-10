@@ -1,10 +1,14 @@
 import React from 'react';
-import { MapPin, Navigation, Building2, Star } from 'lucide-react';
+import { MapPin, Navigation, Building2, Star, Lock, LogIn } from 'lucide-react';
+import HowToReach from '../../../Generic/HowToReach.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const Location = ({ collegeData }) => {
+    const navigate = useNavigate();
     const name = collegeData?.name || 'College';
     let locationStr = collegeData?.location || '';
     let addressStr = collegeData?.address || '';
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
     
     locationStr = locationStr.replace(/["']/g, '').trim();
     addressStr = addressStr.replace(/["']/g, '').trim();
@@ -26,7 +30,7 @@ const Location = ({ collegeData }) => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            <div style={{ background: '#fff', borderRadius: '24px', padding: '32px', border: '1px solid #e2e8f0' }}>
+            <div style={{ background: '#fff', borderRadius: '24px', padding: '32px', border: '1px solid #e2e8f0', position: 'relative' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
                     <div style={{ width: '48px', height: '48px', background: 'rgba(56, 189, 248, 0.1)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <MapPin color="#0ea5e9" size={24} />
@@ -40,12 +44,12 @@ const Location = ({ collegeData }) => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                     
                     {/* Institution Details Section */}
-                    <div style={{ padding: '24px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+                    <div style={{ padding: '24px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #f1f5f9', position: 'relative' }}>
                         <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <Building2 size={20} color="#5b51d8" />
                             Institution Details
                         </h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', filter: !user ? 'blur(4px)' : 'none' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
                                 <div>
                                     <div style={{ fontSize: '12px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '6px' }}>Institution Name</div>
@@ -61,49 +65,185 @@ const Location = ({ collegeData }) => {
                                 </div>
                             </div>
                         </div>
+                        {!user && (
+                            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontWeight: 800, color: '#5b51d8', fontSize: '14px' }}>
+                                Login to view address
+                            </div>
+                        )}
                     </div>
 
                     {/* Google Map Embedded iframe */}
                     <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                             <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', margin: 0 }}>Find Our Office / Campus</h3>
-                            <button 
-                                style={{ 
-                                    padding: '10px 20px', 
-                                    background: '#eff6ff', 
-                                    color: '#3b82f6', 
-                                    borderRadius: '10px', 
-                                    border: '1px solid #bfdbfe', 
-                                    fontSize: '13px', 
-                                    fontWeight: 800, 
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px',
-                                    transition: 'all 0.2s'
-                                }}
-                                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(searchQuery)}`, '_blank')}
-                                onMouseEnter={e => { e.currentTarget.style.background = '#dbeafe'; }}
-                                onMouseLeave={e => { e.currentTarget.style.background = '#eff6ff'; }}
-                            >
-                                <Navigation size={16} />
-                                Get Directions
-                            </button>
+                            {user && (
+                                <button 
+                                    style={{ 
+                                        padding: '10px 20px', 
+                                        background: '#eff6ff', 
+                                        color: '#3b82f6', 
+                                        borderRadius: '10px', 
+                                        border: '1px solid #bfdbfe', 
+                                        fontSize: '13px', 
+                                        fontWeight: 800, 
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        transition: 'all 0.2s'
+                                    }}
+                                    onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(searchQuery)}`, '_blank')}
+                                    onMouseEnter={e => { e.currentTarget.style.background = '#dbeafe'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = '#eff6ff'; }}
+                                >
+                                    <Navigation size={16} />
+                                    Get Directions
+                                </button>
+                            )}
                         </div>
                         <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid #e2e8f0', height: '450px', background: '#f8fafc', position: 'relative' }}>
-                            <iframe 
-                                width="100%" 
-                                height="100%" 
-                                frameBorder="0" 
-                                scrolling="no" 
-                                marginHeight="0" 
-                                marginWidth="0" 
-                                src={`https://www.google.com/maps/embed/v1/place?q=${encodeURIComponent(searchQuery)}`}
-                                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                                title="Google Maps Location"
-                            />
+                            <div style={{ width: '100%', height: '100%', filter: !user ? 'blur(10px)' : 'none', pointerEvents: !user ? 'none' : 'auto' }}>
+                                <iframe 
+                                    width="100%" 
+                                    height="100%" 
+                                    frameBorder="0" 
+                                    scrolling="no" 
+                                    marginHeight="0" 
+                                    marginWidth="0" 
+                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(searchQuery)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                                    title="Google Maps Location"
+                                />
+                            </div>
+
+                            {!user && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 0,
+                                    zIndex: 20,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    background: 'rgba(255, 255, 255, 0.3)',
+                                    textAlign: 'center',
+                                    padding: '24px'
+                                }}>
+                                    <div style={{ 
+                                        background: 'linear-gradient(135deg, #1e1b4b, #5b51d8)', 
+                                        padding: '40px 32px', 
+                                        borderRadius: '24px', 
+                                        color: '#fff',
+                                        boxShadow: '0 25px 50px rgba(0,0,0,0.2)',
+                                        maxWidth: '340px'
+                                    }}>
+                                        <div style={{ width: '64px', height: '64px', background: 'rgba(255,255,255,0.1)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                                            <Lock size={32} color="#fff" />
+                                        </div>
+                                        <h4 style={{ fontSize: '22px', fontWeight: 900, marginBottom: '12px' }}>Unlock Campus Map</h4>
+                                        <p style={{ fontSize: '14px', opacity: 0.8, marginBottom: '28px', lineHeight: 1.6 }}>Join our community to access interactive maps, virtual tours, and detailed transport routes.</p>
+                                        <button 
+                                            onClick={() => navigate('/Login/')}
+                                            style={{ 
+                                                width: '100%', 
+                                                padding: '16px', 
+                                                background: '#fff', 
+                                                color: '#5b51d8', 
+                                                border: 'none', 
+                                                borderRadius: '12px', 
+                                                fontSize: '15px', 
+                                                fontWeight: 800, 
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '10px',
+                                                transition: 'transform 0.2s'
+                                            }}
+                                            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                                            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                                        >
+                                            <LogIn size={20} /> Login to Access
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {user && (
+                                <button 
+                                    onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`, '_blank')}
+                                    style={{
+                                        position: 'absolute',
+                                        top: '16px',
+                                        left: '16px',
+                                        background: '#fff',
+                                        color: '#2563eb',
+                                        border: '1px solid #e5e7eb',
+                                        padding: '8px 16px',
+                                        borderRadius: '8px',
+                                        fontSize: '14px',
+                                        fontWeight: '600',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        cursor: 'pointer',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                        transition: 'all 0.2s',
+                                        zIndex: 10
+                                    }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.background = '#f8fafc'; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.background = '#fff'; }}
+                                >
+                                    Open in Maps
+                                    <Navigation size={14} />
+                                </button>
+                            )}
+                            
+                            {user && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    color: '#fff',
+                                    fontSize: '20px',
+                                    fontWeight: '700',
+                                    textShadow: '0 2px 4px rgba(0,0,0,0.8)',
+                                    pointerEvents: 'none',
+                                    textAlign: 'center',
+                                    width: '100%',
+                                    zIndex: 5
+                                }}>
+                                    Use ctrl + scroll to zoom the map
+                                </div>
+                            )}
                         </div>
                     </div>
+
+                    {/* How to Reach Details */}
+                    <HowToReach
+                        collegeData={collegeData}
+                        fallbackHubs={[
+                            {
+                                type: 'airport',
+                                hubName: 'Indira Gandhi International Airport',
+                                travelTime: '10 km',
+                            },
+                            {
+                                type: 'railway',
+                                hubName: 'New Delhi Railway Station',
+                                travelTime: '15 km',
+                            },
+                            {
+                                type: 'bus',
+                                hubName: 'IIT Gate Bus Stop',
+                                travelTime: 'walkable',
+                            },
+                        ]}
+                    />
 
                 </div>
             </div>
@@ -112,3 +252,4 @@ const Location = ({ collegeData }) => {
 };
 
 export default Location;
+

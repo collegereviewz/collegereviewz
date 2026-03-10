@@ -1,4 +1,23 @@
 import Review from '../models/Review.model.js';
+import User from '../models/User.model.js';
+
+const updateUserReviewStats = async (userId) => {
+    if (!userId) return;
+    const userReviews = await Review.find({ user: userId });
+    const total = userReviews.length;
+    const approved = userReviews.filter(r => r.status === 'Approved').length;
+    const pending = userReviews.filter(r => !r.status || r.status === 'Pending').length;
+
+    const approvalRate = total > 0 ? (approved / total) * 100 : 0;
+    const totalEarnings = approved * 100; // 100 per approved review
+    const pendingEarnings = pending * 50; // 50 Potential earnings per pending review
+
+    await User.findByIdAndUpdate(userId, {
+        approvalRate: parseFloat(approvalRate.toFixed(1)),
+        totalEarnings,
+        pendingEarnings
+    });
+};
 
 export const createReview = async (req, res) => {
     try {
@@ -16,6 +35,12 @@ export const createReview = async (req, res) => {
             rating: rating || 0
         });
         const savedReview = await review.save();
+
+        // Update user stats
+        if (userId) {
+            await updateUserReviewStats(userId);
+        }
+
         res.status(201).json(savedReview);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -137,6 +162,31 @@ export const updateComment = async (req, res) => {
         if (type) comment.type = type;
         if (mediaUrl) comment.mediaUrl = mediaUrl;
         await review.save();
+        res.status(200).json(review);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const updateReviewStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body; // 'Approved', 'Rejected'
+
+        if (!['Approved', 'Rejected'].includes(status)) {
+            return res.status(400).json({ message: "Invalid status" });
+        }
+
+        const review = await Review.findById(id);
+        if (!review) return res.status(404).json({ message: "Review not found" });
+
+        review.status = status;
+        await review.save();
+
+        if (review.user) {
+            await updateUserReviewStats(review.user);
+        }
+
         res.status(200).json(review);
     } catch (error) {
         res.status(400).json({ message: error.message });

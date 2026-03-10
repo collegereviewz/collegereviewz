@@ -9,7 +9,8 @@ import {
     updateReview,
     updateComment,
     deleteComment,
-    getUserReviews
+    getUserReviews,
+    updateReviewStatus
 } from '../controller/review.controller.js';
 
 const router = express.Router();
@@ -17,6 +18,7 @@ const router = express.Router();
 router.get('/', getAllReviews);
 router.get('/user/:userId', getUserReviews);
 router.post('/', createReview);
+router.patch('/:id/status', updateReviewStatus);
 router.patch('/:id/upvote', updateUpvote);
 router.patch('/:id/downvote', updateDownvote);
 router.post('/:id/comment', addComment);

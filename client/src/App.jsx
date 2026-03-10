@@ -23,6 +23,7 @@ import CollegeProfileWrapper from './pages/CollegeProfileWrapper'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import Swal from 'sweetalert2';
+import AuthModal from './components/AuthModal'
 
 // Global alert override matching the website theme
 window.alert = (msg) => {
@@ -42,6 +43,7 @@ window.alert = (msg) => {
 function AppContent() {
   const [loading, setLoading] = useState(true);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [authModal, setAuthModal] = useState({ isOpen: false, mode: 'login' });
   const location = useLocation();
 
   useEffect(() => {
@@ -50,6 +52,25 @@ function AppContent() {
     }, 450);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const handleOpenAuth = (e) => {
+      setAuthModal({ isOpen: true, mode: e.detail || 'login' });
+    };
+    window.addEventListener('open-auth-modal', handleOpenAuth);
+    
+    // Catch legacy routes and trigger modal
+    if (location.pathname.toLowerCase() === '/login/') {
+      setAuthModal({ isOpen: true, mode: 'login' });
+      // Clean up the URL without a full reload
+      window.history.replaceState({}, '', '/');
+    } else if (location.pathname.toLowerCase() === '/signup/') {
+      setAuthModal({ isOpen: true, mode: 'signup' });
+      window.history.replaceState({}, '', '/');
+    }
+
+    return () => window.removeEventListener('open-auth-modal', handleOpenAuth);
+  }, [location.pathname]);
 
   const getCurrentView = () => {
     if (location.pathname === '/') return 'Home';
@@ -63,21 +84,31 @@ function AppContent() {
     return 'Home';
   };
 
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAdminRoute = location.pathname.toLowerCase().startsWith('/admin');
+  const isProfileRoute = location.pathname.toLowerCase().startsWith('/profile');
+  const isAuthRoute = location.pathname.toLowerCase().startsWith('/login') || location.pathname.toLowerCase().startsWith('/signup');
+
+  const hideMainUI = isAdminRoute || isProfileRoute || isAuthRoute;
 
   return (
     <>
       <AnimatePresence>
         {loading && <Preloader />}
       </AnimatePresence>
+
+      <AuthModal 
+        isOpen={authModal.isOpen} 
+        onClose={() => setAuthModal({ ...authModal, isOpen: false })} 
+        initialMode={authModal.mode} 
+      />
+
       <div style={{
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
-        background: '#fff',
-        zoom: isAdminRoute ? 1 : 1.1
+        zoom: isAdminRoute ? 1 : 1
       }}>
-        {!isAdminRoute && <Header currentView={getCurrentView()} />}
+        {!hideMainUI && <Header currentView={getCurrentView()} />}
         <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
           <AnimatePresence mode="wait">
             <motion.div
@@ -98,8 +129,6 @@ function AppContent() {
                 <Route path="/Resources/" element={<Resources />} />
                 <Route path="/WriteReview/" element={<WriteReview />} />
                 <Route path="/Support/" element={<Support />} />
-                <Route path="/Login/" element={<LoginPage />} />
-                <Route path="/Signup/" element={<SignupPage />} />
                 <Route path="/Profile/" element={<ProfilePage />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin" element={<AdminDashboard />} />
@@ -108,9 +137,9 @@ function AppContent() {
             </motion.div>
           </AnimatePresence>
         </main>
-        {!isAdminRoute && <Footer />}
-        {!isAdminRoute && <FloatingAskExperts onClick={() => setIsAssistantOpen(true)} />}
-        {!isAdminRoute && <AIVoiceAssistant isOpen={isAssistantOpen} onClose={() => setIsAssistantOpen(false)} />}
+        {!hideMainUI && <Footer />}
+        {!hideMainUI && <FloatingAskExperts onClick={() => setIsAssistantOpen(true)} />}
+        {!hideMainUI && <AIVoiceAssistant isOpen={isAssistantOpen} onClose={() => setIsAssistantOpen(false)} />}
       </div>
     </>
   );

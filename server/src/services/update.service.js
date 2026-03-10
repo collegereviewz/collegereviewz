@@ -3,6 +3,13 @@ import * as cheerio from 'cheerio';
 import College from '../models/College.model.js';
 import { extractCollegeInfo } from './gemini.service.js';
 
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+
 /**
  * Heuristic to guess official website domain from college name
  */
@@ -137,6 +144,40 @@ export const scrapeUpdates = async (domain, collegeName = '') => {
 };
 
 /**
+ * AI-powered fetching of photos and videos using Gemini Google Search
+ */
+export const fetchMediaWithAI = async (collegeName, state) => {
+    try {
+        if (!process.env.GEMINI_API_KEY) return null;
+
+        const model = genAI.getGenerativeModel({
+            model: "gemini-2.0-flash",
+            tools: [{ googleSearch: {} }]
+        });
+
+        const prompt = `Find 3-5 high-quality YouTube video URLs and 4-6 high-quality campus photo URLs (Unsplash or official) for "${collegeName}, ${state}".
+        Return ONLY a JSON object with "photos" and "videos" arrays. 
+        Example: {"photos": ["url1", "url2"], "videos": ["url1", "url2"]}
+        Respond with raw JSON only.`;
+
+        const result = await model.generateContent(prompt);
+        let text = result.response.text();
+
+        // Clean up markdown
+        if (text.includes('```')) {
+            text = text.replace(/```json|```/g, '').trim();
+        }
+
+        const media = JSON.parse(text);
+        return media;
+    } catch (error) {
+        console.error(`AI Media fetching error for ${collegeName}:`, error.message);
+        return null;
+    }
+};
+
+
+/**
  * Update a specific college by ID
  */
 export const updateCollegeData = async (collegeId) => {
@@ -193,3 +234,4 @@ export const updateCollegeData = async (collegeId) => {
         return null;
     }
 };
+

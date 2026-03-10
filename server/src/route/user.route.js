@@ -1,11 +1,11 @@
 import express from 'express';
-import { updateProfile, getUserActivity } from '../controller/user.controller.js';
+import { updateProfile, getUserActivity, getUserProfile } from '../controller/user.controller.js';
 
 const router = express.Router();
 
-// Define a route to update user profile. 
-// In a fully authenticated system, we would have a middleware `verifyToken` here.
+// Define routes for user profile
 router.put('/profile/:id', updateProfile);
+router.get('/profile/:id', getUserProfile);
 router.get('/activity/:id', getUserActivity);
 
 export default router;

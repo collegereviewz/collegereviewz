@@ -1,0 +1,117 @@
+[
+    {
+        "id": "college-info",
+        "title": "College Info",
+        "component": "CollegeInfo",
+        "icon": "Info",
+        "requiredField": "name"
+    },
+    {
+        "id": "course-fees",
+        "title": "Course & Fees",
+        "component": "CourseFees",
+        "icon": "BookOpen",
+        "requiredField": "courses",
+        "emptyMessage": "Detailed Course & Fee information is being updated by our team."
+    },
+    {
+        "id": "cut-off",
+        "title": "Cut Off",
+        "component": "CutOff",
+        "icon": "Scissors",
+        "requiredField": "cutoff",
+        "emptyMessage": "Previous year cutoff data will be available shortly."
+    },
+    {
+        "id": "admission",
+        "title": "Admission",
+        "component": "Admission",
+        "icon": "UserPlus",
+        "requiredField": "admissionProcess",
+        "emptyMessage": "Admission criteria and process for 2025-26 are being processed."
+    },
+    {
+        "id": "reviews",
+        "title": "Reviews",
+        "component": "Reviews",
+        "icon": "Star",
+        "requiredField": "_id"
+    },
+    {
+        "id": "ranking-placement",
+        "title": "Ranking and Placement",
+        "component": "RankingPlacement",
+        "icon": "Trophy",
+        "requiredField": "placement",
+        "emptyMessage": "Placement statistics and ranking data coming soon."
+    },
+    {
+        "id": "result",
+        "title": "Result",
+        "component": "Result",
+        "icon": "FileText",
+        "requiredField": "results",
+        "emptyMessage": "Examination results and notifications are currently unavailable."
+    },
+    {
+        "id": "location",
+        "title": "Location",
+        "component": "Location",
+        "icon": "MapPin",
+        "requiredField": "address"
+    },
+    {
+        "id": "photo-video",
+        "title": "Photo & Video",
+        "component": "PhotoVideo",
+        "icon": "Camera",
+        "requiredField": "photos",
+        "emptyMessage": "Our AI is currently scouring the web for verified campus images and video tours."
+    },
+    {
+        "id": "scholarship",
+        "title": "Scholarship",
+        "component": "Scholarship",
+        "icon": "GraduationCap",
+        "requiredField": "scholarships",
+        "emptyMessage": "Scholarship and Financial Aid details coming soon."
+    },
+    {
+        "id": "notification-upload",
+        "title": "Notification & Upload",
+        "component": "NotificationUpload",
+        "icon": "Bell",
+        "requiredField": "notifications",
+        "emptyMessage": "No active notifications found for this session."
+    },
+    {
+        "id": "q-a",
+        "title": "Q & A",
+        "component": "QA",
+        "icon": "MessageSquare",
+        "requiredField": "questions",
+        "emptyMessage": "No questions have been asked yet. Be the first to ask!"
+    },
+    {
+        "id": "facility",
+        "title": "Facility",
+        "component": "Facility",
+        "icon": "Building",
+        "requiredField": "facilities",
+        "emptyMessage": "Campus facility details are currently being indexed."
+    },
+    {
+        "id": "student-life",
+        "title": "Student Life",
+        "component": "StudentLife",
+        "icon": "Users",
+        "requiredField": "studentLifeHtml",
+        "emptyMessage": "Campus life and extracurricular details coming soon."
+    },
+    {
+        "id": "contact-details",
+        "title": "Contact Details",
+        "component": "ContactDetails",
+        "icon": "contactDetails"
+    }
+]

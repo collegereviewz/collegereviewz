@@ -30,6 +30,17 @@ function getCollegeRoute(name) {
 
 const ExploreColleges = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        return JSON.parse(storedUser);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  });
   const [selectedStream, setSelectedStream] = useState('All');
   const [sortBy, setSortBy] = useState('Ranking');
   const [selectedState, setSelectedState] = useState('All');
@@ -363,9 +374,26 @@ const ExploreColleges = () => {
               </button>
             )}
 
-            <div ref={filtersRef} className="no-scrollbar" style={{ display: 'flex', flex: 1, gap: '12px', overflowX: 'auto', scrollBehavior: 'smooth' }}>
+            <motion.div 
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: { staggerChildren: 0.05 }
+                }
+              }}
+              ref={filtersRef} 
+              className="no-scrollbar" 
+              style={{ display: 'flex', flex: 1, gap: '12px', overflowX: 'auto', scrollBehavior: 'smooth' }}
+            >
               {filters.map((f, i) => (
-                <div
+                <motion.div
+                  variants={{
+                    hidden: { opacity: 0, x: 20 },
+                    visible: { opacity: 1, x: 0 }
+                  }}
                   key={i}
                   onClick={() => setOpenFilter(openFilter === f.label ? null : f.label)}
                   style={{
@@ -420,9 +448,9 @@ const ExploreColleges = () => {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
             {/* Right Scroll Arrow for Filters */}
             {canScrollFilterRight && (
@@ -523,12 +551,20 @@ const ExploreColleges = () => {
             <tbody>
               {loading ? (
                 <tr><td colSpan="6" style={{ padding: '80px', textAlign: 'center', fontSize: '18px', fontWeight: 800, color: '#64748b' }}>Loading colleges from database...</td></tr>
-              ) : displayedColleges.map((col, idx) => {
-                const rankNum = (currentPage - 1) * itemsPerPage + idx + 1;
+              ) : (
+                <AnimatePresence mode="popLayout">
+                  {displayedColleges.map((col, idx) => {
+                    const rankNum = (currentPage - 1) * itemsPerPage + idx + 1;
 
-                return (
-                  <React.Fragment key={idx}>
-                    <tr style={{ transition: 'background 0.2s ease' }}>
+                    return (
+                      <React.Fragment key={col._id || idx}>
+                        <motion.tr 
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ duration: 0.3, delay: idx * 0.05 }}
+                          style={{ transition: 'background 0.2s ease' }}
+                        >
                       {/* CD RANK */}
                       <td style={{ padding: '24px 20px 10px', fontSize: '14px', fontWeight: 700, color: '#334155', verticalAlign: 'top', borderRight: '1px solid rgba(0,0,0,0.1)', textAlign: 'center' }}>#{rankNum}</td>
 
@@ -571,24 +607,29 @@ const ExploreColleges = () => {
                       </td>
 
                       {/* PLACEMENT / CLINICAL EXPOSURE */}
-                      <td style={{ padding: '24px 20px 10px', verticalAlign: 'top', borderRight: '1px solid rgba(0,0,0,0.1)', textAlign: 'center' }}>
+                      <td style={{ padding: '24px 20px 10px', verticalAlign: 'top', borderRight: '1px solid rgba(0,0,0,0.1)', textAlign: 'center', position: 'relative' }}>
                         {selectedStream === 'MBBS' ? (
-                          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center', filter: !user ? 'blur(4px)' : 'none' }}>
                             <div style={{ fontSize: '14px', fontWeight: 900, color: '#10b981', marginBottom: '4px' }}>Excellent</div>
                             <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>Clinical Exposure</div>
                           </div>
                         ) : (
                           <>
-                            <div style={{ marginBottom: '10px' }}>
-                              <div style={{ fontSize: '14px', fontWeight: 900, color: '#10b981' }}>{col.placement}</div>
+                            <div style={{ marginBottom: '10px', filter: !user ? 'blur(5px)' : 'none' }}>
+                              <div style={{ fontSize: '14px', fontWeight: 900, color: '#10b981' }}>{user ? col.placement : '₹ XX.X LPA'}</div>
                               <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>Average Package</div>
                             </div>
-                            <div style={{ marginBottom: '12px' }}>
-                              <div style={{ fontSize: '14px', fontWeight: 900, color: '#10b981' }}>{col.highestPackage}</div>
+                            <div style={{ marginBottom: '12px', filter: !user ? 'blur(5px)' : 'none' }}>
+                              <div style={{ fontSize: '14px', fontWeight: 900, color: '#10b981' }}>{user ? col.highestPackage : '₹ XX.X LPA'}</div>
                               <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>Highest Package</div>
                             </div>
-                            <button style={{ padding: '7px 12px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', margin: '0 auto' }}>
-                              <FlaskConical size={12} color="#5b51d8" /> Compare Placement
+                            <button 
+                              onClick={() => {
+                                if (!user) window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }));
+                              }}
+                              style={{ padding: '7px 12px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', margin: '0 auto' }}>
+                              {!user ? <Scale size={12} color="#f59e0b" /> : <FlaskConical size={12} color="#5b51d8" />} 
+                              {user ? 'Compare Placement' : 'Login to View'}
                             </button>
                           </>
                         )}
@@ -644,17 +685,18 @@ const ExploreColleges = () => {
                           <button style={{ padding: '7px 12px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Landmark size={12} /> Apply for Loan</button>
                         </div>
                       </td>
-                    </tr>
-                    {/* THE "ONE LINE" UNDER THE BOX */}
-                    <tr key={`${idx}-footer`} style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
-                      <td colSpan="6" style={{ padding: '0 20px 0px' }}>
-                        {/* Internal line removed */}
-                      </td>
-                    </tr>
-                  </React.Fragment>
-                );
-              })
-              }
+                    </motion.tr>
+                        {/* THE "ONE LINE" UNDER THE BOX */}
+                        <tr key={`${idx}-footer`} style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
+                          <td colSpan="6" style={{ padding: '0 20px 0px' }}>
+                            {/* Internal line removed */}
+                          </td>
+                        </tr>
+                      </React.Fragment>
+                    );
+                  })}
+                </AnimatePresence>
+              )}
             </tbody>
           </table>
         </div>
@@ -725,6 +767,31 @@ const ExploreColleges = () => {
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @media (max-width: 1024px) {
+            .filters-tabs-container {
+                overflow-x: auto !important;
+                padding-bottom: 8px !important;
+            }
+            .college-table-container {
+                overflow-x: auto !important;
+            }
+            .college-table {
+                min-width: 900px !important; /* Forces horizontal scroll on table but keeps structure */
+            }
+            .college-row {
+                font-size: 13px !important;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .college-table-container {
+                display: block !important;
+            }
+            /* Alternative: Hide table and show cards on mobile. 
+             * But for now, let's just make it scrollable as requested for consistency.
+             */
+        }
       `}</style>
     </div>
   );

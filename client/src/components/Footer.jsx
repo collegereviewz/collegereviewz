@@ -47,7 +47,7 @@ const Footer = () => (
         {/* Logo & Social */}
         <div>
            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-              <img src={logoImg} alt="Logo" style={{ width: '28px', height: '28px', filter: 'brightness(0) invert(1)' }} />
+              <img src={logoImg} alt="Logo" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
               <span style={{ fontSize: '22px', fontWeight: 900, letterSpacing: '-0.5px' }}>CollegeReviewZ</span>
            </div>
            

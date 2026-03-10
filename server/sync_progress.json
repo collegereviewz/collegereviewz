@@ -1,0 +1,118 @@
+{
+  "successCount": 2,
+  "failCount": 28,
+  "failedColleges": [
+    {
+      "name": "DR. S. & S. S. GHANDHY GOVERNMENT ENGINEERING COLLEGE, SURAT.",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "SARVAJANIK COLLEGE OF ENGINEERING AND TECHNOLOGY",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "SHRRE SWAMINARAYAN GADI INSTITUTE OF TECHNOLOGY",
+      "state": "GUJARAT(Computer Applications)"
+    },
+    {
+      "name": "UCP INSTITUTE OF TECHNOLOGY",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "INSTITUTE OF ADVANCED RESEARCH",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "ASIA PACIFIC INSTITUTE OF HOTEL MANAGEMENT",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "STATE INSTITUTE OF HOTEL MANAGMENT GUJARAT",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "VIVEKANAND INSTITUTE OF HOTEL & TOURISM MANAGEMENT",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "APOLLO HMCT COLLEGE",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "R. N. G. PATEL INSTITUTE OF TECHNOLOGY RNGPIT",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "C Z PATEL INSTITUTE OF BUSINESS AND MANAGEMENT",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "C.K.PITHAWALLA COLLEGE OF COMMERCE MANAGEMENT COMPUTER APPLICATION",
+      "state": "GUJARAT(Computer Applications)"
+    },
+    {
+      "name": "CHAUDHARI TECHNICAL INSTITUTE",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "PATEL GROUP OF INSTITUTIONS",
+      "state": "GUJARAT(Computer Applications)"
+    },
+    {
+      "name": "CHIMANBHAI PATEL INTITUTE OF MANAGEMENT & RESEARCH",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "CHRIST INSTITUTE OF MANAGEMENT",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "DHARMSINH DESAI UNIVERSITY",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "D. L. PATEL INSTITUTE OF MANAGEMENT & TECHNOLOGY, MBA COLLEGE",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "DARSHAN INSTITUTE OF ENGINEERING & TECHNOLOGY",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "DEPARTMENT OF COMMERCE & MANAGEMENT, K.S.K.V. KACHCHH UNIVERSITY, BHUJ.",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "DEPARTMENT OF COMPUTER SCIENCE FACULTY OF MANAGEMENT AND TECHNOLOGY GUJARAT VIDYAPITH AHMEDABAD",
+      "state": "GUJARAT(Computer Applications)"
+    },
+    {
+      "name": "GYANMANJARI INSTITUTE OF TECHNOLOGY",
+      "state": "Gujarat"
+    },
+    {
+      "name": "DR. V. R. GODHANIA COLLEGE OF ENGINEERING & TECHNOLOGY",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "GROW MORE FOUNDATION'S GROUP OF INSTITUTIONS",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "GEETANJALI INSTITUTE OF MANAGMENT STUDIES-RAJKOT",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "GENEVA INSTITUTE OF MANAGEMENT STUDIES",
+      "state": "GUJARAT"
+    },
+    {
+      "name": "SHANTI BUSINESS SCHOOL",
+      "state": "GUJARAT(Computer Applications)"
+    },
+    {
+      "name": "GROW MORE INSTITUTE OF COMPUTER APPLICATION",
+      "state": "GUJARAT(Computer Applications)"
+    }
+  ]
+}

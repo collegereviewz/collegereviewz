@@ -835,8 +835,9 @@ const WriteAReview = ({ collegeId: propCollegeId, collegeName: propCollegeName, 
         }
 
         const reviewData = {
-            author: "Anonymous Student",
-            role: "Student",
+            userId: user?._id,
+            author: user?.fullName || "Anonymous Student",
+            role: user?.role || "Student",
             content: finalContent,
             type: finalType,
             mediaUrl: mediaUrl,

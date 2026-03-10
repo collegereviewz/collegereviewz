@@ -9,7 +9,18 @@ const Header = ({ currentView }) => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        return JSON.parse(storedUser);
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+        return null;
+      }
+    }
+    return null;
+  });
   const navigate = useNavigate();
   const profileMenuRef = React.useRef(null);
 
@@ -18,7 +29,7 @@ const Header = ({ currentView }) => {
     localStorage.removeItem('token');
     setUser(null);
     setProfileMenuOpen(false);
-    navigate('/Login/');
+    window.location.href = '/';
   };
 
   useEffect(() => {
@@ -33,24 +44,6 @@ const Header = ({ currentView }) => {
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
-    const fetchUser = () => {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        try {
-          setUser(JSON.parse(storedUser));
-        } catch (e) {
-          console.error('Error parsing user from localStorage:', e);
-          setUser(null);
-        }
-      } else {
-        setUser(null);
-      }
-    };
-
-    fetchUser();
-    window.addEventListener('scroll', onScroll);
-    window.addEventListener('auth-change', fetchUser);
-
     const loadUser = () => {
       const storedUser = localStorage.getItem('user');
       if (storedUser) {
@@ -65,14 +58,13 @@ const Header = ({ currentView }) => {
       }
     };
 
-    // Load initial user state
-    loadUser();
-
-    // Listen for custom login/signup events
+    window.addEventListener('scroll', onScroll);
+    window.addEventListener('auth-change', loadUser);
     window.addEventListener('userLogin', loadUser);
 
     return () => {
       window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('auth-change', loadUser);
       window.removeEventListener('userLogin', loadUser);
     };
   }, []);
@@ -107,7 +99,10 @@ const Header = ({ currentView }) => {
                 <NavLink to="/Support/" style={{ color: '#fff', textDecoration: 'none', opacity: 0.95 }}>Support</NavLink>
                 <span style={{ opacity: 0.4 }}>/</span>
                 {!user && (
-                  <NavLink to="/Login/" style={{ color: '#fff', textDecoration: 'none', opacity: 0.95 }}>Login</NavLink>
+                <span 
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }))} 
+                  style={{ color: '#fff', textDecoration: 'none', opacity: 0.95, cursor: 'pointer' }}
+                >Login</span>
                 )}
               </div>
               <div style={{ width: '1px', height: '16px', backgroundColor: 'rgba(255,255,255,0.3)' }}></div>
@@ -164,7 +159,29 @@ const Header = ({ currentView }) => {
           </div>
 
           {/* CTA Button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }} className="nav-right-wrap">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }} className="nav-right-wrap">
+            {!user && (
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }))}
+                style={{
+                  color: '#475569',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  padding: '8px 16px',
+                  borderRadius: '10px',
+                  transition: 'background 0.2s',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = '#f1f5f9'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                className="hidden-mobile"
+              >
+                Login
+              </button>
+            )}
             <NavLink
               to="/WriteReview/"
               className="nav-cta"

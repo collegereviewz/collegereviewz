@@ -1,5 +1,6 @@
 import React from 'react';
 import { MapPin, Navigation, Building2, Star } from 'lucide-react';
+import HowToReach from '../../../Generic/HowToReach.jsx';
 
 const Location = ({ collegeData }) => {
     const name = collegeData?.name || 'College';
@@ -98,12 +99,79 @@ const Location = ({ collegeData }) => {
                                 scrolling="no" 
                                 marginHeight="0" 
                                 marginWidth="0" 
-                                src={`https://www.google.com/maps/embed/v1/place?q=${encodeURIComponent(searchQuery)}`}
+                                src={`https://maps.google.com/maps?q=${encodeURIComponent(searchQuery)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
                                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                                 title="Google Maps Location"
                             />
+                            
+                            <button 
+                                onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`, '_blank')}
+                                style={{
+                                    position: 'absolute',
+                                    top: '16px',
+                                    left: '16px',
+                                    background: '#fff',
+                                    color: '#2563eb',
+                                    border: '1px solid #e5e7eb',
+                                    padding: '8px 16px',
+                                    borderRadius: '8px',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                    transition: 'all 0.2s',
+                                    zIndex: 10
+                                }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = '#f8fafc'; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = '#fff'; }}
+                            >
+                                Open in Maps
+                                <Navigation size={14} />
+                            </button>
+                            
+                            <div style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                color: '#fff',
+                                fontSize: '20px',
+                                fontWeight: '700',
+                                textShadow: '0 2px 4px rgba(0,0,0,0.8)',
+                                pointerEvents: 'none',
+                                textAlign: 'center',
+                                width: '100%',
+                                zIndex: 5
+                            }}>
+                                Use ctrl + scroll to zoom the map
+                            </div>
                         </div>
                     </div>
+
+                    {/* How to Reach Details */}
+                    <HowToReach
+                        collegeData={collegeData}
+                        fallbackHubs={[
+                            {
+                                type: 'airport',
+                                hubName: 'Netaji Subhas Chandra Bose Intl Airport',
+                                travelTime: '140 km',
+                            },
+                            {
+                                type: 'railway',
+                                hubName: 'Kharagpur Junction',
+                                travelTime: '5 km',
+                            },
+                            {
+                                type: 'bus',
+                                hubName: 'Kharagpur Bus Stand',
+                                travelTime: '5 km',
+                            },
+                        ]}
+                    />
 
                 </div>
             </div>

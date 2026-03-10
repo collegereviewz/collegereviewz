@@ -1,0 +1,79 @@
+{
+    "_id": {
+        "$oid": ""
+    },
+    "aicteId": "",
+    "__v": 0,
+    "address": "",
+    "courses": [
+        {
+            "programme": "",
+            "course": "",
+            "intake": 0,
+            "fees": "",
+            "_id": {
+                "$oid": ""
+            }
+        }
+    ],
+    "createdAt": {
+        "$date": ""
+    },
+    "district": "",
+    "institutionType": "",
+    "name": "",
+    "state": "",
+    "university": "",
+    "updatedAt": {
+        "$date": ""
+    },
+    "updates": {
+        "notifications": [],
+        "news": [],
+        "events": [],
+        "lastUpdated": {
+            "$date": ""
+        }
+    },
+    "establishedYear": "",
+    "managementType": "",
+    "about": "",
+    "admissionProcess": "",
+    "avgPackage": "",
+    "contactDetails": {
+        "phone": "",
+        "email": ""
+    },
+    "cutOffs": "",
+    "facilities": [],
+    "faq": [
+        {
+            "question": "",
+            "answer": "",
+            "_id": {
+                "$oid": ""
+            }
+        }
+    ],
+    "fees": "",
+    "highestPackage": "",
+    "mapLink": "",
+    "officialWebsite": "",
+    "photos": [],
+    "ranking": "",
+    "resultInfo": "",
+    "scholarships": "",
+    "studentLife": "",
+    "topRecruiters": [],
+    "videos": [],
+    "commuteIntelligence": [
+        {
+            "type": "",
+            "hubName": "",
+            "travelTime": "",
+            "_id": {
+                "$oid": ""
+            }
+        }
+    ]
+}

@@ -1,0 +1,37 @@
+Exam Name,Category ID,Level,State/UT,Purpose,Conducting Body,Eligibility Level,Official Website,Current Status,Notes
+GATE (Graduate Aptitude Test in Engineering),CAT_06,National,All India,Admission / Recruitment,IISc Bangalore & Seven IITs,UG,gate.iisc.ac.in (or organizing IIT portal),Active,"Gateway for M.Tech/Ph.D at IITs/NITs and entry-level jobs in top PSUs (BHEL, ONGC, etc.)."
+CUET PG (Common University Entrance Test),CAT_06,National,All India,Admission,National Testing Agency (NTA),UG,exams.nta.ac.in/CUET-PG/,Active,"Standardized test for M.Sc, MCA, M.Tech, and M.Arch across Central and State Universities."
+IIT JAM (Joint Admission test for Masters),CAT_06,National,All India,Admission,IITs,UG,jam.iitm.ac.in (or organizing IIT),Active,"For M.Sc., Joint M.Sc.-Ph.D., and Dual Degree programs at IITs, IISc, and NITs (via CCMN)."
+NIMCET (NIT MCA Common Entrance Test),CAT_06,National,All India,Admission,NITs (Rotational),UG,nimcet.in,Active,The premier entrance exam for MCA programs offered exclusively across participating NITs.
+JEST (Joint Entrance Screening Test),CAT_06,National,All India,Admission / Fellowship,SERB / Participating Research Institutes,UG / PG,jest.org.in,Active,"For Ph.D. / Integrated Ph.D. in Physics, Theoretical Computer Science, and Neuroscience."
+CEED (Common Entrance Examination for Design),CAT_06,National,All India,Admission,IIT Bombay,UG / PG,ceed.iitb.ac.in,Active,"Primarily for M.Des and Ph.D. in Design at IITs, IISc, and recognized design institutes."
+NEET PG (National Eligibility cum Entrance Test),CAT_06,National,All India,Admission,NBEMS,Professional (MBBS),natboard.edu.in,Active,"Single national gateway for MD, MS, and PG Diploma courses (All India & State Quotas)."
+NEET MDS,CAT_06,National,All India,Admission,NBEMS,Professional (BDS),natboard.edu.in,Active,Single national gateway for Masters in Dental Surgery (MDS).
+NEET SS (Super Specialty),CAT_06,National,All India,Admission,NBEMS,Professional (MD/MS),natboard.edu.in,Active,Single entrance for DM and MCh programs.
+INI-CET (Institute of National Importance - CET),CAT_06,National,All India,Admission,"AIIMS, New Delhi",Professional (MBBS/BDS),aiimsexams.ac.in,Active,"Replaces individual exams for MD/MS/MDS at all AIIMS campuses, JIPMER, PGIMER, and NIMHANS."
+INI-SS (Super Specialty),CAT_06,National,All India,Admission,"AIIMS, New Delhi",Professional (MD/MS),aiimsexams.ac.in,Active,"For admission to DM, M.Ch., and MD Hospital Administration at INI institutes."
+GPAT (Graduate Pharmacy Aptitude Test),CAT_06,National,All India,Admission / Scholarship,NBEMS,UG (B.Pharm),natboard.edu.in,Active,Recently moved from NTA to NBEMS. Essential for M.Pharm admissions and AICTE stipends.
+NIPER JEE,CAT_06,National,All India,Admission,NIPER (Rotational),UG (B.Pharm/M.Sc),niper.gov.in,Active,"Must have a valid GPAT/GATE/NET score to apply. For M.Pharm, MS (Pharm), M.Tech (Pharm)."
+AIAPGET (AYUSH PG Entrance Test),CAT_06,National,All India,Admission,NTA,Professional,exams.nta.ac.in/AIAPGET/,Active,"For postgraduate courses in Ayurveda, Unani, Siddha & Homeopathy."
+DNB PDCET,CAT_06,National,All India,Admission,NBEMS,Professional (PG Diploma),natboard.edu.in,Active,Post Diploma Centralized Entrance Test for admission to DNB Broad Specialty courses.
+AP PGECET,CAT_06,State-UT,Andhra Pradesh,Admission,Sri Venkateswara University (for APSCHE),UG,cets.apsche.ap.gov.in,Active,"State-level entrance for M.Tech, M.Pharm, and Pharm.D (PB). GATE/GPAT qualifiers are prioritized."
+TS PGECET,CAT_06,State-UT,Telangana,Admission,JNTU Hyderabad (for TGCHE),UG,pgecet.tsche.ac.in,Active,"Official test for M.E, M.Tech, M.Arch, and M.Pharm under Telangana state quota."
+Karnataka PGCET,CAT_06,State-UT,Karnataka,Admission,Karnataka Examinations Authority (KEA),UG,cetonline.karnataka.gov.in/kea/,Active,"Required for state-quota seats in M.E., M.Tech, M.Arch, and MCA."
+CEETA PG,CAT_06,State-UT,Tamil Nadu,Admission,Anna University,UG,tancet.annauniv.edu,Active,"Exclusively for M.E., M.Tech, M.Arch, and M.Plan. (Separated from TANCET)."
+TANCET (MCA),CAT_06,State-UT,Tamil Nadu,Admission,Anna University,UG,tancet.annauniv.edu,Active,State test for MCA admissions in Tamil Nadu. (Also used for MBA).
+MAH-MCA CET,CAT_06,State-UT,Maharashtra,Admission,"State CET Cell, Maharashtra",UG,cetcell.mahacet.org,Active,Centralized state entrance for Master of Computer Applications (MCA).
+MAH-M.ARCH CET,CAT_06,State-UT,Maharashtra,Admission,"State CET Cell, Maharashtra",UG (B.Arch),cetcell.mahacet.org,Active,Centralized state entrance for Master of Architecture.
+MH M.Sc Nursing CET,CAT_06,State-UT,Maharashtra,Admission,"State CET Cell, Maharashtra",UG (B.Sc Nursing),cetcell.mahacet.org,Active,Mandatory for all state quota PG nursing admissions in Maharashtra.
+WBJECA,CAT_06,State-UT,West Bengal,Admission,WBJEEB,UG,wbjeeb.nic.in,Active,Official test for MCA programs across institutions in West Bengal.
+WBJEE JEMAS (PG),CAT_06,State-UT,West Bengal,Admission,WBJEEB,UG,wbjeeb.nic.in,Active,"Entrance for M.Sc Nursing, MPT, Master in Hospital Administration (MHA), etc."
+OJEE (PG),CAT_06,State-UT,Odisha,Admission,OJEE Cell,UG,ojee.nic.in,Active,"State-level entrance for M.Tech, M.Arch, M.Pharm, and MCA."
+Gujarat PGCET,CAT_06,State-UT,Gujarat,Admission,ACPC Gujarat,UG,acpc.gujarat.gov.in,Active,"Only for seats left vacant after GATE/GPAT counseling for M.E, M.Tech, and M.Pharm."
+HPCET (PG),CAT_06,State-UT,Himachal Pradesh,Admission,HP Technical University,UG,himtu.ac.in,Active,"State entrance for M.Tech, MCA, and M.Pharm programs."
+RUHS M.Sc Nursing/Pharmacy,CAT_06,State-UT,Rajasthan,Admission,Rajasthan University of Health Sciences,UG,[suspicious link removed],Active,"Conducts its own CBT for PG Nursing, Pharmacy, and Paramedical."
+ABVMU UP CNET (PG),CAT_06,State-UT,Uttar Pradesh,Admission,ABVMU,UG (B.Sc Nursing),abvmuup.edu.in,Active,Centralized Nursing Entrance Test for M.Sc Nursing across all UP colleges.
+BITS HD (Higher Degree),CAT_06,Institute,All India,Admission,BITS Pilani,UG,[suspicious link removed],Active,"For M.E., M.Pharm, and Ph.D. across Pilani, Goa, and Hyderabad campuses."
+VITMEE,CAT_06,Institute,All India,Admission,VIT,UG,vit.ac.in,Active,For M.Tech and MCA programs across Vellore and Chennai campuses.
+SRMJEEE PG,CAT_06,Institute,All India,Admission,SRMIST,UG,srmist.edu.in,Active,Entrance for M.Tech across SRM campuses.
+CUSAT CAT (PG),CAT_06,Institute,All India,Admission,Cochin University,UG,admissions.cusat.ac.in,Active,"For M.Sc, MCA, and M.Tech admissions. GATE scorers may be exempted/given preference."
+AIIMS M.Sc Courses Entrance,CAT_06,Institute,All India,Admission,"AIIMS, New Delhi",UG,aiimsexams.ac.in,Active,"Separate CBT for M.Sc Nursing, M.Sc Medical Anatomy, Biochemistry, etc."
+PGIMER M.Sc Entrance,CAT_06,Institute,All India,Admission,"PGIMER, Chandigarh",UG,pgimer.edu.in,,

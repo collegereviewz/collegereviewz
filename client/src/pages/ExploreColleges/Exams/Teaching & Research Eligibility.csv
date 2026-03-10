@@ -1,0 +1,54 @@
+Exam Name,Category ID,Level,State/UT,Purpose,Conducting Body,Eligibility Level,Official Website,Current Status,Notes
+UGC NET (National Eligibility Test),CAT_11,National,All India,Eligibility / Scholarship,NTA (for UGC),PG,ugcnet.nta.ac.in,Active,"Determines eligibility for Assistant Professor and awards Junior Research Fellowship (JRF) in Humanities, Arts, and Commerce."
+CSIR UGC NET,CAT_11,National,All India,Eligibility / Scholarship,NTA (for CSIR),PG,csirnet.nta.ac.in,Active,"Specifically for Science subjects (Life Sciences, Physical Sciences, Chemical Sciences, Mathematical & Earth Sciences)."
+CTET (Central Teacher Eligibility Test),CAT_11,National,All India,Eligibility,CBSE,Class 12 / UG,ctet.nic.in,Active,"Mandatory for teaching in central schools (KVS, NVS, DSSSB). Recognized by UTs without their own TET (e.g., Delhi, Chandigarh)."
+ASRB NET (ICAR NET),CAT_11,National,All India,Eligibility,Agricultural Scientists Recruitment Board,PG,asrb.org.in,Active,Mandatory for Lecturer/Assistant Professor roles in State Agricultural Universities (SAUs).
+ICMR JRF,CAT_11,National,All India,Scholarship,NTA / Indian Council of Medical Research,PG,icmr.nic.in,Active,Awards fellowships for Ph.D./research in biomedical and health sciences.
+DBT BET (Biotechnology Eligibility Test),CAT_11,National,All India,Scholarship,Regional Centre for Biotechnology / NTA,PG,rcb.res.in,Active,Awards the DBT-JRF for research purely in biotechnology and allied fields.
+NCET (National Common Entrance Test),CAT_11,National,All India,Admission,NTA,Class 12,ncet.samarth.ac.in,Active,"Gateway for admission to the 4-Year Integrated Teacher Education Programme (ITEP) at IITs, NITs, and RIEs."
+RIE CEE (Common Entrance Exam),CAT_11,National,All India,Admission,NCERT,Class 12 / UG,cee.ncert.gov.in,Active,"Official entrance for B.Sc.B.Ed, B.A.B.Ed, and M.Ed at Regional Institutes of Education (NCERT)."
+AP TET,CAT_11,State-UT,Andhra Pradesh,Eligibility,"Dept. of School Education, AP",Class 12 / UG,aptet.apcfss.in,Active,AP state teacher eligibility test. Certificate validity is lifetime.
+AP SET,CAT_11,State-UT,Andhra Pradesh,Eligibility,Andhra University (for APSCHE),PG,apset.net.in,Active,Qualifies candidates for Assistant Professor in AP universities.
+AP EdCET,CAT_11,State-UT,Andhra Pradesh,Admission,Andhra University (for APSCHE),UG,cets.apsche.ap.gov.in,Active,State centralized admission test for 2-year B.Ed regular courses.
+Arunachal Pradesh TET,CAT_11,State-UT,Arunachal Pradesh,Eligibility,"Dept. of Education, Arunachal",Class 12 / UG,education.arunachal.gov.in,Active,Local teacher eligibility test. (Also accepts CTET).
+Assam TET,CAT_11,State-UT,Assam,Eligibility,"Dept. of School Education, Assam",Class 12 / UG,ssa.assam.gov.in,Active,Conducted separately for Lower Primary (LP) and Upper Primary (UP).
+NE SLET (State Level Eligibility Test),CAT_11,State-UT,Assam / NE States,Eligibility,"SLET Commission, Assam",PG,sletne.org,Active,"Covers Assam, Arunachal Pradesh, Mizoram, Manipur, Meghalaya, Sikkim, and Tripura."
+Bihar STET (State Teacher Eligibility Test),CAT_11,State-UT,Bihar,Eligibility,Bihar School Examination Board (BSEB),UG / PG,bsebstet.com,Active,Conducted heavily for Secondary and Higher Secondary school teacher eligibility.
+Bihar B.Ed CET,CAT_11,State-UT,Bihar,Admission,LNMU (Rotational Nodal Univ),UG,biharcetbed-lnmu.in,Active,Combined Entrance Test for all state B.Ed colleges in Bihar.
+CG TET,CAT_11,State-UT,Chhattisgarh,Eligibility,CG Vyapam,Class 12 / UG,vyapam.cgstate.gov.in,Active,State primary and upper primary eligibility test.
+CG SET,CAT_11,State-UT,Chhattisgarh,Eligibility,CG Vyapam,PG,vyapam.cgstate.gov.in,Active,Qualifies candidates for Assistant Professor in Chhattisgarh universities.
+Gujarat TET & TAT,CAT_11,State-UT,Gujarat,Eligibility,State Examination Board (SEB),Class 12/UG/PG,sebexam.org,Active,TET (Primary/Upper Primary) and TAT (Teachers Aptitude Test for Secondary/Higher Secondary).
+GSET,CAT_11,State-UT,Gujarat,Eligibility,Maharaja Sayajirao University of Baroda,PG,gujaratset.in,Active,Official test for Assistant Professor eligibility in Gujarat.
+HTET (Haryana TET),CAT_11,State-UT,Haryana,Eligibility,Board of School Education Haryana (BSEH),Class 12/UG/PG,bseh.org.in,Active,"Conducted in 3 levels (PRT, TGT, PGT)."
+HP TET,CAT_11,State-UT,Himachal Pradesh,Eligibility,HPBOSE,Class 12 / UG,hpbose.org,Active,"Conducted for TGT, Shastri, Language Teachers, and Punjabi/Urdu."
+HP SET,CAT_11,State-UT,Himachal Pradesh,Eligibility,HPPSC,PG,hppsc.hp.gov.in,Active,Mandatory for state university assistant professorships.
+JKSET / LASET,CAT_11,State-UT,Jammu & Kashmir / Ladakh,Eligibility,University of Kashmir (Rotational),PG,kashmiruniversity.net,Active,Combined SET for the two Union Territories.
+JTET (Jharkhand TET),CAT_11,State-UT,Jharkhand,Eligibility,Jharkhand Academic Council (JAC),Class 12 / UG,jac.jharkhand.gov.in,Active,Validates teaching eligibility for government schools in Jharkhand.
+KARTET (Karnataka TET),CAT_11,State-UT,Karnataka,Eligibility,"Dept. of School Education, Karnataka",Class 12 / UG,schooleducation.kar.nic.in,Active,Official state TET for primary and upper primary levels.
+KSET,CAT_11,State-UT,Karnataka,Eligibility,Karnataka Examinations Authority (KEA),PG,cetonline.karnataka.gov.in/kea/,Active,State eligibility test for Assistant Professors.
+KTET (Kerala TET),CAT_11,State-UT,Kerala,Eligibility,Kerala Pareeksha Bhavan,Class 12 / UG,ktet.kerala.gov.in,Active,"Conducted in 4 categories (Lower Primary, Upper Primary, High School, Language)."
+Kerala SET,CAT_11,State-UT,Kerala,Eligibility,LBS Centre for Science and Technology,PG,lbsedp.lbscentre.in,Active,"Note: Unlike other states, Kerala SET is specifically for Higher Secondary School Teacher eligibility, not Assistant Professor."
+"MP TET (Varg 1, 2, 3)",CAT_11,State-UT,Madhya Pradesh,Eligibility,MP Employees Selection Board (ESB),Class 12/UG/PG,esb.mp.gov.in,Active,"Divided into Primary (Varg 3), Middle (Varg 2), and High School (Varg 1)."
+MP SET,CAT_11,State-UT,Madhya Pradesh,Eligibility,MPPSC,PG,mppsc.mp.gov.in,Active,MP state test for Assistant Professor eligibility.
+MAHA TET,CAT_11,State-UT,Maharashtra,Eligibility,Maharashtra State Council of Examination (MSCE),Class 12 / UG,mahatet.in,Active,Standard state TET for Maharashtra.
+MH SET,CAT_11,State-UT,Maharashtra / Goa,Eligibility,Savitribai Phule Pune University (SPPU),PG,setexam.unipune.ac.in,Active,Nodal agency conducting SET jointly for Maharashtra and Goa.
+MAH-B.Ed CET / M.Ed CET,CAT_11,State-UT,Maharashtra,Admission,"State CET Cell, Maharashtra",UG / PG,cetcell.mahacet.org,Active,Mandatory for B.Ed / M.Ed admission across the state. Includes special English Language Content Test (ELCT).
+OTET / OSSTET,CAT_11,State-UT,Odisha,Eligibility,BSE Odisha,Class 12/UG/PG,bseodisha.ac.in,Active,OTET is for Primary; OSSTET is specifically for Secondary School teachers.
+PSTET,CAT_11,State-UT,Punjab,Eligibility,Punjab School Education Board (PSEB),Class 12 / UG,pstet.pseb.ac.in,Active,State-level teacher eligibility test.
+REET (Rajasthan Eligibility Exam),CAT_11,State-UT,Rajasthan,Eligibility,Board of Secondary Education Rajasthan,Class 12 / UG,rajeduboard.rajasthan.gov.in,Active,Dual-purpose: Acts as an eligibility test and a direct recruitment tier for grade III teachers.
+Rajasthan SET,CAT_11,State-UT,Rajasthan,Eligibility,GGTU / RPSC,PG,ggtu.ac.in,Active,Re-initiated after a long gap; determines university Assistant Professor eligibility.
+Rajasthan PTET,CAT_11,State-UT,Rajasthan,Admission,VMOU Kota (Rotational Nodal),Class 12 / UG,vmou.ac.in,Active,Pre-Teacher Education Test for 2-year B.Ed and 4-year integrated BA/B.Sc B.Ed.
+Sikkim TET (STET),CAT_11,State-UT,Sikkim,Eligibility,"Education Department, Sikkim",Class 12 / UG,sikkimhrdd.org,Active,For local primary and graduate teacher eligibility.
+TNTET,CAT_11,State-UT,Tamil Nadu,Eligibility,Teachers Recruitment Board (TRB) TN,Class 12 / UG,trb.tn.gov.in,Active,State-level teacher eligibility.
+TNSET,CAT_11,State-UT,Tamil Nadu,Eligibility,Manonmaniam Sundaranar University (Rotational),PG,msuniv.ac.in,Active,Evaluates PG candidates for Assistant Professor roles.
+TS TET,CAT_11,State-UT,Telangana,Eligibility,"Dept. of School Education, Telangana",Class 12 / UG,tgtet.aptonline.in,Active,Conducted entirely online via CBT mode.
+TS SET,CAT_11,State-UT,Telangana,Eligibility,Osmania University,PG,telanganaset.org,Active,State exam for assistant professor eligibility.
+TS EdCET,CAT_11,State-UT,Telangana,Admission,Mahatma Gandhi University (for TGCHE),UG,edcet.tsche.ac.in,Active,Centralized state B.Ed admission test.
+Tripura TET (T-TET),CAT_11,State-UT,Tripura,Eligibility,"Teachers' Recruitment Board, Tripura (TRBT)",Class 12 / UG,trb.tripura.gov.in,Active,State TET for Tripura.
+UPTET,CAT_11,State-UT,Uttar Pradesh,Eligibility,UP Education Service Selection Commission (UPESSC),Class 12 / UG,updeled.gov.in,Active,One of the largest TET exams in India by candidate volume.
+UP B.Ed JEE,CAT_11,State-UT,Uttar Pradesh,Admission,Bundelkhand University (Rotational),UG / PG,bujhansi.ac.in,Active,Joint entrance exam mandatory for UP B.Ed state and private colleges.
+UTET,CAT_11,State-UT,Uttarakhand,Eligibility,Uttarakhand Board of School Education (UBSE),Class 12 / UG,ukutet.com,Active,State-level teacher eligibility test.
+WB TET (Primary),CAT_11,State-UT,West Bengal,Eligibility,West Bengal Board of Primary Education (WBBPE),Class 12 / UG,wbbpe.org,Active,Specifically for Classes 1 to 5.
+WBSSC SLST,CAT_11,State-UT,West Bengal,Recruitment,WB Central School Service Commission,UG / PG,westbengalssc.com,Active,State Level Selection Test for secondary and higher secondary teachers.
+WB SET,CAT_11,State-UT,West Bengal,Eligibility,West Bengal College Service Commission,PG,wbcsconline.in,Active,Test for eligibility as an Assistant Professor in WB colleges.
+IGNOU B.Ed Entrance Test,CAT_11,Institute,All India,Admission,IGNOU,UG,ignou.ac.in,,

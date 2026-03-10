@@ -1,0 +1,46 @@
+Exam Name,Category ID,Level,State/UT,Purpose,Conducting Body,Eligibility Level,Official Website,Current Status,Notes
+CBSE Class 10 & 12 Board Exams,CAT_01,National,All India,Eligibility,Central Board of Secondary Education (CBSE),Class 10 / Class 12,cbse.gov.in,Active,"Standardized national curriculum; widely used by central schools (KVs, JNVs) and private schools."
+CISCE ICSE (Class 10) & ISC (Class 12) Exams,CAT_01,National,All India,Eligibility,Council for the Indian School Certificate Examinations (CISCE),Class 10 / Class 12,cisce.org,Active,Recognized pan-India private board known for comprehensive English and practical curriculum.
+NIOS Secondary & Sr. Secondary Public Exams,CAT_01,National,All India,Eligibility,National Institute of Open Schooling (NIOS),Class 10 / Class 12,nios.ac.in,Active,Largest open schooling system globally; offers flexible exams for regular and mature learners.
+Bhartiya Shiksha Board (BSB) Exams,CAT_01,National,All India,Eligibility,Bhartiya Shiksha Board,Class 10 / Class 12,bsb.org.in,Active,Recognized national board combining modern curriculum with Indian traditional knowledge.
+MSRVVP Veda Bhushan & Veda Vibhushan Exams,CAT_01,National,All India,Eligibility,Maharshi Sandipani Rashtriya Veda Sanskrit Shiksha Board,Class 10 / Class 12,msrvvp.ac.in,Active,Veda Bhushan is equivalent to Class 10; Veda Vibhushan is equivalent to Class 12.
+AP SSC Board Examinations,CAT_01,State-UT,Andhra Pradesh,Eligibility,"Board of Secondary Education, Andhra Pradesh (BSEAP)",Class 10,[suspicious link removed],Active,State-level matriculation exam.
+AP Intermediate Public Examinations,CAT_01,State-UT,Andhra Pradesh,Eligibility,"Board of Intermediate Education, Andhra Pradesh (BIEAP)",Class 12,bieap.apcfss.in,Active,State-level intermediate (+2) exam.
+Assam HSLC Examination,CAT_01,State-UT,Assam,Eligibility,"Board of Secondary Education, Assam (SEBA)",Class 10,sebaonline.org,Active,Transitioning into Assam State School Education Board (ASSEB).
+Assam HS Final Examination,CAT_01,State-UT,Assam,Eligibility,Assam Higher Secondary Education Council (AHSEC),Class 12,ahsec.assam.gov.in,Active,Transitioning into ASSEB.
+Bihar Matric & Inter Examinations,CAT_01,State-UT,Bihar,Eligibility,Bihar School Examination Board (BSEB),Class 10 / Class 12,biharboardonline.bihar.gov.in,Active,Conducts both Class 10 and 12 regular state board exams.
+BBOSE Open School Exams,CAT_01,State-UT,Bihar,Eligibility,Bihar Board of Open Schooling & Examination (BBOSE),Class 10 / Class 12,bboseonline.bihar.gov.in,Active,State open school equivalent to BSEB.
+CGBSE High School & Higher Sec. Exams,CAT_01,State-UT,Chhattisgarh,Eligibility,Chhattisgarh Board of Secondary Education (CGBSE),Class 10 / Class 12,cgbse.nic.in,Active,
+DBSE Secondary & Senior Secondary Exams,CAT_01,State-UT,Delhi,Eligibility,Delhi Board of School Education (DBSE),Class 10 / Class 12,edudel.nic.in,Active,Official board for Delhi Govt's Schools of Specialized Excellence.
+Goa SSC & HSSC Examinations,CAT_01,State-UT,Goa,Eligibility,Goa Board of Secondary & Higher Secondary Education (GBSHSE),Class 10 / Class 12,gbshse.in,Active,
+GSEB SSC & HSC Examinations,CAT_01,State-UT,Gujarat,Eligibility,Gujarat Secondary and Higher Secondary Education Board (GSEB),Class 10 / Class 12,gseb.org,Active,
+HBSE Secondary & Senior Secondary Exams,CAT_01,State-UT,Haryana,Eligibility,Board of School Education Haryana (BSEH),Class 10 / Class 12,bseh.org.in,Active,Also conducts Haryana Open School (HOS) exams.
+HPBOSE Matric & Plus Two Examinations,CAT_01,State-UT,Himachal Pradesh,Eligibility,Himachal Pradesh Board of School Education (HPBOSE),Class 10 / Class 12,hpbose.org,Active,
+JKBOSE Secondary & Higher Sec. Exams,CAT_01,State-UT,Jammu & Kashmir,Eligibility,J&K State Board of School Education (JKBOSE),Class 10 / Class 12,jkbose.nic.in,Active,Ladakh formerly used this but is actively transitioning to CBSE.
+JAC Secondary & Intermediate Exams,CAT_01,State-UT,Jharkhand,Eligibility,Jharkhand Academic Council (JAC),Class 10 / Class 12,jac.jharkhand.gov.in,Active,
+KSEAB SSLC & II PUC Examinations,CAT_01,State-UT,Karnataka,Eligibility,Karnataka School Examination and Assessment Board (KSEAB),Class 10 / Class 12,kseab.karnataka.gov.in,Active,Formed by merging KSEEB (10th) and DPUE (12th).
+Kerala SSLC Examination,CAT_01,State-UT,Kerala,Eligibility,Kerala Board of Public Examination (KBPE),Class 10,pareekshabhavan.kerala.gov.in,Active,
+Kerala DHSE (Plus Two) Examination,CAT_01,State-UT,Kerala,Eligibility,"Directorate of Higher Secondary Education, Kerala (DHSE)",Class 12,dhsekerala.gov.in,Active,Includes Vocational Higher Secondary (VHSE) exams.
+MPBSE High School & Higher Sec. Exams,CAT_01,State-UT,Madhya Pradesh,Eligibility,"Board of Secondary Education, Madhya Pradesh (MPBSE)",Class 10 / Class 12,mpbse.nic.in,Active,
+Maharashtra SSC & HSC Examinations,CAT_01,State-UT,Maharashtra,Eligibility,Maharashtra State Board of Secondary & Higher Secondary Education (MSBSHSE),Class 10 / Class 12,mahahsscboard.in,Active,
+Manipur HSLC Examination,CAT_01,State-UT,Manipur,Eligibility,"Board of Secondary Education, Manipur (BOSEM)",Class 10,bsem.nic.in,Active,
+Manipur HSE Examination,CAT_01,State-UT,Manipur,Eligibility,"Council of Higher Secondary Education, Manipur (COHSEM)",Class 12,cohsem.nic.in,Active,
+MBOSE SSLC & HSSLC Examinations,CAT_01,State-UT,Meghalaya,Eligibility,Meghalaya Board of School Education (MBOSE),Class 10 / Class 12,mbose.in,Active,
+MBSE HSLC & HSSLC Examinations,CAT_01,State-UT,Mizoram,Eligibility,Mizoram Board of School Education (MBSE),Class 10 / Class 12,mbse.edu.in,Active,
+NBSE HSLC & HSSLC Examinations,CAT_01,State-UT,Nagaland,Eligibility,Nagaland Board of School Education (NBSE),Class 10 / Class 12,nbsenl.edu.in,Active,
+Odisha HSC Examination,CAT_01,State-UT,Odisha,Eligibility,"Board of Secondary Education, Odisha (BSE Odisha)",Class 10,bseodisha.ac.in,Active,
+Odisha Annual Higher Secondary Exam,CAT_01,State-UT,Odisha,Eligibility,"Council of Higher Secondary Education, Odisha (CHSE)",Class 12,chseodisha.nic.in,Active,
+PSEB Matriculation & Senior Sec. Exams,CAT_01,State-UT,Punjab,Eligibility,Punjab School Education Board (PSEB),Class 10 / Class 12,pseb.ac.in,Active,
+RBSE Secondary & Senior Sec. Exams,CAT_01,State-UT,Rajasthan,Eligibility,Board of Secondary Education Rajasthan (BSER / RBSE),Class 10 / Class 12,rajeduboard.rajasthan.gov.in,Active,
+BOSSE Secondary & Sr. Secondary Exams,CAT_01,State-UT,Sikkim,Eligibility,Board of Open Schooling and Skill Education (BOSSE),Class 10 / Class 12,bosse.ac.in,Active,Recognized open board setup by the Govt of Sikkim.
+"TN SSLC & HSE (+1, +2) Examinations",CAT_01,State-UT,Tamil Nadu,Eligibility,Directorate of Government Examinations (DGE TN),Class 10 / Class 12,dge.tn.gov.in,Active,Also officially serves Puducherry and Andaman.
+Telangana SSC Examinations,CAT_01,State-UT,Telangana,Eligibility,"Board of Secondary Education, Telangana (BSET)",Class 10,bse.telangana.gov.in,Active,
+Telangana IPE (Intermediate) Exams,CAT_01,State-UT,Telangana,Eligibility,Telangana State Board of Intermediate Education (TSBIE),Class 12,tsbie.cgg.gov.in,Active,
+TBSE Madhyamik & HS Examinations,CAT_01,State-UT,Tripura,Eligibility,Tripura Board of Secondary Education (TBSE),Class 10 / Class 12,tbse.tripura.gov.in,Active,
+UP Board High School & Intermediate,CAT_01,State-UT,Uttar Pradesh,Eligibility,UP Madhyamik Shiksha Parishad (UPMSP),Class 10 / Class 12,upmsp.edu.in,Active,One of the largest student volume boards in the world.
+UBSE High School & Intermediate Exams,CAT_01,State-UT,Uttarakhand,Eligibility,Uttarakhand Board of School Education (UBSE),Class 10 / Class 12,ubse.uk.gov.in,Active,
+WBBSE Madhyamik Pariksha,CAT_01,State-UT,West Bengal,Eligibility,West Bengal Board of Secondary Education (WBBSE),Class 10,wbbse.wb.gov.in,Active,
+WBCHSE Higher Secondary Examination,CAT_01,State-UT,West Bengal,Eligibility,West Bengal Council of Higher Secondary Education (WBCHSE),Class 12,wbchse.wb.gov.in,Active,
+AMU Board School Examinations,CAT_01,Institute,All India,Eligibility,Aligarh Muslim University (AMU),Class 10 / Class 12,amu.ac.in,Active,Fully recognized board for schools affiliated with AMU.
+JMI Board School Examinations,CAT_01,Institute,All India,Eligibility,Jamia Millia Islamia (JMI),Class 10 / Class 12,jmi.ac.in,Active,Fully recognized board for schools affiliated with JMI.
+Banasthali Vidyapith School Exams,CAT_01,Institute,All India,Eligibility,Banasthali Vidyapith,Class 10 / Class 12,banasthali.org,Active,Recognized autonomous institute conducting its own valid school exams.

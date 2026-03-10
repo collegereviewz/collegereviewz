@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Review from '../Review';
-import { ChevronRight, Info, BookOpen, Trophy, SlidersHorizontal, Users, Play, Bell, Newspaper, Calendar } from 'lucide-react';
+import { ChevronRight, Info, BookOpen, Trophy, SlidersHorizontal, Users, Play, Bell, Newspaper, Calendar, Navigation } from 'lucide-react';
+import HowToReach from './HowToReach.jsx';
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 

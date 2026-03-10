@@ -1,5 +1,6 @@
 import College from '../models/College.model.js';
 import Review from '../models/Review.model.js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const getColleges = async (req, res) => {
     try {
@@ -187,5 +188,116 @@ export const getCollegeCourses = async (req, res) => {
     } catch (error) {
         console.error('Error fetching college courses:', error);
         res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    }
+};
+
+export const getCollegeDetails = async (req, res) => {
+    try {
+        const { name } = req.params;
+
+        // Use aggregation to get the college WITH review stats in one go
+        const pipeline = [
+            { $match: { name: { $regex: new RegExp(`^${name}$`, 'i') } } },
+            {
+                $lookup: {
+                    from: 'reviews',
+                    let: { college_id: '$_id', college_name: '$name' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $or: [
+                                        { $eq: ['$collegeId', '$$college_id'] },
+                                        { $eq: ['$collegeName', '$$college_name'] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'collegeReviews'
+                }
+            },
+            {
+                $addFields: {
+                    rating: { $ifNull: [{ $avg: '$collegeReviews.rating' }, 0] },
+                    reviewsCount: { $size: '$collegeReviews' }
+                }
+            },
+            {
+                $project: {
+                    collegeReviews: 0
+                }
+            }
+        ];
+
+        const results = await College.aggregate(pipeline);
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'College not found' });
+        }
+
+        res.json({
+            success: true,
+            data: results[0]
+        });
+    } catch (error) {
+        console.error('Error fetching college details:', error);
+        res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    }
+};
+
+export const getCollegeCommute = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const college = await College.findById(id);
+
+        if (!college) {
+            return res.status(404).json({ success: false, message: 'College not found' });
+        }
+
+        // Return existing data if available
+        if (college.commuteIntelligence && college.commuteIntelligence.length > 0) {
+            return res.json({ success: true, data: college.commuteIntelligence });
+        }
+
+        // Verify API Key
+        if (!process.env.GEMINI_API_KEY) {
+            return res.status(500).json({ success: false, message: 'Gemini API keys are not configured properly' });
+        }
+
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+
+        const prompt = `
+        Find the nearest airport, railway station, and bus terminal to the following college:
+        College Name: ${college.name}
+        District/Location: ${college.district || ''}
+        State: ${college.state || ''}
+
+        Please provide the average travel time by car from the college to each hub.
+        
+        Return the result EXACTLY as a JSON array of objects with the following format, and nothing else (no markdown blocks, no \`\`\`json, just the raw array).
+        [
+            { "type": "airport", "hubName": "Name of Airport", "travelTime": "XX mins" },
+            { "type": "railway", "hubName": "Name of Railway Station", "travelTime": "XX mins" },
+            { "type": "bus", "hubName": "Name of Bus Terminal", "travelTime": "XX mins" }
+        ]
+        `;
+
+        const result = await model.generateContent(prompt);
+        let responseText = result.response.text();
+        responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+
+        const parsedData = JSON.parse(responseText);
+
+        // Update in database
+        college.commuteIntelligence = parsedData;
+        await college.save();
+
+        res.json({ success: true, data: parsedData });
+    } catch (error) {
+        console.error('Error dynamically fetching commute data:', error);
+        res.status(500).json({ success: false, message: 'Failed to find commute info' });
     }
 };

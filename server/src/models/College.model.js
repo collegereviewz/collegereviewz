@@ -24,6 +24,31 @@ const collegeSchema = new mongoose.Schema({
     }],
     avgPackage: { type: String },
     highestPackage: { type: String },
+    about: { type: String },
+    cutOffs: { type: String },
+    admissionProcess: { type: String },
+    ranking: { type: String },
+    topRecruiters: [{ type: String }],
+    resultInfo: { type: String },
+    mapLink: { type: String },
+    photos: [{ type: String }],
+    videos: [{ type: String }],
+    scholarships: { type: String },
+    faq: [{
+        question: String,
+        answer: String
+    }],
+    facilities: [{ type: String }],
+    studentLife: { type: String },
+    contactDetails: {
+        phone: String,
+        email: String
+    },
+    commuteIntelligence: [{
+        type: { type: String }, // 'airport', 'railway', 'bus'
+        hubName: { type: String },
+        travelTime: { type: String }
+    }],
     updates: {
         notifications: [{
             title: String,

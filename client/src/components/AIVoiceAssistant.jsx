@@ -32,8 +32,8 @@ const AIVoiceAssistant = ({ isOpen, onClose }) => {
             { keywords: ['contact', 'support', 'help'], path: '/Contact/', response: "I'm taking you to our contact page. Our support team is ready to assist you with any specific queries you might have." },
             { keywords: ['review', 'write', 'community'], path: '/WriteReview/', response: "I'm opening our review dashboard. Sharing your experience helps thousands of other students make better decisions." },
             { keywords: ['support', 'customer care', 'ticket'], path: '/Support/', response: "I'm navigating to our support center. You can find FAQs and technical assistance details for our platform here." },
-            { keywords: ['login', 'sign in', 'enter'], path: '/Login/', response: "I'm taking you to the login page. Please enter your credentials to access your personalized dashboard." },
-            { keywords: ['signup', 'register', 'create account'], path: '/Signup/', response: "I'm opening the registration page. Creating an account allows you to save your favorite colleges and track your applications." },
+            { keywords: ['login', 'sign in', 'enter'], path: '/Login/', response: "I'm opening the sign in window. You can access your personalized dashboard from here." },
+            { keywords: ['signup', 'register', 'create account'], path: '/Signup/', response: "I'm opening the registration window. Creating an account allows you to save colleges and track your scholarship applications." },
             { keywords: ['profile', 'account', 'settings', 'my'], path: '/Profile/', response: "I'm opening your personal profile. You can manage your account information and preferences there." }
         ],
         external: [

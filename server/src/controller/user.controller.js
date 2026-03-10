@@ -60,7 +60,20 @@ export const getUserActivity = async (req, res) => {
             openToAbroad: user?.openToAbroad || false
         });
     } catch (error) {
-        console.error("User Activity Fetch Error:", error);
         res.status(500).json({ message: 'Server error fetching user activity', error: error.message });
+    }
+};
+
+export const getUserProfile = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const user = await User.findById(userId).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        console.error("User Profile Fetch Error:", error);
+        res.status(500).json({ message: 'Server error fetching profile', error: error.message });
     }
 };

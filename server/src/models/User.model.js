@@ -54,6 +54,39 @@ const userSchema = new mongoose.Schema({
     isAdmin: {
         type: Boolean,
         default: false
+    },
+    avatar: {
+        type: String,
+        default: ''
+    },
+    studentId: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    userStatus: {
+        type: String,
+        default: 'Active'
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    isTopReviewer: {
+        type: Boolean,
+        default: false
+    },
+    totalEarnings: {
+        type: Number,
+        default: 0
+    },
+    pendingEarnings: {
+        type: Number,
+        default: 0
+    },
+    approvalRate: {
+        type: Number,
+        default: 0
     }
 }, { timestamps: true });
 

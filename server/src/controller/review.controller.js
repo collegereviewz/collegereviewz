@@ -25,6 +25,12 @@ export const createReview = async (req, res) => {
             rating: rating || 0
         });
         const savedReview = await review.save();
+
+        // Update user stats
+        if (userId) {
+            await updateUserReviewStats(userId);
+        }
+
         res.status(201).json(savedReview);
     } catch (error) {
         console.error('Create Review Error:', error);
@@ -180,6 +186,31 @@ export const updateComment = async (req, res) => {
         if (type) comment.type = type;
         if (mediaUrl) comment.mediaUrl = finalMediaUrl;
         await review.save();
+        res.status(200).json(review);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const updateReviewStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body; // 'Approved', 'Rejected'
+
+        if (!['Approved', 'Rejected'].includes(status)) {
+            return res.status(400).json({ message: "Invalid status" });
+        }
+
+        const review = await Review.findById(id);
+        if (!review) return res.status(404).json({ message: "Review not found" });
+
+        review.status = status;
+        await review.save();
+
+        if (review.user) {
+            await updateUserReviewStats(review.user);
+        }
+
         res.status(200).json(review);
     } catch (error) {
         res.status(400).json({ message: error.message });

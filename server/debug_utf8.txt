@@ -1,0 +1,41 @@
+﻿Connecting to MongoDB...
+Connected to MongoDB
+Initializing Gemini API...
+Prompting Gemini AI...
+Gemini Response parsing...
+Data parsed successfully. Name: RCC INSTITUTE OF INFORMATION TECHNOLOGY
+Upserting into MongoDB...
+node : (node:23316) 
+[MONGOOSE] Warning: 
+mongoose: the `new` 
+option for 
+`findOneAndUpdate()` 
+and 
+`findOneAndReplace()` 
+is deprecated. Use 
+`returnDocument: 
+'after'` instead.
+At line:1 char:1
++ node scripts\fetch_r
+cc_gemini.js > 
+debug.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: ((node:2331   
+ 6) [M...fter'` in    
+stead.:String) []    
+, RemoteException
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+(Use `node 
+--trace-warnings ...` 
+to show where the 
+warning was created)
+Successfully added/updated RCC Institute of Information Technology in the database.
+ID: new ObjectId('69a9242fad894a064c144d80')
+Disconnected from MongoDB.

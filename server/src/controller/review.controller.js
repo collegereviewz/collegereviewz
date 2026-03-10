@@ -1,15 +1,24 @@
 import Review from '../models/Review.model.js';
+import { uploadToR2 } from '../services/r2.service.js';
 
 export const createReview = async (req, res) => {
     try {
         const { author, role, content, type, mediaUrl, hashtags, userId, collegeId, collegeName, rating } = req.body;
+
+        // Upload to R2 if mediaUrl is base64
+        let finalMediaUrl = mediaUrl;
+        if (mediaUrl && mediaUrl.startsWith('data:')) {
+            const folder = type === 'video' ? 'reviews/video' : 'reviews/audio';
+            finalMediaUrl = await uploadToR2(mediaUrl, folder);
+        }
+
         const review = new Review({
             user: userId || null,
             author,
             role,
             content,
             type,
-            mediaUrl,
+            mediaUrl: finalMediaUrl,
             hashtags,
             collegeId,
             collegeName,
@@ -18,6 +27,7 @@ export const createReview = async (req, res) => {
         const savedReview = await review.save();
         res.status(201).json(savedReview);
     } catch (error) {
+        console.error('Create Review Error:', error);
         res.status(400).json({ message: error.message });
     }
 };
@@ -34,10 +44,19 @@ export const getUserReviews = async (req, res) => {
 
 export const getAllReviews = async (req, res) => {
     try {
-        const { page = 1, limit = 10, collegeId } = req.query;
+        const { page = 1, limit = 10, collegeId, collegeName, hashtag } = req.query;
         const filter = {};
+
         if (collegeId && collegeId !== 'undefined') {
             filter.collegeId = collegeId;
+        } else if (collegeName) {
+            // Support searching by college name if ID is missing (hardcoded colleges)
+            const escapedName = collegeName.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+            filter.collegeName = { $regex: new RegExp(`^${escapedName}$`, 'i') };
+        }
+
+        if (hashtag) {
+            filter.hashtags = { $in: [hashtag.replace(/^#/, '')] };
         }
 
         const skip = (page - 1) * limit;
@@ -82,8 +101,16 @@ export const addComment = async (req, res) => {
     try {
         const { id } = req.params;
         const { author, content, type, mediaUrl } = req.body;
+
+        // Upload to R2 if mediaUrl is base64
+        let finalMediaUrl = mediaUrl;
+        if (mediaUrl && mediaUrl.startsWith('data:')) {
+            const folder = type === 'video' ? 'comments/video' : 'comments/audio';
+            finalMediaUrl = await uploadToR2(mediaUrl, folder);
+        }
+
         const review = await Review.findById(id);
-        review.comments.push({ author, content, type, mediaUrl });
+        review.comments.push({ author, content, type, mediaUrl: finalMediaUrl });
         await review.save();
         res.status(200).json(review);
     } catch (error) {
@@ -105,9 +132,17 @@ export const updateReview = async (req, res) => {
     try {
         const { id } = req.params;
         const { content, type, mediaUrl, hashtags } = req.body;
+
+        // Upload to R2 if mediaUrl is base64
+        let finalMediaUrl = mediaUrl;
+        if (mediaUrl && mediaUrl.startsWith('data:')) {
+            const folder = type === 'video' ? 'reviews/video' : 'reviews/audio';
+            finalMediaUrl = await uploadToR2(mediaUrl, folder);
+        }
+
         const review = await Review.findByIdAndUpdate(
             id,
-            { content, type, mediaUrl, hashtags },
+            { content, type, mediaUrl: finalMediaUrl, hashtags },
             { new: true }
         );
         res.status(200).json(review);
@@ -131,11 +166,19 @@ export const updateComment = async (req, res) => {
     try {
         const { id, commentId } = req.params;
         const { content, type, mediaUrl } = req.body;
+
+        // Upload to R2 if mediaUrl is base64
+        let finalMediaUrl = mediaUrl;
+        if (mediaUrl && mediaUrl.startsWith('data:')) {
+            const folder = type === 'video' ? 'comments/video' : 'comments/audio';
+            finalMediaUrl = await uploadToR2(mediaUrl, folder);
+        }
+
         const review = await Review.findById(id);
         const comment = review.comments.id(commentId);
         if (content) comment.content = content;
         if (type) comment.type = type;
-        if (mediaUrl) comment.mediaUrl = mediaUrl;
+        if (mediaUrl) comment.mediaUrl = finalMediaUrl;
         await review.save();
         res.status(200).json(review);
     } catch (error) {

@@ -36,7 +36,9 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/colleges/${encodeURIComponent(collegeInfo.fullName)}/stats`);
+                // Use a cleaner name for API requests to avoid 404s from descriptive titles
+                const searchName = collegeInfo.fullName.split(' - ')[0];
+                const response = await axios.get(`http://localhost:5000/api/colleges/${encodeURIComponent(searchName)}/stats`);
                 if (response.data.success) {
                     setStats(response.data.data);
                 }
@@ -209,6 +211,7 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
                                 collegeId={collegeInfo.data?._id || collegeInfo.data?.data?._id}
                                 collegeName={collegeInfo.fullName || collegeInfo.data?.name}
                                 collegeData={collegeInfo.data}
+                                collegeStats={stats}
                                 isEmbedded={true}
                                 onStatsUpdate={handleStatsUpdate}
                             />

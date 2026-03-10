@@ -165,7 +165,7 @@ const ProfilePage = () => {
                     </div>
 
                     <div
-                        onClick={() => navigate('/review')}
+                        onClick={() => navigate('/WriteReview')}
                         style={{
                             padding: '12px 24px',
                             borderRadius: '50px',
@@ -402,7 +402,7 @@ const ProfilePage = () => {
                                         ) : activity.reviews.length === 0 ? (
                                             <div style={{ padding: '24px', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed rgba(255,255,255,0.1)' }}>
                                                 <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>You haven't written any reviews yet.</p>
-                                                <div onClick={() => navigate('/review')} style={{ color: '#38bdf8', fontSize: '13px', marginTop: '8px', cursor: 'pointer', fontWeight: 700 }}>Write your first!</div>
+                                                <div onClick={() => navigate('/WriteReview')} style={{ color: '#38bdf8', fontSize: '13px', marginTop: '8px', cursor: 'pointer', fontWeight: 700 }}>Write your first!</div>
                                             </div>
                                         ) : activity.reviews.map((post, idx) => (
                                             <div key={idx} style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>

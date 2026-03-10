@@ -8,6 +8,7 @@ import {
     MessageSquare, Send, ChevronDown, Check, X
 } from 'lucide-react';
 import WriteAReview from '../WriteAReview';
+import internalLogo from '../../assets/logo6.png';
 
 // Helper to remove duplicate hashtags and highlight them inline
 const renderContentWithHashtags = (content, setFilterTag) => {
@@ -49,10 +50,10 @@ const renderContentWithHashtags = (content, setFilterTag) => {
     });
 };
 
-const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData }) => {
+const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData, collegeStats }) => {
     const API_BASE = 'http://localhost:5000/api/reviews';
     const [posts, setPosts] = useState([]);
-    const [stats, setStats] = useState(collegeData?.reviewStats || collegeData?.data?.reviewStats || null);
+    const [stats, setStats] = useState(collegeStats || collegeData?.reviewStats || collegeData?.data?.reviewStats || null);
     const [statsLoading, setStatsLoading] = useState(!stats);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -109,19 +110,22 @@ const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData }) => {
         try {
             setLoading(true);
             let url = `${API_BASE}?page=${pageNum}&limit=10&sort=${sortType}`;
+
             if (collegeId) {
-                // Fetch college specific reviews or fallback to hashtag search if not implemented in backend
                 url += `&collegeId=${collegeId}`;
+            } else if (collegeName) {
+                // If ID is missing, backend now supports filtering by name
+                // Use a cleaner name to avoid descriptive titles causing mismatch
+                const searchName = collegeName.split(' - ')[0];
+                url += `&collegeName=${encodeURIComponent(searchName)}`;
             }
+
+            if (filterTag) {
+                url += `&hashtag=${encodeURIComponent(filterTag)}`;
+            }
+
             const res = await axios.get(url);
             let fetched = res.data.reviews || [];
-
-            // If the backend doesn't filter perfectly, enforce local filtering
-            if (collegeId) {
-                fetched = fetched.filter(p => p.collegeId === collegeId || (defaultTag && JSON.stringify(p).toUpperCase().includes(defaultTag.toUpperCase())));
-            } else if (defaultTag) {
-                fetched = fetched.filter(p => JSON.stringify(p).toUpperCase().includes(defaultTag.toUpperCase()));
-            }
 
             if (append) {
                 setPosts(prev => {
@@ -402,10 +406,10 @@ const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData }) => {
                             </thead>
                             <tbody>
                                 {[
-                                    { name: 'Google Review', key: 'google', color: '#4285F4' },
-                                    { name: 'Shiksha Reviews', key: 'shiksha', color: '#FF7D00' },
-                                    { name: 'Collegedunia Review', key: 'collegedunia', color: '#00BFA5' },
-                                    { name: 'Our Review (Internal)', key: 'internal', color: '#4f46e5' }
+                                    { name: 'Google Review', key: 'google', color: '#4285F4', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg' },
+                                    { name: 'Shiksha Reviews', key: 'shiksha', color: '#FF7D00', logo: 'https://images.shiksha.com/mediadata/images/favicon.ico' },
+                                    { name: 'Collegedunia Review', key: 'collegedunia', color: '#00BFA5', logo: 'https://collegedunia.com/favicon.ico' },
+                                    { name: 'Our Review (Internal)', key: 'internal', color: '#4f46e5', logo: internalLogo }
                                 ].map((source, i) => {
                                     const sourceStats = source.key === 'internal'
                                         ? { rating: ratingStats.average, count: ratingStats.total }
@@ -415,7 +419,7 @@ const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData }) => {
                                         <tr key={i} style={{ borderBottom: i === 3 ? 'none' : '1px solid #f8fafc', transition: 'background 0.2s', background: i === 3 ? '#fefce8' : 'transparent' }}>
                                             <td style={{ padding: '20px 24px' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: source.color }} />
+                                                    <img src={source.logo} alt={source.name} style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
                                                     <span style={{ fontWeight: 800, color: '#1e293b', fontSize: '15px' }}>{source.name}</span>
                                                     {i === 3 && <span style={{ fontSize: '10px', background: '#facc15', color: '#854d0e', padding: '2px 8px', borderRadius: '10px', fontWeight: 900, marginLeft: '8px' }}>AUTHENTIC</span>}
                                                 </div>

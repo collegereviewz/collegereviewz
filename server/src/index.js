@@ -1,14 +1,12 @@
+import './config.js';
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,6 +20,33 @@ import voiceRoutes from './route/voice.route.js';
 import scholarshipRoutes from './route/scholarship.route.js';
 import adminRoutes from './route/admin.route.js';
 import newsRoutes from './routes/news.route.js';
+
+
+//Security
+import helmet from "helmet"
+
+app.use(
+    helmet({
+        crossOriginResourcePolicy: { policy: "cross-origin" }
+    })
+)
+//express rate limit
+import rateLimit from "express-rate-limit"
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100
+})
+
+app.use(limiter)
+
+import hpp from "hpp"
+import xss from "xss-clean"
+import mongoSanitize from "express-mongo-sanitize"
+
+app.use(hpp())
+app.use(xss())
+app.use(mongoSanitize())
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -75,6 +100,9 @@ startServer();
 
 app.get('/', (req, res) => {
     res.send('CollegeReviewz API is running...');
+});
+app.get("/api/test", (req, res) => {
+    res.send("API IS WORKING");
 });
 
 // No need for separate listen call, it's now inside startServer()

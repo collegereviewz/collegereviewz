@@ -80,7 +80,7 @@ const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData, collegeSta
     }, [collegeName]);
 
     useEffect(() => {
-        const fetchStats = async () => {
+        const fetchStats = async (isRetry = false) => {
             if (!collegeName) return;
             try {
                 setStatsLoading(true);
@@ -88,11 +88,14 @@ const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData, collegeSta
                 const res = await axios.get(`http://localhost:5000/api/colleges/${encodeURIComponent(collegeName)}/stats?triggerScrape=true`);
                 if (res.data.success && res.data.data.reviewStats) {
                     setStats(res.data.data.reviewStats);
+                } else if (!isRetry) {
+                    // If background scrape was triggered, wait 5s and try once more
+                    setTimeout(() => fetchStats(true), 5000);
                 }
             } catch (err) {
                 console.error("Error fetching stats:", err);
             } finally {
-                setStatsLoading(false);
+                if (!isRetry) setStatsLoading(false);
             }
         };
 
@@ -393,8 +396,28 @@ const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData, collegeSta
 
                     {/* Modern Ordered Ratings Table */}
                     <div style={{ background: '#fff', borderRadius: '20px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
-                        <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', background: '#f8fafc' }}>
+                        <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>Platform Comparison</h3>
+                            <button 
+                                onClick={() => fetchStats()} 
+                                disabled={statsLoading}
+                                style={{ 
+                                    background: 'none', 
+                                    border: '1px solid #e2e8f0', 
+                                    borderRadius: '8px', 
+                                    padding: '6px 12px', 
+                                    fontSize: '12px', 
+                                    fontWeight: 700, 
+                                    color: '#4f46e5', 
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px'
+                                }}
+                            >
+                                <RefreshCcw size={14} className={statsLoading ? 'spin-anim' : ''} />
+                                {statsLoading ? 'Refreshing...' : 'Refresh Ratings'}
+                            </button>
                         </div>
                         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                             <thead>
@@ -426,14 +449,20 @@ const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData, collegeSta
                                             </td>
                                             <td style={{ padding: '20px 24px' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                    <div style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a' }}>{Number(sourceStats.rating || 0).toFixed(1)}</div>
-                                                    <div style={{ display: 'flex', gap: '2px' }}>
-                                                        {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill={s <= Math.round(Number(sourceStats.rating || 0)) ? '#f59e0b' : 'none'} color="#f59e0b" />)}
+                                                    <div style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a' }}>
+                                                        {sourceStats.rating > 0 ? Number(sourceStats.rating).toFixed(1) : <span style={{ color: '#94a3b8', fontSize: '14px' }}>N/A</span>}
                                                     </div>
+                                                    {sourceStats.rating > 0 && (
+                                                        <div style={{ display: 'flex', gap: '2px' }}>
+                                                            {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill={s <= Math.round(Number(sourceStats.rating)) ? '#f59e0b' : 'none'} color="#f59e0b" />)}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td style={{ padding: '20px 24px' }}>
-                                                <span style={{ color: '#64748b', fontSize: '14px', fontWeight: 600 }}>{sourceStats.count || 0}+ Reviews</span>
+                                                <span style={{ color: '#64748b', fontSize: '14px', fontWeight: 600 }}>
+                                                    {sourceStats.count > 0 ? `${sourceStats.count}+ Reviews` : <span style={{ color: '#94a3b8', fontWeight: 400 }}>No data yet</span>}
+                                                </span>
                                             </td>
                                         </tr>
                                     );
@@ -648,6 +677,8 @@ const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData, collegeSta
                     .responsive-stats { grid-template-columns: 1fr !important; }
                 }
                 .hover-shadow:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+                .spin-anim { animation: spin 1s linear infinite; }
+                @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
             `}</style>
             {/* Write A Review Modal */}
             <AnimatePresence>

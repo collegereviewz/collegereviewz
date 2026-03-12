@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   BookOpen, ChevronLeft, ChevronRight, FileText, BarChart3, Clock,
   GraduationCap, Users, Settings, Scale, FlaskConical, Landmark,
-  Stethoscope, Palette, Code, Search, MessageSquare, TrendingUp, Briefcase
+  Stethoscope, Palette, Code, Search, MessageSquare, TrendingUp, Briefcase, LayoutGrid
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -11,12 +12,27 @@ import cuetLogo from '../assets/Exams/cuet.png';
 import gateLogo from '../assets/Exams/gate.png';
 import jeeLogo from '../assets/Exams/jee.png';
 import jeeAdvLogo from '../assets/Exams/jeeadvanced.png';
-import jeeMainLogo from '../assets/Exams/jee.png';
+import jeeMainLogo from '../assets/Exams/jeemain.png';
 import tsEamcetLogo from '../assets/Exams/taseamcat.png';
 import wbjeeLogo from '../assets/Exams/wbjee.png';
+import neetLogo from '../assets/Exams/neet.png';
+import ibpsLogo from '../assets/Exams/ibps.png';
+import sbiLogo from '../assets/Exams/sbi.png';
+import kiitteeLogo from '../assets/Exams/kiitee.png';
+import clatLogo from '../assets/Exams/clat.png';
+
+// Import Exam Data
+import examsListData from '../data/exams_list.json';
+import examOfficialLogos from '../data/exam_official_logos.json';
+
+// Logo.dev API Configuration
+const LOGO_DEV_PK = 'pk_BcA5p3g7Qs6Yzy2HVMeIhw';
+const PLACEHOLDER_LOGO = 'https://raw.githubusercontent.com/Anish-CRZ/Assets/main/placeholder-exam.png';
 
 const ExamsSection = ({ showHeader = true }) => {
-  const [selectedStream, setSelectedStream] = useState('MBBS');
+  const navigate = useNavigate();
+  const [selectedStream, setSelectedStream] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const tabsRef = useRef(null);
@@ -29,6 +45,10 @@ const ExamsSection = ({ showHeader = true }) => {
   }, []);
 
   useEffect(() => {
+    setVisibleCount(12);
+  }, [selectedStream]);
+
+  useEffect(() => {
     const el = tabsRef.current;
     if (!el) return;
     checkScroll();
@@ -39,79 +59,123 @@ const ExamsSection = ({ showHeader = true }) => {
       window.removeEventListener('resize', checkScroll);
     };
   }, [checkScroll]);
-  const exams = [
-    {
-      id: 1,
-      name: 'CUET 2025',
-      fullName: 'Common Universities Entrance Test',
-      category: 'Science',
-      examDate: '11 May 26 - 31 May 26',
-      appDate: '03 Jan 26 - 30 Jan 26',
-      resultDate: '30 Jul 26',
-      logo: cuetLogo,
-      color: '#f97316'
-    },
-    {
-      id: 2,
-      name: 'JEE Main 2026',
-      fullName: 'Joint Entrance Exam Main',
-      category: 'BE/B.Tech',
-      examDate: '22 Jan 26 - 29 Jan 26',
-      appDate: '15 Oct 25 - 25 Nov 25',
-      resultDate: '19 Feb 26',
-      logo: jeeMainLogo,
-      color: '#06b6d4'
-    },
-    {
-      id: 3,
-      name: 'JEE Advanced 2026',
-      fullName: 'Joint Entrance Examination Advanced',
-      category: 'BE/B.Tech',
-      examDate: '17 May 26',
-      appDate: '23 Apr 26 - 02 May 26',
-      resultDate: '01 Jun 26',
-      logo: jeeAdvLogo,
-      color: '#64748b'
-    },
-    {
-      id: 4,
-      name: 'TS EAMCET 2026',
-      fullName: 'Telangana State Engineering Agriculture...',
-      category: 'BE/B.Tech',
-      examDate: '29 Apr 26 - 05 May 26',
-      appDate: '01 Mar 26 - 04 Apr 26',
-      resultDate: '11 May 26',
-      logo: tsEamcetLogo,
-      color: '#0891b2'
-    },
-    {
-      id: 5,
-      name: 'GATE 2026',
-      fullName: 'Graduate Aptitude Test in Engineering',
-      category: 'ME/M.Tech',
-      examDate: '07 Feb 26',
-      appDate: '28 Aug 25 - 13 Oct 25',
-      resultDate: '19 Mar 26',
-      logo: gateLogo,
-      color: '#eab308'
-    },
-    {
-      id: 6,
-      name: 'WBJEE 2025',
-      fullName: 'West Bengal Joint Entrance Examination',
-      category: 'BE/B.Tech',
-      examDate: '27 Apr 25',
-      appDate: '09 Jan 25 - 05 Feb 25',
-      resultDate: '22 Aug 25',
-      logo: wbjeeLogo,
-      color: '#6366f1'
-    }
-  ];
 
-  const filteredExams = exams.filter(e => e.category === selectedStream || selectedStream === 'All');
+  const exams = examsListData.map(exam => {
+    // High Quality Logo Mapping
+    let logo = null;
+    const name = (exam.fullName || "").toLowerCase();
+    const officialLogo =
+      examOfficialLogos?.[(exam.fullName || '').toLowerCase().trim()] ||
+      examOfficialLogos?.[(exam.name || '').toLowerCase().trim()];
+    
+    // 0. Official Logos from checking.csv (preferred)
+    if (officialLogo) logo = officialLogo;
+
+    // 1. Check Local Assets First
+    else if (name.includes('cuet')) logo = cuetLogo;
+    else if (name.includes('jee main')) logo = jeeMainLogo;
+    else if (name.includes('jee advanced')) logo = jeeAdvLogo;
+    else if (name.includes('gate')) logo = gateLogo;
+    else if (name.includes('wbjee')) logo = wbjeeLogo;
+    else if (name.includes('ts eamcet') || name.includes('ts eapcet')) logo = tsEamcetLogo;
+    else if (name.includes('ibps')) logo = ibpsLogo;
+    else if (name.includes('sbi')) logo = sbiLogo;
+    else if (name.includes('kiit')) logo = kiitteeLogo;
+    else if (name.includes('clat')) logo = clatLogo;
+    else if (name.includes('nchm')) logo = jeeLogo;
+    
+    // 2. Use Logo.dev for National/Global Exams (Dynamic Domains)
+    else if (name.includes('neet')) logo = neetLogo;
+    else if (name.includes('cat')) logo = `https://img.logo.dev/iimcat.ac.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('bitsat')) logo = `https://img.logo.dev/bits-pilani.ac.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('mat')) logo = `https://img.logo.dev/aima.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('xat')) logo = `https://img.logo.dev/xatonline.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('nmat')) logo = `https://img.logo.dev/nmat.org?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('snap')) logo = `https://img.logo.dev/snaptest.org?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('iit') || name.includes('uceed') || name.includes('jam')) logo = `https://img.logo.dev/iitd.ac.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('aiims')) logo = `https://img.logo.dev/aiims.edu?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('nift')) logo = `https://img.logo.dev/nift.ac.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('lsat')) logo = `https://img.logo.dev/lsac.org?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('mhcet') || name.includes('mah-')) logo = `https://img.logo.dev/mahacet.org?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('upcet') || name.includes('uppsc')) logo = `https://img.logo.dev/uppsc.up.nic.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('kcet') || name.includes('kpsc')) logo = `https://img.logo.dev/kpsc.kar.nic.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('tancet') || name.includes('tnpsc')) logo = `https://img.logo.dev/tnpsc.gov.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('upsc')) logo = `https://img.logo.dev/upsc.gov.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('ssc')) logo = `https://img.logo.dev/ssc.nic.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('rbi')) logo = `https://img.logo.dev/rbi.org.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('nabard')) logo = `https://img.logo.dev/nabard.org?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('sebi')) logo = `https://img.logo.dev/sebi.gov.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('rr b') || name.includes('rrb')) logo = `https://img.logo.dev/indianrailways.gov.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('vit')) logo = `https://img.logo.dev/vit.ac.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('srm')) logo = `https://img.logo.dev/srmist.edu.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('manipal') || name.includes('met')) logo = `https://img.logo.dev/manipal.edu?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('amrita') || name.includes('aeee')) logo = `https://img.logo.dev/amrita.edu?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('comedk')) logo = `https://img.logo.dev/comedk.org?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('nata')) logo = `https://img.logo.dev/nata.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('net') || name.includes('ugc')) logo = `https://img.logo.dev/nta.ac.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('appsc')) logo = `https://img.logo.dev/psc.ap.gov.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('gpsc')) logo = `https://img.logo.dev/gpsc.gujarat.gov.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('mppsc')) logo = `https://img.logo.dev/mppsc.mp.gov.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('bpsc')) logo = `https://img.logo.dev/bpsc.bih.nic.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('opsc')) logo = `https://img.logo.dev/opsc.gov.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('rpsc')) logo = `https://img.logo.dev/rpsc.rajasthan.gov.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('wbpsc')) logo = `https://img.logo.dev/wbpsc.gov.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('nid')) logo = `https://img.logo.dev/nid.edu?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('ailet')) logo = `https://img.logo.dev/nludelhi.ac.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('jipmat')) logo = `https://img.logo.dev/jipmat.nta.ac.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('fddi')) logo = `https://img.logo.dev/fddiindia.com?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('klee')) logo = `https://img.logo.dev/cee.kerala.gov.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('nmims') || name.includes('npat')) logo = `https://img.logo.dev/nmims.edu?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('symbiosis') || name.includes('set') || name.includes('slat')) logo = `https://img.logo.dev/siu.edu.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('cusat')) logo = `https://img.logo.dev/cusat.ac.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('ipu')) logo = `https://img.logo.dev/ipu.ac.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('amu')) logo = `https://img.logo.dev/amu.ac.in?token=${LOGO_DEV_PK}&size=128`;
+    else if (name.includes('jmi')) logo = `https://img.logo.dev/jmi.ac.in?token=${LOGO_DEV_PK}&size=128`;
+
+    // Fallback to placeholder if no logo is found
+    if (!logo) {
+      logo = PLACEHOLDER_LOGO;
+    }
+
+    // Stream-based Fallback Icons
+    const getFallbackIcon = (category) => {
+      switch(category) {
+        case 'MBBS': return <Users size={28} color="#ef4444" />;
+        case 'BE/B.Tech': return <Settings size={28} color="#3b82f6" />;
+        case 'Law': return <Scale size={28} color="#6366f1" />;
+        case 'BBA': return <Briefcase size={28} color="#f59e0b" />;
+        case 'BCA': return <Code size={28} color="#10b981" />;
+        case 'Arts': return <Palette size={28} color="#ec4899" />;
+        default: return <GraduationCap size={28} color="#64748b" />;
+      }
+    };
+
+    return {
+      ...exam,
+      logo,
+      fallbackIcon: getFallbackIcon(exam.category),
+      // Assign colors based on category
+      color: exam.category === 'MBBS' ? '#ef4444' : 
+             exam.category === 'BE/B.Tech' ? '#3b82f6' : 
+             exam.category === 'Law' ? '#6366f1' : '#f97316'
+    };
+  });
+
+  const totalExams = exams.length;
+  const highQualityLogos = exams.filter(e => e.logo !== PLACEHOLDER_LOGO).length;
+  const fallbackLogos = totalExams - highQualityLogos;
+
+  const [visibleCount, setVisibleCount] = useState(12);
+  
+  const filteredExams = exams.filter(e => {
+    const matchesStream = selectedStream === 'All' || e.category === selectedStream;
+    const matchesSearch = e.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          e.fullName.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesStream && matchesSearch;
+  }).slice(0, visibleCount);
 
   return (
-    <section style={{ padding: '30px 0 80px', background: '#fff', position: 'relative' }}>
+    <section id="exams-hub" style={{ padding: '30px 0 80px', background: '#fff', position: 'relative' }}>
       <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 32px' }}>
         
         {/* Header Section */}
@@ -123,11 +187,24 @@ const ExamsSection = ({ showHeader = true }) => {
              <p style={{ fontSize: '18px', color: '#64748b', fontWeight: 600, maxWidth: '800px', margin: '0 auto', lineHeight: '1.5' }}>
                Entrance exams in India determine eligibility for admission to higher education institutions.
              </p>
+             <p style={{ fontSize: '14px', color: '#94a3b8', fontWeight: 600, marginTop: '8px' }}>
+               Logos added: {highQualityLogos} · Using fallback: {fallbackLogos}
+             </p>
           </div>
         )}
 
-        {/* Tab Selection with Scroll Controls */}
-        <div style={{ position: 'relative', marginBottom: '60px', maxWidth: '1350px', margin: '0 auto 60px' }}>
+        {/* Filter & Search Bar */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          gap: '24px',
+          marginBottom: '60px',
+          maxWidth: '1350px',
+          margin: '0 auto 60px'
+        }}>
+          {/* Scrollable Tabs */}
+          <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
           {/* Left Scroll Button */}
           {canScrollLeft && (
           <button 
@@ -175,7 +252,7 @@ const ExamsSection = ({ showHeader = true }) => {
             }} 
             className="no-scrollbar"
           >
-            {['MBBS', 'BE/B.Tech', 'BBA', 'BCA', 'B.Sc (Nursing)', 'Arts', 'Law', 'Science', 'Commerce', 'Pharmacy', 'ME/M.Tech'].map(tab => (
+            {['All', 'MBBS', 'BE/B.Tech', 'BBA', 'BCA', 'B.Sc (Nursing)', 'Arts', 'Law', 'Science', 'Commerce', 'Pharmacy', 'ME/M.Tech'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setSelectedStream(tab)}
@@ -191,6 +268,7 @@ const ExamsSection = ({ showHeader = true }) => {
                   scrollSnapAlign: 'start'
                 }}
               >
+                {tab === 'All' && <LayoutGrid size={18} />}
                 {tab === 'MBBS' && <Users size={18} />}
                 {tab === 'BE/B.Tech' && <Settings size={18} />}
                 {tab === 'BBA' && <Briefcase size={18} />}
@@ -207,6 +285,39 @@ const ExamsSection = ({ showHeader = true }) => {
             ))}
           </div>
         </div>
+
+        {/* Search Input on the Right */}
+        <div style={{ 
+          position: 'relative', 
+          width: '320px', 
+          flexShrink: 0 
+        }}>
+          <div style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}>
+            <Search size={20} />
+          </div>
+          <input
+            type="text"
+            placeholder="Search all 500+ exams..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '14px 16px 14px 48px',
+              borderRadius: '50px',
+              border: '1.5px solid #f1f5f9',
+              background: '#fff',
+              color: '#1e293b',
+              fontSize: '16px',
+              fontWeight: 600,
+              outline: 'none',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.02)'
+            }}
+            onFocus={(e) => { e.target.style.borderColor = '#5b51d8'; e.target.style.boxShadow = '0 8px 20px rgba(91, 81, 216, 0.08)'; }}
+            onBlur={(e) => { e.target.style.borderColor = '#f1f5f9'; e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.02)'; }}
+          />
+        </div>
+      </div>
 
         {/* Exams Grid */}
         <div style={{ 
@@ -240,7 +351,7 @@ const ExamsSection = ({ showHeader = true }) => {
                       src={exam.logo} 
                       alt={exam.name} 
                       style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                      onError={(e) => { e.currentTarget.src = 'https://raw.githubusercontent.com/Anish-CRZ/Assets/main/placeholder-exam.png'; }}
+                      onError={(e) => { e.currentTarget.src = PLACEHOLDER_LOGO; }}
                     />
                   </div>
                   <div>
@@ -267,7 +378,12 @@ const ExamsSection = ({ showHeader = true }) => {
                 </div>
 
                 <div style={{ display: 'flex', gap: '12px', marginTop: 'auto' }}>
-                  <button style={{ 
+                  <button 
+                    onClick={() => {
+                        const { fallbackIcon, ...serializableExamData } = exam;
+                        navigate(`/exams/${exam.name.toLowerCase().replace(/\s+/g, '-')}`, { state: { examData: serializableExamData } });
+                    }}
+                    style={{ 
                     flex: 1, padding: '12px 0', borderRadius: '50px', border: 'none',
                     background: 'linear-gradient(135deg, #5b51d8, #38bdf8)', color: '#fff',
                     fontSize: '14px', fontWeight: 800, cursor: 'pointer', transition: 'all 0.3s ease',
@@ -288,6 +404,60 @@ const ExamsSection = ({ showHeader = true }) => {
           </AnimatePresence>
         </div>
 
+        {/* View More Button */}
+        {exams.filter(e => {
+          const matchesStream = selectedStream === 'All' || e.category === selectedStream;
+          const matchesSearch = e.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                e.fullName.toLowerCase().includes(searchQuery.toLowerCase());
+          return matchesStream && matchesSearch;
+        }).length > visibleCount && (
+          <div style={{ textAlign: 'center', marginTop: '60px' }}>
+            <button
+              onClick={() => setVisibleCount(prev => prev + 12)}
+              style={{
+                padding: '16px 48px', borderRadius: '50px', border: '1.5px solid #5b51d8',
+                background: '#fff', color: '#5b51d8', fontSize: '16px', fontWeight: 800,
+                cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 4px 12px rgba(91, 81, 216, 0.05)'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#5b51d8'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#5b51d8'; }}
+            >
+              View More Exams
+            </button>
+          </div>
+        )}
+
+        {/* Best of Luck / Footer Note */}
+        <div style={{ 
+          marginTop: '80px', 
+          padding: '40px', 
+          borderRadius: '32px', 
+          background: 'linear-gradient(135deg, rgba(91, 81, 216, 0.03), rgba(56, 189, 248, 0.03))',
+          textAlign: 'center',
+          border: '1.5px dashed rgba(91, 81, 216, 0.2)'
+        }}>
+          <div style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: '12px', 
+            padding: '8px 24px', 
+            borderRadius: '50px', 
+            background: '#fff', 
+            color: '#5b51d8', 
+            fontSize: '14px', 
+            fontWeight: 800, 
+            marginBottom: '20px',
+            boxShadow: '0 4px 12px rgba(91, 81, 216, 0.08)'
+          }}>
+            <GraduationCap size={18} /> Official Exam Partner Resource
+          </div>
+          <h2 style={{ fontSize: '32px', fontWeight: 950, color: '#1e293b', marginBottom: '16px' }}>
+            Best of luck for your <span style={{ color: '#5b51d8' }}>Brilliant Future!</span>
+          </h2>
+          <p style={{ fontSize: '16px', color: '#64748b', fontWeight: 600, maxWidth: '600px', margin: '0 auto' }}>
+            We've curated these 500+ official entrance exams to help you navigate your academic journey. Stay focused, stay prepared.
+          </p>
+        </div>
       </div>
 
       <style>{`

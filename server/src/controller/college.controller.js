@@ -8,13 +8,141 @@ export const getColleges = async (req, res) => {
 
         const query = {};
 
-        // Search by name or location
+        let scoreStage;
+
+        // Search by name, popular name, or location
         if (search) {
+            const cleanSearch = search.trim();
+            const searchUpper = cleanSearch.toUpperCase();
+
+            // 1. Expand standard acronyms to Full Forms
+            const acronymMap = {
+                'IIT': 'Indian Institute of Technology',
+                'NIT': 'National Institute of Technology',
+                'IIM': 'Indian Institute of Management',
+                'IIIT': 'Indian Institute of Information Technology',
+                'AIIMS': 'All India Institute of Medical Sciences',
+                'IISER': 'Indian Institute of Science Education and Research',
+                'BITS': 'Birla Institute of Technology and Science',
+                'RCCIIT': 'RCC Institute of Information Technology',
+                'SRM': 'SRM Institute of Science and Technology',
+                'VIT': 'Vellore Institute of Technology'
+            };
+
+            let expandedTerm = null;
+            const words = searchUpper.split(/[\s\.-]+/);
+            const firstWord = words[0];
+
+            if (acronymMap[searchUpper]) {
+                expandedTerm = acronymMap[searchUpper];
+            } else if (acronymMap[firstWord]) {
+                // e.g. 'IIT Bombay' -> 'Indian Institute of Technology Bombay'
+                const restOfSearch = cleanSearch.substring(firstWord.length).trim();
+                const cleanRest = restOfSearch.replace(/^[\.-]+/, '').trim(); // Remove leading dots/dashes
+                expandedTerm = `${acronymMap[firstWord]} ${cleanRest}`;
+            }
+
+            // 2. Build precise short-form matching (handles dots, spaces, e.g. "G.L.A" or "GLA")
+            // This requires the match to be an independent word or phrase, avoiding substring matches inside larger words
+            const generateFlexiblePattern = (str) => {
+                const clean = str.replace(/[\s\.-]/g, '');
+                if (clean.length === 0) return null;
+                // e.g. "GLA" -> "G[\s\.\-_]*L[\s\.\-_]*A"
+                const pattern = clean.split('').map(char =>
+                    char.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&') + '[\\s\\.\\-_]*'
+                ).join('');
+                // Use word boundaries \b to ensure "GLA" doesn't match "Bangla"
+                return new RegExp(`\\b${pattern}`, 'i');
+            };
+
+            // Basic full word regexes, escape special characters to avoid dots acting as wildcards
+            const escapedSearch = cleanSearch.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+            const mainReg = new RegExp(`\\b${escapedSearch}`, 'i');
+            const mainFlexReg = generateFlexiblePattern(cleanSearch);
+
             query.$or = [
-                { name: { $regex: search, $options: 'i' } },
-                { district: { $regex: search, $options: 'i' } },
-                { state: { $regex: search, $options: 'i' } }
+                { name: { $regex: mainReg } },
+                { popularName: { $regex: mainReg } },
+                { district: { $regex: mainReg } },
+                { state: { $regex: mainReg } }
             ];
+
+            // Add the flexible acronymmatcher (useful for G.L.A, R.C.C, S.R.M)
+            if (mainFlexReg) {
+                query.$or.push({ name: { $regex: mainFlexReg } });
+                query.$or.push({ popularName: { $regex: mainFlexReg } });
+            }
+
+            // If we found a known expansion (like IIT -> Indian Institute of Technology)
+            let flexibleExpanded = '';
+            if (expandedTerm) {
+                // To allow commas or hyphens between words (e.g. "Technology, Bombay"), make spaces flexible
+                flexibleExpanded = expandedTerm.split(/\s+/).map(w => w.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')).join('[\\s\\W_]+');
+                const expandedReg = new RegExp(`\\b${flexibleExpanded}`, 'i');
+                query.$or.push({ name: { $regex: expandedReg } });
+                query.$or.push({ popularName: { $regex: expandedReg } });
+            }
+
+            // Calculate a basic relevance score for search sorting
+            // Give highest score (20) if name starts with the expanded term
+            // Give high score (10) if name starts with the short term
+            const escapedSearchBoundary = `^${escapedSearch}\\b`;
+            const shortRegex = new RegExp(escapedSearchBoundary, 'i');
+
+            if (expandedTerm) {
+                const escapedExpandedBoundary = `^${flexibleExpanded}\\b`;
+                const expandedRegex = new RegExp(escapedExpandedBoundary, 'i');
+
+                scoreStage = {
+                    $addFields: {
+                        relevanceScore: {
+                            $cond: {
+                                if: { $regexMatch: { input: "$name", regex: expandedRegex } },
+                                then: 20,
+                                else: {
+                                    $cond: {
+                                        if: { $regexMatch: { input: "$popularName", regex: expandedRegex } },
+                                        then: 18,
+                                        else: {
+                                            $cond: {
+                                                if: { $regexMatch: { input: "$name", regex: shortRegex } },
+                                                then: 10,
+                                                else: {
+                                                    $cond: {
+                                                        if: { $regexMatch: { input: "$popularName", regex: shortRegex } },
+                                                        then: 8,
+                                                        else: 0
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+            } else {
+                scoreStage = {
+                    $addFields: {
+                        relevanceScore: {
+                            $cond: {
+                                if: { $regexMatch: { input: "$name", regex: shortRegex } },
+                                then: 10,
+                                else: {
+                                    $cond: {
+                                        if: { $regexMatch: { input: "$popularName", regex: shortRegex } },
+                                        then: 8,
+                                        else: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+        } else {
+            scoreStage = { $addFields: { relevanceScore: 0 } };
         }
 
         // Filter by state
@@ -47,11 +175,27 @@ export const getColleges = async (req, res) => {
 
         const skip = (parseInt(page) - 1) * parseInt(limit);
 
-        // Use aggregation to get review stats
+        // Simple but memory-safe pipeline
         const pipeline = [
             { $match: query },
+            scoreStage,
+            // Step 1: Smallest possible projection for sorting + Scoring
+            { $project: { _id: 1, name: 1, relevanceScore: 1 } },
+            { $sort: { relevanceScore: -1, name: 1 } },
             { $skip: skip },
             { $limit: parseInt(limit) },
+            // Step 2: Hydrate full details only for the paginated results
+            {
+                $lookup: {
+                    from: 'colleges',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'fullDoc'
+                }
+            },
+            { $unwind: "$fullDoc" },
+            { $replaceRoot: { newRoot: "$fullDoc" } },
+            // Step 3: Attach review stats
             {
                 $lookup: {
                     from: 'reviews',
@@ -77,14 +221,10 @@ export const getColleges = async (req, res) => {
                     reviewsCount: { $size: '$collegeReviews' }
                 }
             },
-            {
-                $project: {
-                    collegeReviews: 0
-                }
-            }
+            { $project: { collegeReviews: 0 } }
         ];
 
-        const colleges = await College.aggregate(pipeline);
+        const colleges = await College.aggregate(pipeline).allowDiskUse(true);
         const total = await College.countDocuments(query);
 
         res.json({

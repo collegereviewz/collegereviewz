@@ -1,7 +1,9 @@
 import React from 'react';
-import { Calendar, CheckCircle2, FileText, HelpCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Calendar, CheckCircle2, FileText, HelpCircle, Compass, LineChart, Map } from 'lucide-react';
 
 const Admission = ({ collegeData }) => {
+    const navigate = useNavigate();
     const name = collegeData?.name || 'College';
     
     const cardStyle = {
@@ -86,6 +88,33 @@ const Admission = ({ collegeData }) => {
                         <div style={{ color: '#3b82f6', fontWeight: 900, fontSize: '12px', marginBottom: '8px', textTransform: 'uppercase' }}>Level</div>
                         <div style={{ fontSize: '18px', fontWeight: 950, color: '#1e293b' }}>UG & PG</div>
                     </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
+                    <button 
+                        onClick={() => window.open('https://collegereview.io/', '_blank')}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#eef2ff'; e.currentTarget.style.borderColor = '#c7d2fe'; e.currentTarget.style.transform = 'translateY(-2px)'}}
+                        onMouseLeave={e => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.transform = 'translateY(0)'}}
+                        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', background: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '14px', fontSize: '14px', fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 5px rgba(0,0,0,0.02)' }}
+                    >
+                        <Compass size={18} color="#5b51d8" /> AI Career Predictor
+                    </button>
+                    <button 
+                        onClick={() => window.open('https://counseling.collegereview.io/', '_blank')}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#ecfdf5'; e.currentTarget.style.borderColor = '#a7f3d0'; e.currentTarget.style.transform = 'translateY(-2px)'}}
+                        onMouseLeave={e => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.transform = 'translateY(0)'}}
+                        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', background: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '14px', fontSize: '14px', fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 5px rgba(0,0,0,0.02)' }}
+                    >
+                        <LineChart size={18} color="#10b981" /> Smart Counselling Portal
+                    </button>
+                    <button 
+                        onClick={() => navigate('/WriteReview/')}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#fffbeb'; e.currentTarget.style.borderColor = '#fde68a'; e.currentTarget.style.transform = 'translateY(-2px)'}}
+                        onMouseLeave={e => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.transform = 'translateY(0)'}}
+                        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px', background: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '14px', fontSize: '14px', fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 5px rgba(0,0,0,0.02)' }}
+                    >
+                        <Map size={18} color="#f59e0b" /> Student Community Hub
+                    </button>
                 </div>
 
             </div>

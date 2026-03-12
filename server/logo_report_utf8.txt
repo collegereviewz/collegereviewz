@@ -1,0 +1,13 @@
+﻿==========================================
+EXAM LOGO COVERAGE REPORT
+==========================================
+Total Unique Exams: 463
+Logos Added (High Quality): 63
+Using Fallback Icons: 400
+------------------------------------------
+Logos Currently Mapped:
+National/Local: JEE, CUET, GATE, NEET, CAT, CLAT, etc.
+------------------------------------------
+Examples of Exams using Fallback Icons:
+AILET, UCEED, NID DAT, NCHM JEE, FDDI AIST, MH CET Law, MAH-B.BCA/BBA/BMS/BBM CET, MAH-B.Design CET, MAH-B.HMCT CET, AP LAWCET...
+==========================================

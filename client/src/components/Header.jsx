@@ -75,7 +75,7 @@ const Header = ({ currentView }) => {
     { name: 'Home', path: '/' },
     { name: 'Explore Colleges', path: '/ExploreColleges/' },
     { name: 'Courses', path: '/Courses/' },
-    { name: 'Exams', path: '/Exams/' },
+    { name: 'Exams', path: '/exams/' },
     { name: 'Scholarship', path: '/Scholarship/' },
     { name: 'Study Abroad', path: '/StudyAbroad/' },
     { name: 'Resources', path: '/Resources/' },

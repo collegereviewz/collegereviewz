@@ -16,7 +16,10 @@ export const getCollegeLogo = (domain, name) => {
         'Manipal University': 'https://upload.wikimedia.org/wikipedia/commons/2/2f/India-MAHE-logo.png',
         'LPU': 'https://upload.wikimedia.org/wikipedia/en/3/3a/Lovely_Professional_University_logo.png',
         'VIT Vellore': 'https://upload.wikimedia.org/wikipedia/en/c/c5/Vellore_Institute_of_Technology_logo_2017.png',
-        'Amity University': 'https://upload.wikimedia.org/wikipedia/en/a/ad/Amity_University_logo.png'
+        'Amity University': 'https://upload.wikimedia.org/wikipedia/en/a/ad/Amity_University_logo.png',
+        'KIIT University': 'https://raw.githubusercontent.com/Anish-CRZ/Assets/main/kiit-logo.png',
+        'IBPS': 'https://img.logo.dev/ibps.in?token=pk_BcA5p3g7Qs6Yzy2HVMeIhw&size=128',
+        'State Bank of India': 'https://img.logo.dev/sbi.co.in?token=pk_BcA5p3g7Qs6Yzy2HVMeIhw&size=128'
     };
 
     if (name && officialLogos[name]) return officialLogos[name];
@@ -56,7 +59,10 @@ export const guessDomainByName = (name) => {
         'IIT Roorkee': 'iitr.ac.in',
         'IIT Guwahati': 'iitg.ac.in',
         'JNU New Delhi': 'jnu.ac.in',
-        'BHU Varanasi': 'bhu.ac.in'
+        'BHU Varanasi': 'bhu.ac.in',
+        'KIIT University': 'kiit.ac.in',
+        'IBPS': 'ibps.in',
+        'State Bank of India': 'sbi.co.in'
     };
 
     return mappings[name] || null;

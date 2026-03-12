@@ -8,6 +8,7 @@ import Home from './pages/Home'
 import CoursesListing from './pages/CoursesListing'
 import ExploreColleges from './pages/ExploreColleges/ExploreColleges'
 import Exams from './pages/Exams'
+import ExamProfileWrapper from './pages/ExamProfileWrapper'
 import Scholarship from './pages/Scholarship'
 import StudyAbroad from './pages/StudyAbroad'
 import Contact from './pages/Contact'
@@ -73,11 +74,15 @@ function AppContent() {
     return () => window.removeEventListener('open-auth-modal', handleOpenAuth);
   }, [location.pathname]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   const getCurrentView = () => {
     if (location.pathname === '/') return 'Home';
     if (location.pathname.startsWith('/Courses')) return 'Courses';
     if (location.pathname.startsWith('/ExploreColleges')) return 'Explore Colleges';
-    if (location.pathname.startsWith('/Exams')) return 'Exams';
+    if (location.pathname.toLowerCase().startsWith('/exams')) return 'Exams';
     if (location.pathname.startsWith('/Scholarship')) return 'Scholarship';
     if (location.pathname.startsWith('/StudyAbroad')) return 'Study Abroad';
     if (location.pathname.startsWith('/Contact')) return 'Contact Us';
@@ -125,7 +130,8 @@ function AppContent() {
                 <Route path="/" element={<Home />} />
                 <Route path="/Courses/" element={<CoursesListing />} />
                 <Route path="/ExploreColleges/" element={<ExploreColleges />} />
-                <Route path="/Exams/" element={<Exams />} />
+                <Route path="/exams/" element={<Exams />} />
+                <Route path="/exams/:examName" element={<ExamProfileWrapper />} />
                 <Route path="/Scholarship/" element={<Scholarship />} />
                 <Route path="/StudyAbroad/" element={<StudyAbroad />} />
                 <Route path="/Contact/" element={<Contact />} />

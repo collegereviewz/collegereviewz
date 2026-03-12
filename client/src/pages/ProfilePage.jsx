@@ -167,7 +167,7 @@ const ProfilePage = () => {
         { name: 'Home', icon: <Home size={20} />, path: '/' },
         { name: 'Colleges', icon: <School size={20} />, path: '/ExploreColleges/' },
         { name: 'Courses', icon: <BookOpen size={20} />, path: '/Courses/' },
-        { name: 'Exam', icon: <FileText size={20} />, path: '/Exams/' },
+        { name: 'Exam', icon: <FileText size={20} />, path: '/exams/' },
         { name: 'Scholarship', icon: <Award size={20} />, path: '/Scholarship/' },
         { name: 'Study Abroad', icon: <Plane size={20} />, path: '/StudyAbroad/' },
         { name: 'Contact Us', icon: <Phone size={20} />, path: '/Contact/' },

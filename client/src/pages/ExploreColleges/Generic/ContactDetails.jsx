@@ -6,7 +6,7 @@ const ContactDetails = ({ collegeData }) => {
     const address = collegeData?.address || 'Address information is being updated.';
     const phone = collegeData?.contactDetails?.phone || 'N/A';
     const email = collegeData?.contactDetails?.email || 'N/A';
-    const website = collegeData?.website || 'https://www.rcciit.org.in';
+    const website = collegeData?.officialWebsite || collegeData?.website || 'N/A';
 
     const cardStyle = {
         background: '#fff',

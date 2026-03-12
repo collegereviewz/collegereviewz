@@ -43,6 +43,7 @@ const ExploreSection = ({ onNavigate }) => {
               onClick={() => {
                 if (item.title === 'Colleges Directory') onNavigate('Explore Colleges');
                 if (item.title === 'Courses & Careers') onNavigate('Courses');
+                if (item.title === 'Entrance Exams') onNavigate('Exams');
               }}
               style={{
                 background: '#fff', borderRadius: '20px', padding: '24px 22px',

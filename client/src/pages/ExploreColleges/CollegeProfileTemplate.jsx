@@ -14,7 +14,6 @@ const tabToComponentMap = {
     'Admission': 'Admission',
     'Reviews': 'Reviews',
     'Ranking and Placement': 'RankingPlacement',
-    'Result': 'Result',
     'Location': 'Location',
     'Photo & Video': 'PhotoVideo',
     'Scholarship': 'Scholarship',
@@ -81,7 +80,7 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
 
     const tabs = [
         'College Info', 'Course & Fees', 'Cut Off', 'Admission',
-        'Reviews', 'Ranking and Placement', 'Result', 'Location',
+        'Reviews', 'Ranking and Placement', 'Location',
         'Photo & Video', 'Scholarship', 'Notification & Upload', 'Q & A',
         'Facility', 'Student Life', 'Contact Details'
     ];
@@ -95,25 +94,28 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
         const componentName = tabToComponentMap[activeTab];
 
         if (collegeInfo.isGeneric) {
-            // Check if we have a generic/MBBS version, else show a placeholder
             return lazy(() =>
-                import(`./${collegeInfo.folderName}/${componentName}`).catch(() => ({
-                    default: () => <div style={{ padding: '40px', textAlign: 'center', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-                        <h3 style={{ color: '#64748b' }}>{activeTab} for {collegeInfo.fullName} is coming soon!</h3>
-                    </div>
-                }))
+                import(`./${collegeInfo.folderName}/${componentName}`)
+                    .catch(() => import(`./Generic/${componentName}`))
+                    .catch(() => ({
+                        default: () => <div style={{ padding: '40px', textAlign: 'center', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                            <h3 style={{ color: '#64748b' }}>{activeTab} for {collegeInfo.fullName} is coming soon!</h3>
+                        </div>
+                    }))
             );
         }
 
         return lazy(() =>
             import(`./BE-BTech/Colleges/${collegeInfo.folderName}/${collegeInfo.detailsFolder}/${componentName}`)
+                .catch(() => import(`./Generic/${componentName}`))
         );
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [collegeInfo.folderName, activeTab, collegeInfo.isGeneric]);
 
 
     const containerStyle = {
-        maxWidth: '1440px',
+        maxWidth: '1600px',
+        width: '98%',
         margin: '0 auto',
         padding: '0 40px',
     };
@@ -170,6 +172,14 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
                                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><MapPin size={16} /> {collegeInfo.location}</span>
                                     <span>| {collegeInfo.type}</span>
                                     <span>| Estd {collegeInfo.established}</span>
+                                    {collegeInfo.website && (
+                                        <a href={collegeInfo.website.startsWith('http') ? collegeInfo.website : `https://${collegeInfo.website}`} 
+                                           target="_blank" 
+                                           rel="noopener noreferrer"
+                                           style={{ color: '#fff', textDecoration: 'underline', opacity: 0.9 }}>
+                                            | Visit Website
+                                        </a>
+                                    )}
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginLeft: '8px', background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: '20px', backdropFilter: 'blur(4px)' }}>
                                         <Star size={14} fill="#f59e0b" color="#f59e0b" />
                                         <span style={{ fontWeight: 800 }}>

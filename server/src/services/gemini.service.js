@@ -4,8 +4,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-// Using gemini-2.0-flash without tools to avoid 503/quota issues observed with search tool
-const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+// Using gemini-2.0-flash for high speed and reliability
+const model = genAI.getGenerativeModel({
+  model: 'gemini-2.0-flash'
+});
 
 /**
  * Extract fee structure and other details from college-related text

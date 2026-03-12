@@ -1,7 +1,17 @@
 import College from '../models/College.model.js';
 import Review from '../models/Review.model.js';
+import JosaaCutoff from '../models/JosaaCutoff.model.js';
+import CsabCutoff from '../models/CsabCutoff.model.js';
+import CcmtCutoff from '../models/CcmtCutoff.model.js';
+import WbjeeCutoff from '../models/WbjeeCutoff.model.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import csv from 'csv-parser';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 export const getColleges = async (req, res) => {
     try {
         const { page = 1, limit = 5, search = '', state = 'All', course = 'All', stream = 'All' } = req.query;
@@ -299,5 +309,113 @@ export const getCollegeCommute = async (req, res) => {
     } catch (error) {
         console.error('Error dynamically fetching commute data:', error);
         res.status(500).json({ success: false, message: 'Failed to find commute info' });
+    }
+};
+
+export const getCollegeCutoffs = async (req, res) => {
+    try {
+        const { name } = req.params;
+        const { round, category, quota } = req.query;
+
+        if (!round) {
+            return res.status(400).json({ success: false, message: 'Round is required' });
+        }
+
+        const roundLower = round.toLowerCase();
+        let Model;
+        if (roundLower.includes('josaa')) Model = JosaaCutoff;
+        else if (roundLower.includes('csab')) Model = CsabCutoff;
+        else if (roundLower.includes('ccmt')) Model = CcmtCutoff;
+        else if (roundLower.includes('wbjee')) Model = WbjeeCutoff;
+        else {
+            return res.json({ success: true, data: [] });
+        }
+
+        // Build query
+        const query = {};
+
+        // Name matching: use tokens since exact matches might fail
+        const getTokens = (str) => {
+            return (str || '').toLowerCase()
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .split(/\s+/)
+                .filter(word => word.length > 2 && !['and', 'of', 'for', 'the', 'institute', 'technology', 'engineering', 'college', 'university'].includes(word));
+        };
+        const searchTokens = getTokens(name);
+        const searchNameClean = (name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+        const cleanName = name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+        query.institute = { $regex: new RegExp(cleanName, 'i') };
+
+        // Round match
+        query.round = { $regex: new RegExp('^' + round.trim() + '$', 'i') };
+
+        // Category match
+        if (category && category !== 'All') {
+            const mappedCategory = category === 'General' ? 'OPEN' : category;
+            if (Model === CcmtCutoff) {
+                query.category = { $regex: new RegExp(mappedCategory, 'i') };
+            } else {
+                query.seatType = { $regex: new RegExp(mappedCategory, 'i') };
+            }
+        }
+
+        // Quota match
+        if (quota && quota !== 'All') {
+            if (Model !== CcmtCutoff) {
+                query.quota = quota;
+            }
+        }
+
+        let results = await Model.find(query).limit(200).lean();
+
+        // Fallback matching logic in case exact regex misses (very common due to naming differences)
+        if (results.length === 0) {
+            const fallbackQuery = { round: { $regex: new RegExp('^' + round.trim() + '$', 'i') } };
+            // Category match in fallback
+            if (category && category !== 'All') {
+                const mappedCategory = category === 'General' ? 'OPEN' : category;
+                if (Model === CcmtCutoff) {
+                    fallbackQuery.category = { $regex: new RegExp(mappedCategory, 'i') };
+                } else {
+                    fallbackQuery.seatType = { $regex: new RegExp(mappedCategory, 'i') };
+                }
+            }
+            if (quota && quota !== 'All' && Model !== CcmtCutoff) {
+                fallbackQuery.quota = quota;
+            }
+            
+            const allRoundResults = await Model.find(fallbackQuery).lean();
+            results = allRoundResults.filter(doc => {
+                 const docNameClean = (doc.institute || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                 if (docNameClean && searchNameClean && (docNameClean.includes(searchNameClean) || searchNameClean.includes(docNameClean))) {
+                     return true;
+                 }
+                 
+                 const docTokens = getTokens(doc.institute);
+                 const matchCount = searchTokens.filter(t => docTokens.includes(t)).length;
+                 const requiredMatches = Math.min(2, Math.min(searchTokens.length, docTokens.length));
+                 
+                 return matchCount >= requiredMatches && matchCount > 0;
+            });
+        }
+
+        let finalResults = results;
+
+        // format to unified output
+        const formattedResults = finalResults.map(item => ({
+            course: item.program || 'N/A',
+            quota: item.quota || item.group || 'N/A',
+            category: item.seatType || item.category || 'N/A',
+            gender: item.gender || 'N/A',
+            openingRank: item.openingRank || item.maxGateScore || 'N/A',
+            closingRank: item.closingRank || item.minGateScore || 'N/A'
+        }));
+
+        res.json({ success: true, data: formattedResults });
+
+    } catch (error) {
+        console.error('Error inside getCollegeCutoffs:', error);
+        res.status(500).json({ success: false, message: 'Server Error' });
     }
 };

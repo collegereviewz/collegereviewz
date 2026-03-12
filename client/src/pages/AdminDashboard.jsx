@@ -13,7 +13,10 @@ import {
     Save,
     CheckCircle,
     XCircle,
-    Clock
+    Clock,
+    Briefcase,
+    Download,
+    PlusCircle
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -22,6 +25,21 @@ const AdminDashboard = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+
+    const [applications, setApplications] = useState([]);
+    const [appLoading, setAppLoading] = useState(false);
+    const [appError, setAppError] = useState('');
+
+    const [jobForm, setJobForm] = useState({
+        title: '',
+        department: '',
+        location: '',
+        type: 'Full-Time',
+        description: '',
+        requirements: ''
+    });
+    const [jobFormLoading, setJobFormLoading] = useState(false);
+    const [jobFormSuccess, setJobFormSuccess] = useState('');
 
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -38,8 +56,46 @@ const AdminDashboard = () => {
             navigate('/admin/login');
         } else {
             fetchUsers();
+            fetchApplications();
         }
     }, [adminToken]);
+
+    const fetchApplications = async () => {
+        setAppLoading(true);
+        try {
+            const response = await axios.get('http://localhost:5000/api/jobs/applications');
+            setApplications(response.data);
+        } catch (err) {
+            setAppError('Failed to fetch job applications.');
+        } finally {
+            setAppLoading(false);
+        }
+    };
+
+    const handleUpdateApplicationStatus = async (appId, newStatus) => {
+        try {
+            await axios.patch(`http://localhost:5000/api/jobs/applications/${appId}/status`, { status: newStatus });
+            setApplications(prev => prev.map(app => app._id === appId ? { ...app, status: newStatus } : app));
+        } catch (err) {
+            alert('Failed to update application status.');
+        }
+    };
+
+    const handleCreateJob = async (e) => {
+        e.preventDefault();
+        setJobFormLoading(true);
+        setJobFormSuccess('');
+        try {
+            const reqArray = jobForm.requirements.split(',').map(item => item.trim()).filter(Boolean);
+            await axios.post('http://localhost:5000/api/jobs/create', { ...jobForm, requirements: reqArray });
+            setJobFormSuccess('Job created successfully!');
+            setJobForm({ title: '', department: '', location: '', type: 'Full-Time', description: '', requirements: '' });
+        } catch (err) {
+            alert('Failed to create job posting.');
+        } finally {
+            setJobFormLoading(false);
+        }
+    };
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -137,6 +193,32 @@ const AdminDashboard = () => {
                         }}
                     >
                         <Users size={20} /> Users Management
+                    </div>
+                    <div
+                        onClick={() => setActiveTab('jobApplications')}
+                        style={{
+                            padding: '14px 16px', borderRadius: '12px', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px',
+                            background: activeTab === 'jobApplications' ? 'rgba(99,102,241,0.1)' : 'transparent',
+                            color: activeTab === 'jobApplications' ? '#818cf8' : '#94a3b8',
+                            transition: 'all 0.2s',
+                            fontWeight: activeTab === 'jobApplications' ? 600 : 500
+                        }}
+                    >
+                        <Briefcase size={20} /> Job Applications
+                    </div>
+                    <div
+                        onClick={() => setActiveTab('postJob')}
+                        style={{
+                            padding: '14px 16px', borderRadius: '12px', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px',
+                            background: activeTab === 'postJob' ? 'rgba(99,102,241,0.1)' : 'transparent',
+                            color: activeTab === 'postJob' ? '#818cf8' : '#94a3b8',
+                            transition: 'all 0.2s',
+                            fontWeight: activeTab === 'postJob' ? 600 : 500
+                        }}
+                    >
+                        <PlusCircle size={20} /> Post New Job
                     </div>
                     <div
                         onClick={() => setActiveTab('settings')}
@@ -286,6 +368,167 @@ const AdminDashboard = () => {
                                 </div>
                             )}
                         </motion.div>
+                    ) : activeTab === 'jobApplications' ? (
+                        <motion.div
+                            key="jobApplications"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                        >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                                <div>
+                                    <h2 style={{ fontSize: '28px', fontWeight: 700, color: '#1e293b', margin: 0 }}>Job Applications</h2>
+                                    <p style={{ color: '#64748b', marginTop: '4px' }}>Review applicant resumes and update their ATS status</p>
+                                </div>
+                            </div>
+
+                            {appLoading ? (
+                                <div style={{ textAlign: 'center', padding: '100px' }}>
+                                    <div style={{ width: '40px', height: '40px', border: '3px solid #e2e8f0', borderTopColor: '#6366f1', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto' }}></div>
+                                    <p style={{ color: '#64748b', marginTop: '16px' }}>Loading applications...</p>
+                                </div>
+                            ) : appError ? (
+                                <div style={{ background: '#fef2f2', border: '1px solid #fee2e2', padding: '24px', borderRadius: '16px', textAlign: 'center' }}>
+                                    <XCircle color="#ef4444" size={48} style={{ marginBottom: '16px' }} />
+                                    <p style={{ color: '#b91c1c', fontWeight: 600 }}>{appError}</p>
+                                </div>
+                            ) : (
+                                <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                                        <thead>
+                                            <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: 600, color: '#64748b' }}>APPLICANT</th>
+                                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: 600, color: '#64748b' }}>ROLE</th>
+                                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: 600, color: '#64748b' }}>RESUME</th>
+                                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: 600, color: '#64748b' }}>APPLIED ON</th>
+                                                <th style={{ padding: '16px 24px', fontSize: '14px', fontWeight: 600, color: '#64748b' }}>STATUS</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {applications.length > 0 ? applications.map((app, idx) => (
+                                                <tr key={app._id} style={{ borderBottom: idx === applications.length - 1 ? 'none' : '1px solid #f1f5f9' }}>
+                                                    <td style={{ padding: '16px 24px' }}>
+                                                        <div style={{ fontWeight: 600, color: '#1e293b' }}>{app.applicantName}</div>
+                                                        <div style={{ fontSize: '13px', color: '#64748b' }}>{app.email}</div>
+                                                        <div style={{ fontSize: '13px', color: '#64748b' }}>{app.phone}</div>
+                                                    </td>
+                                                    <td style={{ padding: '16px 24px' }}>
+                                                        <div style={{ fontWeight: 600, color: '#475569' }}>{app.jobId?.title || 'Unknown Role'}</div>
+                                                        <div style={{ fontSize: '12px', color: '#94a3b8' }}>{app.jobId?.department || ''}</div>
+                                                    </td>
+                                                    <td style={{ padding: '16px 24px' }}>
+                                                        <a href={`http://localhost:5000${app.resumeUrl}`} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#3b82f6', textDecoration: 'none', fontWeight: 600, fontSize: '13px' }}>
+                                                            <Download size={16} /> View Resume
+                                                        </a>
+                                                    </td>
+                                                    <td style={{ padding: '16px 24px', color: '#94a3b8', fontSize: '13px' }}>
+                                                        {new Date(app.createdAt).toLocaleDateString()}
+                                                    </td>
+                                                    <td style={{ padding: '16px 24px' }}>
+                                                        <select
+                                                            value={app.status}
+                                                            onChange={(e) => handleUpdateApplicationStatus(app._id, e.target.value)}
+                                                            style={{
+                                                                padding: '8px 12px',
+                                                                borderRadius: '8px',
+                                                                border: '1px solid #e2e8f0',
+                                                                outline: 'none',
+                                                                fontSize: '13px',
+                                                                fontWeight: 600,
+                                                                cursor: 'pointer',
+                                                                background: app.status === 'Pending' ? '#fffbeb' : app.status === 'Interview Scheduled' ? '#e0e7ff' : app.status === 'Hired' ? '#dcfce7' : app.status === 'Rejected' || app.status === 'Uninterested' ? '#fee2e2' : '#f1f5f9',
+                                                                color: app.status === 'Pending' ? '#b45309' : app.status === 'Interview Scheduled' ? '#4338ca' : app.status === 'Hired' ? '#15803d' : app.status === 'Rejected' || app.status === 'Uninterested' ? '#b91c1c' : '#475569'
+                                                            }}
+                                                        >
+                                                            <option value="Pending">Pending</option>
+                                                            <option value="Interested">Interested</option>
+                                                            <option value="Uninterested">Uninterested</option>
+                                                            <option value="Interview Scheduled">Interview Scheduled</option>
+                                                            <option value="Hired">Hired</option>
+                                                            <option value="Rejected">Rejected</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                            )) : (
+                                                <tr>
+                                                    <td colSpan="5" style={{ padding: '48px', textAlign: 'center', color: '#94a3b8' }}>No applications received yet.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </motion.div>
+                    ) : activeTab === 'postJob' ? (
+                        <motion.div
+                            key="postJob"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            style={{ maxWidth: '800px' }}
+                        >
+                            <h2 style={{ fontSize: '28px', fontWeight: 700, color: '#1e293b', marginBottom: '8px' }}>Create Job Posting</h2>
+                            <p style={{ color: '#64748b', marginBottom: '32px' }}>Add a new open role to the Careers page</p>
+
+                            <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', padding: '32px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                                {jobFormSuccess && (
+                                    <div style={{ 
+                                        background: '#dcfce7', color: '#15803d', padding: '16px', borderRadius: '12px', 
+                                        marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 
+                                    }}>
+                                        <CheckCircle size={20} /> {jobFormSuccess}
+                                    </div>
+                                )}
+                                <form onSubmit={handleCreateJob} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                        <div>
+                                            <label style={{ display: 'block', color: '#334155', fontWeight: 600, fontSize: '14px', marginBottom: '8px' }}>Job Title *</label>
+                                            <input required type="text" value={jobForm.title} onChange={e => setJobForm({...jobForm, title: e.target.value})} style={inputStyles} placeholder="e.g. Senior Product Manager" />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', color: '#334155', fontWeight: 600, fontSize: '14px', marginBottom: '8px' }}>Department *</label>
+                                            <input required type="text" value={jobForm.department} onChange={e => setJobForm({...jobForm, department: e.target.value})} style={inputStyles} placeholder="e.g. Product" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                        <div>
+                                            <label style={{ display: 'block', color: '#334155', fontWeight: 600, fontSize: '14px', marginBottom: '8px' }}>Location *</label>
+                                            <input required type="text" value={jobForm.location} onChange={e => setJobForm({...jobForm, location: e.target.value})} style={inputStyles} placeholder="e.g. Remote, San Francisco" />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', color: '#334155', fontWeight: 600, fontSize: '14px', marginBottom: '8px' }}>Job Type *</label>
+                                            <select required value={jobForm.type} onChange={e => setJobForm({...jobForm, type: e.target.value})} style={inputStyles}>
+                                                <option value="Full-Time">Full-Time</option>
+                                                <option value="Part-Time">Part-Time</option>
+                                                <option value="Contract">Contract</option>
+                                                <option value="Internship">Internship</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label style={{ display: 'block', color: '#334155', fontWeight: 600, fontSize: '14px', marginBottom: '8px' }}>Description *</label>
+                                        <textarea required rows={4} value={jobForm.description} onChange={e => setJobForm({...jobForm, description: e.target.value})} style={{...inputStyles, resize: 'vertical'}} placeholder="Describe the role and responsibilities..." />
+                                    </div>
+
+                                    <div>
+                                        <label style={{ display: 'block', color: '#334155', fontWeight: 600, fontSize: '14px', marginBottom: '8px' }}>Requirements (Comma Separated) *</label>
+                                        <textarea required rows={3} value={jobForm.requirements} onChange={e => setJobForm({...jobForm, requirements: e.target.value})} style={{...inputStyles, resize: 'vertical'}} placeholder="e.g. 5+ years React experience, Strong UX portfolio, Excellent communication..." />
+                                    </div>
+
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
+                                        <button disabled={jobFormLoading} type="submit" style={{
+                                            background: '#3b82f6', color: 'white', padding: '12px 32px', borderRadius: '12px',
+                                            fontWeight: 600, fontSize: '15px', border: 'none', cursor: jobFormLoading ? 'not-allowed' : 'pointer',
+                                            opacity: jobFormLoading ? 0.7 : 1, transition: 'all 0.2s'
+                                        }}>
+                                            {jobFormLoading ? 'Creating...' : 'Publish Job Posting'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </motion.div>
                     ) : (
                         <motion.div
                             key="settings"
@@ -375,6 +618,16 @@ const AdminDashboard = () => {
             `}</style>
         </div>
     );
+};
+
+const inputStyles = {
+    width: '100%',
+    padding: '12px 16px',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+    fontSize: '15px',
+    outline: 'none',
+    boxSizing: 'border-box'
 };
 
 export default AdminDashboard;

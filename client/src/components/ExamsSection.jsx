@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { 
+import {
   BookOpen, ChevronLeft, ChevronRight, FileText, BarChart3, Clock,
   GraduationCap, Users, Settings, Scale, FlaskConical, Landmark,
   Stethoscope, Palette, Code, Search, MessageSquare, TrendingUp, Briefcase
@@ -113,16 +113,16 @@ const ExamsSection = ({ showHeader = true }) => {
   return (
     <section style={{ padding: '30px 0 80px', background: '#fff', position: 'relative' }}>
       <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 32px' }}>
-        
+
         {/* Header Section */}
         {showHeader && (
           <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-             <h1 style={{ fontSize: '48px', fontWeight: 950, color: '#1e293b', marginBottom: '16px', letterSpacing: '-1.5px' }}>
-               Entrance Exams — <span style={{ background: 'linear-gradient(135deg, #5b51d8, #38bdf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>In India</span>
-             </h1>
-             <p style={{ fontSize: '18px', color: '#64748b', fontWeight: 600, maxWidth: '800px', margin: '0 auto', lineHeight: '1.5' }}>
-               Entrance exams in India determine eligibility for admission to higher education institutions.
-             </p>
+            <h1 style={{ fontSize: '48px', fontWeight: 950, color: '#1e293b', marginBottom: '16px', letterSpacing: '-1.5px' }}>
+              Entrance Exams — <span style={{ background: 'linear-gradient(135deg, #5b51d8, #38bdf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>In India</span>
+            </h1>
+            <p style={{ fontSize: '18px', color: '#64748b', fontWeight: 600, maxWidth: '800px', margin: '0 auto', lineHeight: '1.5' }}>
+              Entrance exams in India determine eligibility for admission to higher education institutions.
+            </p>
           </div>
         )}
 
@@ -130,49 +130,49 @@ const ExamsSection = ({ showHeader = true }) => {
         <div style={{ position: 'relative', marginBottom: '60px', maxWidth: '1350px', margin: '0 auto 60px' }}>
           {/* Left Scroll Button */}
           {canScrollLeft && (
-          <button 
-            onClick={() => {
-              const el = tabsRef.current;
-              el.scrollBy({ left: -200, behavior: 'smooth' });
-              setTimeout(checkScroll, 350);
-            }}
-            style={{
-              position: 'absolute', left: '-20px', top: '50%', transform: 'translateY(-50%)',
-              width: '40px', height: '40px', borderRadius: '50%', background: '#fff',
-              border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', color: '#5b51d8'
-            }}
-          >
-            <ChevronLeft size={20} />
-          </button>
+            <button
+              onClick={() => {
+                const el = tabsRef.current;
+                el.scrollBy({ left: -200, behavior: 'smooth' });
+                setTimeout(checkScroll, 350);
+              }}
+              style={{
+                position: 'absolute', left: '-20px', top: '50%', transform: 'translateY(-50%)',
+                width: '40px', height: '40px', borderRadius: '50%', background: '#fff',
+                border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', color: '#5b51d8'
+              }}
+            >
+              <ChevronLeft size={20} />
+            </button>
           )}
 
           {/* Right Scroll Button */}
           {canScrollRight && (
-          <button 
-            onClick={() => {
-              const el = tabsRef.current;
-              el.scrollBy({ left: 200, behavior: 'smooth' });
-              setTimeout(checkScroll, 350);
-            }}
-            style={{
-              position: 'absolute', right: '-20px', top: '50%', transform: 'translateY(-50%)',
-              width: '40px', height: '40px', borderRadius: '50%', background: '#fff',
-              border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', color: '#5b51d8'
-            }}
-          >
-            <ChevronRight size={20} />
-          </button>
+            <button
+              onClick={() => {
+                const el = tabsRef.current;
+                el.scrollBy({ left: 200, behavior: 'smooth' });
+                setTimeout(checkScroll, 350);
+              }}
+              style={{
+                position: 'absolute', right: '-20px', top: '50%', transform: 'translateY(-50%)',
+                width: '40px', height: '40px', borderRadius: '50%', background: '#fff',
+                border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', color: '#5b51d8'
+              }}
+            >
+              <ChevronRight size={20} />
+            </button>
           )}
 
-          <div 
+          <div
             ref={tabsRef}
             id="exam-tabs-scroll"
-            style={{ 
-              display: 'flex', gap: '12px', overflowX: 'auto', padding: '10px 40px', 
+            style={{
+              display: 'flex', gap: '12px', overflowX: 'auto', padding: '10px 40px',
               scrollbarWidth: 'none', position: 'relative', scrollSnapType: 'x mandatory'
-            }} 
+            }}
             className="no-scrollbar"
           >
             {['MBBS', 'BE/B.Tech', 'BBA', 'BCA', 'B.Sc (Nursing)', 'Arts', 'Law', 'Science', 'Commerce', 'Pharmacy', 'ME/M.Tech'].map(tab => (
@@ -209,10 +209,10 @@ const ExamsSection = ({ showHeader = true }) => {
         </div>
 
         {/* Exams Grid */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
-          gap: '24px' 
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: '24px'
         }}>
           <AnimatePresence mode="popLayout">
             {filteredExams.map((exam) => (
@@ -230,15 +230,15 @@ const ExamsSection = ({ showHeader = true }) => {
                 }}
               >
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'start' }}>
-                  <div style={{ 
-                    width: '64px', height: '64px', borderRadius: '12px', 
+                  <div style={{
+                    width: '64px', height: '64px', borderRadius: '12px',
                     background: '#f8fafc', border: '1px solid #f1f5f9',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     overflow: 'hidden', padding: '10px', flexShrink: 0
                   }}>
-                    <img 
-                      src={exam.logo} 
-                      alt={exam.name} 
+                    <img
+                      src={exam.logo}
+                      alt={exam.name}
                       style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                       onError={(e) => { e.currentTarget.src = 'https://raw.githubusercontent.com/Anish-CRZ/Assets/main/placeholder-exam.png'; }}
                     />
@@ -252,22 +252,22 @@ const ExamsSection = ({ showHeader = true }) => {
                 <div style={{ padding: '0 4px' }}>
                   <div style={{ display: 'grid', gap: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
-                        <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Exam Date</span>
-                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{exam.examDate}</span>
+                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Exam Date</span>
+                      <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{exam.examDate}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
-                        <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Application Form</span>
-                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{exam.appDate}</span>
+                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Application Form</span>
+                      <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{exam.appDate}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Result Announce</span>
-                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{exam.resultDate}</span>
+                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Result Announce</span>
+                      <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{exam.resultDate}</span>
                     </div>
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', gap: '12px', marginTop: 'auto' }}>
-                  <button style={{ 
+                  <button style={{
                     flex: 1, padding: '12px 0', borderRadius: '50px', border: 'none',
                     background: 'linear-gradient(135deg, #5b51d8, #38bdf8)', color: '#fff',
                     fontSize: '14px', fontWeight: 800, cursor: 'pointer', transition: 'all 0.3s ease',
@@ -275,7 +275,7 @@ const ExamsSection = ({ showHeader = true }) => {
                   }}>
                     Read More
                   </button>
-                  <button style={{ 
+                  <button style={{
                     flex: 1, padding: '12px 0', borderRadius: '50px', border: '1.5px solid #5b51d8',
                     background: 'transparent', color: '#5b51d8',
                     fontSize: '14px', fontWeight: 800, cursor: 'pointer', transition: 'all 0.3s ease'

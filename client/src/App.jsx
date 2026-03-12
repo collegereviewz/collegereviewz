@@ -10,8 +10,14 @@ import ExploreColleges from './pages/ExploreColleges/ExploreColleges'
 import Exams from './pages/Exams'
 import Scholarship from './pages/Scholarship'
 import StudyAbroad from './pages/StudyAbroad'
+import StudyAbroadCountries from './pages/StudyAbroadCountries'
+import StudyAbroadCountryDetail from './pages/StudyAbroadCountryDetail'
+import StudyAbroadProgramExplorer from './pages/StudyAbroadProgramExplorer'
+import StudyAbroadAllCourses from './pages/StudyAbroadAllCourses'
+import StudyAbroadExamDetail from './pages/StudyAbroadExamDetail'
 import Contact from './pages/Contact'
-import Resources from './pages/Resources'
+import Ecosystem from './pages/Ecosystem'
+import Careers from './pages/Careers'
 import WriteReview from './pages/WriteAReview'
 import Support from './pages/Support'
 import LoginPage from './pages/LoginPage'
@@ -59,7 +65,7 @@ function AppContent() {
       setAuthModal({ isOpen: true, mode: e.detail || 'login' });
     };
     window.addEventListener('open-auth-modal', handleOpenAuth);
-    
+
     // Catch legacy routes and trigger modal
     if (location.pathname.toLowerCase() === '/login/') {
       setAuthModal({ isOpen: true, mode: 'login' });
@@ -81,7 +87,8 @@ function AppContent() {
     if (location.pathname.startsWith('/Scholarship')) return 'Scholarship';
     if (location.pathname.startsWith('/StudyAbroad')) return 'Study Abroad';
     if (location.pathname.startsWith('/Contact')) return 'Contact Us';
-    if (location.pathname.startsWith('/Resources')) return 'Resources';
+    if (location.pathname.startsWith('/Ecosystem')) return 'Ecosystem';
+    if (location.pathname.startsWith('/Careers')) return 'Careers';
     return 'Home';
   };
 
@@ -97,10 +104,10 @@ function AppContent() {
         {loading && <Preloader />}
       </AnimatePresence>
 
-      <AuthModal 
-        isOpen={authModal.isOpen} 
-        onClose={() => setAuthModal({ ...authModal, isOpen: false })} 
-        initialMode={authModal.mode} 
+      <AuthModal
+        isOpen={authModal.isOpen}
+        onClose={() => setAuthModal({ ...authModal, isOpen: false })}
+        initialMode={authModal.mode}
       />
 
       <div style={{
@@ -128,8 +135,14 @@ function AppContent() {
                 <Route path="/Exams/" element={<Exams />} />
                 <Route path="/Scholarship/" element={<Scholarship />} />
                 <Route path="/StudyAbroad/" element={<StudyAbroad />} />
+                <Route path="/StudyAbroad/Countries" element={<StudyAbroadCountries />} />
+                <Route path="/StudyAbroad/Countries/:countryId" element={<StudyAbroadCountryDetail />} />
+                <Route path="/StudyAbroad/Programs/:courseId" element={<StudyAbroadProgramExplorer />} />
+                <Route path="/StudyAbroad/Courses" element={<StudyAbroadAllCourses />} />
+                <Route path="/StudyAbroad/Exams/:examId" element={<StudyAbroadExamDetail />} />
                 <Route path="/Contact/" element={<Contact />} />
-                <Route path="/Resources/" element={<Resources />} />
+                <Route path="/Ecosystem/" element={<Ecosystem />} />
+                <Route path="/Careers/" element={<Careers />} />
                 <Route path="/WriteReview/" element={<WriteReview />} />
                 <Route path="/Support/" element={<Support />} />
                 <Route path="/Profile/" element={<ProfilePage />} />

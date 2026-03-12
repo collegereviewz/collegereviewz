@@ -1,0 +1,19 @@
+{
+  "ccmt_nationalspotround1.csv": "Sr.No,Round ,Institute ,PG Program ,Group ,Category ,Max GATE Score ,Min GATE Score",
+  "ccmt_round1.csv": "Sr.No,Round ,Institute ,PG Program ,Group ,Category ,Max GATE Score ,Min GATE Score",
+  "ccmt_round2.csv": "Sr.No,Round ,Institute ,PG Program ,Group ,Category ,Max GATE Score ,Min GATE Score",
+  "ccmt_round3.csv": "Sr.No,Round ,Institute ,PG Program ,Group ,Category ,Max GATE Score ,Min GATE Score",
+  "ccmt_specialround1.csv": "Sr.No,Round ,Institute ,PG Program ,Group ,Category ,Max GATE Score ,Min GATE Score",
+  "ccmt_specialround2.csv": "Sr.No,Round ,Institute ,PG Program ,Group ,Category ,Max GATE Score ,Min GATE Score",
+  "csab_round1.csv": "Institute,Academic Program Name,Quota,Seat Type,Gender,Opening Rank,Closing Rank",
+  "csab_round2.csv": "Institute,Academic Program Name,Quota,Seat Type,Gender,Opening Rank,Closing Rank",
+  "csab_round3.csv": "Institute,Academic Program Name,Quota,Seat Type,Gender,Opening Rank,Closing Rank",
+  "josaa_round1.csv": ",,Institute,Academic Program Name,Quota,Seat Type,Gender,Opening Rank,Closing Rank",
+  "josaa_round2.csv": "Institute,Academic Program Name,Quota,Seat Type,Gender,Opening Rank,Closing Rank",
+  "josaa_round3.csv": "Institute,Academic Program Name,Quota,Seat Type,Gender,Opening Rank,Closing Rank",
+  "josaa_round4.csv": "Institute,Academic Program Name,Quota,Seat Type,Gender,Opening Rank,Closing Rank",
+  "josaa_round5.csv": ",,,,,Institute,Academic Program Name,Quota,Seat Type,Gender,Opening Rank,Closing Rank",
+  "josaa_round6.csv": "Institute,Academic Program Name,Quota,Seat Type,Gender,Opening Rank,Closing Rank",
+  "wbjee_round1.csv": "Sr.No,Round ,Institute ,Program ,Stream ,Seat Type ,Quota ,Category ,Opening Rank,Closing Rank",
+  "wbjee_round2.csv": "Sr.No,Round ,Institute ,Program ,Stream ,Seat Type ,Quota ,Category ,Opening Rank ,Closing Rank"
+}

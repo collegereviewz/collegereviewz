@@ -20,6 +20,7 @@ import voiceRoutes from './route/voice.route.js';
 import scholarshipRoutes from './route/scholarship.route.js';
 import adminRoutes from './route/admin.route.js';
 import newsRoutes from './routes/news.route.js';
+import jobRoutes from './route/job.route.js';
 
 
 //Security
@@ -52,6 +53,9 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 // Routes
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/auth', authRoutes);
@@ -62,6 +66,10 @@ console.log('✅ Voice Routes mounted at /api/voice');
 app.use('/api/news', newsRoutes);
 app.use('/api/scholarships', scholarshipRoutes);
 app.use('/api/admin', adminRoutes);
+import studyAbroadRoutes from './route/studyAbroad.route.js';
+app.use('/api/study-abroad', studyAbroadRoutes);
+
+app.use('/api/jobs', jobRoutes);
 
 // MongoDB Connection and Server Start
 const startServer = async () => {

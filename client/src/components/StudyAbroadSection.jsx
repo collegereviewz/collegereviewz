@@ -7,12 +7,14 @@ import {
   ChevronRight, Laptop, MessageCircle,
   Cpu, TrendingUp, Bot, Heart, Palette, Scale, Languages, ClipboardList
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import counselorImg from '../assets/StudyAbroad/study_abroad.png';
 import canadaImg from '../assets/StudyAbroad/Canada.png';
 import ukImg from '../assets/StudyAbroad/uk.png';
 import usImg from '../assets/StudyAbroad/us.png';
 
 const StudyAbroadSection = () => {
+  const navigate = useNavigate();
   const containerStyle = {
     maxWidth: '1280px',
     margin: '0 auto',
@@ -20,9 +22,9 @@ const StudyAbroadSection = () => {
   };
 
   const countries = [
-    { name: 'Canada', flag: canadaImg, intake: 'Fall / Winter', colleges: '2,023', tuition: '₹8.1L - ₹21.2L/year' },
-    { name: 'United Kingdom', flag: ukImg, intake: 'September / January', colleges: '178', tuition: '₹10.4L - ₹31.2L/year' },
-    { name: 'United States', flag: usImg, intake: 'Fall / Spring', colleges: '1,018', tuition: '₹18.6L - ₹41.8L/year' }
+    { id: 'canada', name: 'Canada', flag: canadaImg, intake: 'Fall / Winter', colleges: '2,023', tuition: '₹8.1L - ₹21.2L/year' },
+    { id: 'uk', name: 'United Kingdom', flag: ukImg, intake: 'September / January', colleges: '178', tuition: '₹10.4L - ₹31.2L/year' },
+    { id: 'usa', name: 'United States', flag: usImg, intake: 'Fall / Spring', colleges: '1,018', tuition: '₹18.6L - ₹41.8L/year' }
   ];
 
   const features = [
@@ -33,21 +35,21 @@ const StudyAbroadSection = () => {
   ];
 
   const courses = [
-    { title: 'Engineering & Technology', duration: '2-4 years', desc: 'Specializations in Computer Science, Mechanical, Civil, Electrical, and Aerospace Engineering with hands-on research opportunities.', tags: ['USA', 'Germany', 'Canada'], icon: Cpu },
-    { title: 'Business & Management (MBA)', duration: '1-2 years', desc: 'Finance, Marketing, Entrepreneurship, and International Business programs at top global business schools.', tags: ['USA', 'UK', 'Canada', 'Australia'], icon: TrendingUp },
-    { title: 'Data Science & AI', duration: '1-2 years', desc: 'Machine Learning, Artificial Intelligence, Big Data Analytics, and Business Intelligence programs.', tags: ['USA', 'UK', 'Canada', 'Germany'], icon: Bot },
-    { title: 'Medicine & Healthcare', duration: '4-6 years', desc: 'MBBS, Nursing, Dentistry, Pharmacy, Public Health, and Biomedical Science programs.', tags: ['UK', 'USA', 'Australia', 'Germany'], icon: Heart },
-    { title: 'Arts & Humanities', duration: '3-4 years', desc: 'Literature, History, Philosophy, Fine Arts, Design, and Cultural Studies programs.', tags: ['UK', 'USA', 'Canada', 'Australia'], icon: Palette },
-    { title: 'Law & Legal Studies', duration: '3-4 years', desc: 'LLB, LLM, International Law, Corporate Law, and Human Rights programs at prestigious law schools.', tags: ['UK', 'USA', 'Australia', 'Canada'], icon: Scale }
+    { id: 'engineering', title: 'Engineering & Technology', duration: '2-4 years', desc: 'Specializations in Computer Science, Mechanical, Civil, Electrical, and Aerospace Engineering with hands-on research opportunities.', tags: ['USA', 'Germany', 'Canada'], icon: Cpu },
+    { id: 'business', title: 'Business & Management (MBA)', duration: '1-2 years', desc: 'Finance, Marketing, Entrepreneurship, and International Business programs at top global business schools.', tags: ['USA', 'UK', 'Canada', 'Australia'], icon: TrendingUp },
+    { id: 'data-science', title: 'Data Science & AI', duration: '1-2 years', desc: 'Machine Learning, Artificial Intelligence, Big Data Analytics, and Business Intelligence programs.', tags: ['USA', 'UK', 'Canada', 'Germany'], icon: Bot },
+    { id: 'medicine', title: 'Medicine & Healthcare', duration: '4-6 years', desc: 'MBBS, Nursing, Dentistry, Pharmacy, Public Health, and Biomedical Science programs.', tags: ['UK', 'USA', 'Australia', 'Germany'], icon: Heart },
+    { id: 'arts', title: 'Arts & Humanities', duration: '3-4 years', desc: 'Literature, History, Philosophy, Fine Arts, Design, and Cultural Studies programs.', tags: ['UK', 'USA', 'Canada', 'Australia'], icon: Palette },
+    { id: 'law', title: 'Law & Legal Studies', duration: '3-4 years', desc: 'LLB, LLM, International Law, Corporate Law, and Human Rights programs at prestigious law schools.', tags: ['UK', 'USA', 'Australia', 'Canada'], icon: Scale }
   ];
 
   const exams = [
-    { name: 'IELTS', type: 'English Language Proficiency', desc: 'Accepted in UK, USA, Canada, Australia, New Zealand and 140+ countries.', icon: Languages },
-    { name: 'TOEFL', type: 'English Language Proficiency', desc: 'Accepted in USA, Canada, Australia, UK and 150+ countries worldwide.', icon: ClipboardList },
-    { name: 'GRE', type: 'Graduate Record Examination', desc: 'Required for MS programs in USA, Canada, and other countries.', icon: BookOpen },
-    { name: 'GMAT', type: 'Graduate Management Admission Test', desc: 'Required for MBA programs globally, especially in USA and Europe.', icon: Briefcase },
-    { name: 'SAT', type: 'Scholastic Assessment Test', desc: 'Required for undergraduate programs in USA and some other countries.', icon: GraduationCap },
-    { name: 'Duolingo', type: 'English Test', desc: 'Accepted by 3000+ institutions worldwide, online proctored test.', icon: Globe }
+    { id: 'ielts',    name: 'IELTS',     type: 'English Language Proficiency',      desc: 'Accepted in UK, USA, Canada, Australia, New Zealand and 140+ countries.',      icon: Languages },
+    { id: 'toefl',   name: 'TOEFL',     type: 'English Language Proficiency',      desc: 'Accepted in USA, Canada, Australia, UK and 150+ countries worldwide.',         icon: ClipboardList },
+    { id: 'gre',     name: 'GRE',       type: 'Graduate Record Examination',       desc: 'Required for MS programs in USA, Canada, and other countries.',                icon: BookOpen },
+    { id: 'gmat',    name: 'GMAT',      type: 'Graduate Management Admission Test',desc: 'Required for MBA programs globally, especially in USA and Europe.',            icon: Briefcase },
+    { id: 'sat',     name: 'SAT',       type: 'Scholastic Assessment Test',        desc: 'Required for undergraduate programs in USA and some other countries.',          icon: GraduationCap },
+    { id: 'duolingo',name: 'Duolingo',  type: 'English Test',                      desc: 'Accepted by 3000+ institutions worldwide, online proctored test.',             icon: Globe }
   ];
 
   const steps = [
@@ -79,19 +81,14 @@ const StudyAbroadSection = () => {
                 Courses, countries, scholarships & expert guidance for Indian students.
              </p>
              <div style={{ display: 'flex', gap: '20px' }}>
-                <button style={{ 
+                <button 
+                  onClick={() => navigate('/StudyAbroad/Countries')}
+                  style={{ 
                   background: 'linear-gradient(135deg, #5b51d8, #38bdf8)', color: '#fff', 
                   padding: '16px 32px', borderRadius: '12px', border: 'none', fontWeight: 800, 
                   fontSize: '16px', cursor: 'pointer', boxShadow: '0 10px 20px rgba(91, 81, 216, 0.2)' 
                 }}>
                   Explore Countries
-                </button>
-                <button style={{ 
-                  background: 'transparent', color: '#5b51d8', 
-                  padding: '16px 32px', borderRadius: '12px', border: '2px solid #5b51d8', 
-                  fontWeight: 800, fontSize: '16px', cursor: 'pointer'
-                }}>
-                  Get Counselling
                 </button>
              </div>
           </motion.div>
@@ -145,7 +142,9 @@ const StudyAbroadSection = () => {
                       <p>No. Of Colleges: <span style={{ color: '#1e293b' }}>{c.colleges}</span></p>
                       <p>Avg. Tuition: <span style={{ color: '#1e293b' }}>{c.tuition}</span></p>
                    </div>
-                   <button style={{ 
+                   <button 
+                     onClick={() => navigate(`/StudyAbroad/Countries/${c.id}`)}
+                     style={{ 
                      width: '100%', padding: '12px', borderRadius: '10px', 
                      border: '1.5px solid #5b51d8', background: 'transparent', 
                      color: '#5b51d8', fontWeight: 800, fontSize: '14px', cursor: 'pointer' 
@@ -157,7 +156,9 @@ const StudyAbroadSection = () => {
           </div>
           
           <div style={{ textAlign: 'center', marginTop: '48px' }}>
-             <button style={{ 
+             <button 
+               onClick={() => navigate('/StudyAbroad/Countries')}
+               style={{ 
                background: 'linear-gradient(135deg, #5b51d8, #38bdf8)', color: '#fff', 
                padding: '12px 32px', borderRadius: '100px', border: 'none', fontWeight: 800, 
                fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', margin: '0 auto' 
@@ -237,19 +238,23 @@ const StudyAbroadSection = () => {
                       ))}
                    </div>
                    
-                   <button style={{ 
-                     display: 'flex', alignItems: 'center', gap: '8px', 
-                     color: '#5b51d8', fontWeight: 900, fontSize: '13px', 
-                     border: 'none', background: 'transparent', cursor: 'pointer' 
-                   }}>
-                     Explore Programs <ChevronRight size={16} />
-                   </button>
+                   <button 
+                     onClick={() => navigate(`/StudyAbroad/Programs/${c.id}`)}
+                     style={{ 
+                      display: 'flex', alignItems: 'center', gap: '8px', 
+                      color: '#5b51d8', fontWeight: 900, fontSize: '13px', 
+                      border: 'none', background: 'transparent', cursor: 'pointer' 
+                    }}>
+                      Explore Programs <ChevronRight size={16} />
+                    </button>
                 </motion.div>
              ))}
           </div>
           
           <div style={{ textAlign: 'center', marginTop: '48px' }}>
-             <button style={{ 
+             <button 
+               onClick={() => navigate('/StudyAbroad/Courses')}
+               style={{ 
                background: 'linear-gradient(135deg, #5b51d8, #38bdf8)', color: '#fff', 
                padding: '12px 32px', borderRadius: '100px', border: 'none', fontWeight: 800, 
                fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', margin: '0 auto' 
@@ -287,7 +292,7 @@ const StudyAbroadSection = () => {
                       <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '4px' }}>{e.name}</h3>
                       <p style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 800, marginBottom: '12px' }}>{e.type}</p>
                       <p style={{ fontSize: '13px', color: '#64748b', lineHeight: 1.5, fontWeight: 500, marginBottom: '16px' }}>{e.desc}</p>
-                      <button style={{ color: '#5b51d8', fontWeight: 900, fontSize: '12px', border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <button onClick={() => navigate('/StudyAbroad/Exams/' + e.id)} style={{ color: '#5b51d8', fontWeight: 900, fontSize: '12px', border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                         Know More <ArrowRight size={14} />
                       </button>
                    </div>

@@ -220,7 +220,8 @@ const ExploreColleges = () => {
                 reviewsCount: col.reviewsCount || 0,
                 courses: col.courses || [],
                 establishedYear: col.establishedYear || "—",
-                managementType: col.managementType || "Private"
+                managementType: col.managementType || "Private",
+                officialWebsite: col.officialWebsite || ""
               };
             });
             setDisplayedColleges(mapped);

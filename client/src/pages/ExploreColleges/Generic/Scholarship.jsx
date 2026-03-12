@@ -1,81 +1,264 @@
 import React from 'react';
-import { Gift, CheckCircle2, Info, GraduationCap } from 'lucide-react';
+import { Gift, CheckCircle2, Info, GraduationCap, TrendingUp, Filter, ChevronDown, Sparkles, BookOpen, Clock, ExternalLink, AlertTriangle, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const Scholarship = ({ collegeData }) => {
-    const name = collegeData?.name || 'College';
-    const scholarships = collegeData?.scholarships || 'Information about various government and institutional scholarship schemes is being updated. Historically, students have access to state-level merit-cum-means financial aid.';
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    
+    const summaryStats = [
+        { label: 'Total Scholarships Tracked', value: '45+' },
+        { label: 'Total Aid Available', value: '15+ Cr (Illustrative)' },
+        { label: 'Active Applications', value: '12' }
+    ];
 
-    const cardStyle = {
-        background: '#fff',
-        borderRadius: '20px',
-        padding: '28px',
-        border: '1px solid #e2e8f0',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '24px'
-    };
+    const mainScholarships = [
+        {
+            name: 'SVMCM Scholarship',
+            icon: <CheckCircle2 size={24} />,
+            bg: 'linear-gradient(135deg, #065f46 0%, #064e3b 100%)',
+            chart: (
+                <svg width="40" height="40" viewBox="0 0 40 40">
+                    <circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="4" />
+                    <circle cx="20" cy="20" r="16" fill="none" stroke="#34d399" strokeWidth="4" strokeDasharray="100" strokeDashoffset="25" strokeLinecap="round" transform="rotate(-90 20 20)" />
+                    <path d="M14 20 L18 24 L26 16" fill="none" stroke="white" strokeWidth="2.5" />
+                </svg>
+            ),
+            miniChart: (
+                <svg width="40" height="20" viewBox="0 0 40 20" style={{ opacity: 0.4 }}>
+                    <path d="M0 15 L8 10 L16 12 L24 5 L32 8 L40 2" fill="none" stroke="white" strokeWidth="2" />
+                </svg>
+            ),
+            details: [
+                { label: 'Eligibility', value: 'Meritorious Students (EWS, Income < ₹2.5 Lakhs)' },
+                { label: 'Application Deadline', value: 'Dec 15th (LIVE)', highlight: true },
+                { label: 'Next Step', value: 'Check Application Status (Action Button)', link: true },
+                { label: 'View Full Eligibility', value: '(Link)', smallLink: true }
+            ]
+        },
+        {
+            name: 'Kanyashree (K3)',
+            icon: <GraduationCap size={24} />,
+            bg: 'linear-gradient(135deg, #1e3a8a 0%, #172554 100%)',
+            chart: (
+                <div style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img 
+                      src="https://img.icons8.com/color/48/graduation-cap.png" 
+                      alt="cap" 
+                      style={{ width: '32px', height: '32px' }} 
+                    />
+                </div>
+            ),
+            miniChart: (
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', opacity: 0.4 }}>
+                    {[8, 12, 6, 15, 10].map((h, i) => <div key={i} style={{ width: '3px', height: `${h}px`, background: 'white' }} />)}
+                </div>
+            ),
+            details: [
+                { label: 'Criteria', value: 'Post-graduate female students (M.Tech/MCA), Govt ...' },
+                { label: 'Grant Amount', value: 'Max ₹2 Lakhs p.a. (Illustrative)' },
+                { label: 'Required Docs', value: '(Expandable link)', link: true, expandable: true },
+                { label: 'Apply Now via Official Portal', value: '(Action Button)', link: true }
+            ]
+        }
+    ];
+
+    const institutionalSchemes = [
+        { name: 'Adesh University Institutional Scholarship (Merit-based)', tags: ['Merit', 'Merit'] },
+        { name: 'DRDO Fellowship for Tech (New)', tags: ['Merit', 'Tech'], isNew: true }
+    ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            {/* Main Info */}
-            <div style={cardStyle}>
-                <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <Gift size={24} color="#5b51d8" />
-                    Scholarships & Financial Aid
-                </h3>
-                <div style={{ 
-                    background: '#f8fafc', 
-                    padding: '24px', 
-                    borderRadius: '16px', 
-                    border: '1px solid #f1f5f9',
-                    lineHeight: '1.8',
-                    color: '#475569',
-                    fontSize: '14px',
-                    whiteSpace: 'pre-wrap'
-                }}>
-                    {scholarships}
-                </div>
-            </div>
-
-            {/* Common Schemes */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
-                <div style={{ ...cardStyle, background: '#f0fdf4', borderColor: '#dcfce7' }}>
-                    <div style={{ display: 'flex', gap: '16px' }}>
-                        <div style={{ padding: '12px', background: '#fff', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-                            <CheckCircle2 color="#10b981" />
-                        </div>
-                        <div>
-                            <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#166534', marginBottom: '4px' }}>SVMCM Scholarship</h4>
-                            <p style={{ fontSize: '12px', color: '#15803d', lineHeight: 1.5 }}>Available for meritorious students from economically weaker sections with annual family income less than ₹2.5 Lakhs.</p>
-                        </div>
-                    </div>
-                </div>
-                <div style={{ ...cardStyle, background: '#eff6ff', borderColor: '#dbeafe' }}>
-                    <div style={{ display: 'flex', gap: '16px' }}>
-                        <div style={{ padding: '12px', background: '#fff', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-                            <GraduationCap color="#3b82f6" />
-                        </div>
-                        <div>
-                            <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#1e40af', marginBottom: '4px' }}>Kanyashree (K3)</h4>
-                            <p style={{ fontSize: '12px', color: '#1e3a8a', lineHeight: 1.5 }}>Specifically for female students pursuing post-graduate studies (M.Tech/MCA) under various govt schemes.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Note */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Top Summary Bar */}
             <div style={{ 
-                display: 'flex', 
-                gap: '12px', 
-                padding: '16px', 
-                background: '#fef2f2', 
-                borderRadius: '12px',
-                border: '1px solid #fee2e2'
+                background: '#fff', 
+                border: '1px solid #e2e8f0', 
+                borderRadius: '16px', 
+                padding: '16px 32px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)'
             }}>
-                <Info size={20} color="#ef4444" style={{ flexShrink: 0 }} />
-                <p style={{ fontSize: '13px', color: '#b91c1c', lineHeight: '1.5', margin: 0 }}>
-                    Students are strongly advised to check the official state portal and consult the college administration office for current deadlines and specific eligibility criteria for each session.
-                </p>
+                {summaryStats.map((stat, i) => (
+                    <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#64748b' }}>{stat.label}:</span>
+                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{stat.value}</span>
+                        {i < summaryStats.length - 1 && <div style={{ width: '1px', height: '20px', background: '#e2e8f0', marginLeft: '32px' }} />}
+                    </div>
+                ))}
+            </div>
+
+            {/* Main Section Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#1e293b' }}>Active Scholarship & Aid Finder</h2>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                    <div style={{ 
+                        background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', 
+                        padding: '6px 12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b'
+                    }}>
+                        Filter by <ChevronDown size={14} />
+                    </div>
+                    <div style={{ 
+                        background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', 
+                        padding: '6px 12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '8px', color: '#1e293b', fontWeight: 600
+                    }}>
+                        All items <ChevronDown size={14} />
+                    </div>
+                </div>
+            </div>
+
+            {/* Cards and Sidebar Layout */}
+            <div style={{ display: 'flex', gap: '24px' }}>
+                {/* Left Column: Scholarship Cards */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+                        {mainScholarships.map((s, idx) => (
+                            <motion.div 
+                                key={idx}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: idx * 0.1 }}
+                                style={{ 
+                                    background: s.bg, 
+                                    borderRadius: '20px', 
+                                    padding: '24px',
+                                    color: '#fff',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '16px',
+                                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
+                                }}
+                            >
+                                {/* Decorative elements */}
+                                <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
+                                    {s.miniChart}
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                    <div style={{ padding: '4px' }}>
+                                        {s.chart}
+                                    </div>
+                                    <h3 style={{ fontSize: '18px', fontWeight: 800 }}>{s.name}</h3>
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                                    {s.details.map((detail, dIdx) => (
+                                        <div key={dIdx} style={{ fontSize: '12px', lineHeight: 1.4 }}>
+                                            <span style={{ opacity: 0.8, fontWeight: 700 }}>{detail.label}: </span>
+                                            <span style={{ 
+                                                fontWeight: 800, 
+                                                color: detail.highlight ? '#fbbf24' : '#fff',
+                                                textDecoration: detail.link ? 'underline' : 'none',
+                                                cursor: detail.link ? 'pointer' : 'default'
+                                            }}>
+                                                {detail.value}
+                                            </span>
+                                            {detail.expandable && <ChevronDown size={14} style={{ marginLeft: '4px', display: 'inline' }} />}
+                                        </div>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+
+                    {/* Lower List Section */}
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px' }}>
+                        <h4 style={{ fontSize: '15px', fontWeight: 900, color: '#1e293b', marginBottom: '16px' }}>Recent & Institutional Schemes</h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            {institutionalSchemes.map((scheme, sIdx) => (
+                                <div key={sIdx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '12px', borderBottom: sIdx === 0 ? '1px solid #f1f5f9' : 'none' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#e2e8f0' }} />
+                                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#334155' }}>
+                                            {scheme.name} 
+                                            {scheme.isNew && <span style={{ marginLeft: '8px', padding: '2px 6px', background: '#f0fdf4', color: '#166534', borderRadius: '4px', fontSize: '10px', fontWeight: 800 }}>New</span>}
+                                        </span>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                        {scheme.tags.map((tag, tIdx) => (
+                                            <span key={tIdx} style={{ 
+                                                fontSize: '10px', fontWeight: 700, 
+                                                background: tag === 'Tech' ? '#eff6ff' : '#f8fafc', 
+                                                color: tag === 'Tech' ? '#2563eb' : '#64748b', 
+                                                padding: '2px 8px', borderRadius: '6px', border: '1px solid rgba(0,0,0,0.05)'
+                                            }}>{tag}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Column: AI Advisor */}
+                <div style={{ width: '280px' }}>
+                    <motion.div 
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        style={{ background: '#eff6ff', borderRadius: '20px', border: '1px solid #dbeafe', overflow: 'hidden' }}
+                    >
+                        <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{ color: '#2563eb' }}><Sparkles size={18} /></div>
+                                <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e3a8a' }}>Your AI Advisor</span>
+                            </div>
+                            <ChevronDown size={14} color="#1e3a8a" />
+                        </div>
+                        
+                        <div style={{ background: '#fff', margin: '0 8px 8px 8px', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <div style={{ color: '#64748b' }}><TrendingUp size={16} /></div>
+                                <div style={{ fontSize: '12px', color: '#334155', lineHeight: 1.4 }}>
+                                    <strong style={{ fontWeight: 800 }}>Matches Found:</strong> 2 scholarships match your user profile (Dummy Data)
+                                </div>
+                            </div>
+                            
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <div style={{ color: '#f59e0b' }}><AlertTriangle size={16} /></div>
+                                <div style={{ fontSize: '12px', color: '#334155', lineHeight: 1.4 }}>
+                                    <strong style={{ fontWeight: 800 }}>Tip:</strong> Ensure EWS certificate is valid.
+                                </div>
+                            </div>
+                            
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <div style={{ color: '#3b82f6' }}><Info size={16} /></div>
+                                <div style={{ fontSize: '12px', color: '#334155', lineHeight: 1.4 }}>
+                                    <strong style={{ fontWeight: 800 }}>AI-Predicted Success Rate:</strong> 70% (Illustrative)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ padding: '16px', textAlign: 'center' }}>
+                            <button style={{ 
+                                width: '100%', padding: '10px', background: '#3b82f6', color: '#fff', 
+                                border: 'none', borderRadius: '10px', fontSize: '12px', fontWeight: 800, cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                            }}>
+                                Ask AI <ArrowRight size={14} />
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            </div>
+
+            {/* Bottom Alert Section */}
+            <div style={{ 
+                background: '#fef2f2', 
+                border: '1px solid #fee2e2', 
+                borderRadius: '16px', 
+                padding: '20px',
+                display: 'flex',
+                gap: '16px'
+            }}>
+                <div style={{ color: '#ef4444' }}><AlertTriangle size={24} /></div>
+                <div>
+                    <h5 style={{ fontSize: '14px', fontWeight: 900, color: '#991b1b', marginBottom: '4px' }}>Application Advisory</h5>
+                    <p style={{ fontSize: '12px', color: '#b91c1c', lineHeight: 1.6 }}>
+                        Students are strongly advised to check the official state portal and college administration officer for current specific eligibility criteria for each session.
+                    </p>
+                </div>
             </div>
         </div>
     );

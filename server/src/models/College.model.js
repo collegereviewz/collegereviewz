@@ -5,6 +5,7 @@ const collegeSchema = new mongoose.Schema({
     aicteId: { type: String, unique: true, sparse: true },
     aisheId: { type: String, unique: true, sparse: true },
     name: { type: String, required: true },
+    popularName: { type: String },
     address: { type: String },
     district: { type: String },
     institutionType: { type: String },

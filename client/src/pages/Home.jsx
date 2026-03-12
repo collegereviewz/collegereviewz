@@ -20,6 +20,7 @@ const Home = () => {
     if (view === 'Home') navigate('/');
     else if (view === 'Courses') navigate('/Courses/');
     else if (view === 'Explore Colleges') navigate('/ExploreColleges/');
+    else if (view === 'Exams') navigate('/exams/');
     else if (view === 'Write Review') navigate('/WriteReview/');
     window.scrollTo(0, 0);
   };

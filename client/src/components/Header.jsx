@@ -78,7 +78,8 @@ const Header = ({ currentView }) => {
     { name: 'Exams', path: '/exams/' },
     { name: 'Scholarship', path: '/Scholarship/' },
     { name: 'Study Abroad', path: '/StudyAbroad/' },
-    { name: 'Resources', path: '/Resources/' },
+    { name: 'Ecosystem', path: '/Ecosystem/' },
+    { name: 'Careers', path: '/Careers/' },
     { name: 'Contact Us', path: '/Contact/' }
   ];
 

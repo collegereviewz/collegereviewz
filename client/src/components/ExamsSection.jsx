@@ -177,7 +177,7 @@ const ExamsSection = ({ showHeader = true }) => {
   return (
     <section id="exams-hub" style={{ padding: '30px 0 80px', background: '#fff', position: 'relative' }}>
       <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 32px' }}>
-        
+
         {/* Header Section */}
         {showHeader && (
           <div style={{ textAlign: 'center', marginBottom: '30px' }}>
@@ -207,49 +207,49 @@ const ExamsSection = ({ showHeader = true }) => {
           <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
           {/* Left Scroll Button */}
           {canScrollLeft && (
-          <button 
-            onClick={() => {
-              const el = tabsRef.current;
-              el.scrollBy({ left: -200, behavior: 'smooth' });
-              setTimeout(checkScroll, 350);
-            }}
-            style={{
-              position: 'absolute', left: '-20px', top: '50%', transform: 'translateY(-50%)',
-              width: '40px', height: '40px', borderRadius: '50%', background: '#fff',
-              border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', color: '#5b51d8'
-            }}
-          >
-            <ChevronLeft size={20} />
-          </button>
+            <button
+              onClick={() => {
+                const el = tabsRef.current;
+                el.scrollBy({ left: -200, behavior: 'smooth' });
+                setTimeout(checkScroll, 350);
+              }}
+              style={{
+                position: 'absolute', left: '-20px', top: '50%', transform: 'translateY(-50%)',
+                width: '40px', height: '40px', borderRadius: '50%', background: '#fff',
+                border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', color: '#5b51d8'
+              }}
+            >
+              <ChevronLeft size={20} />
+            </button>
           )}
 
           {/* Right Scroll Button */}
           {canScrollRight && (
-          <button 
-            onClick={() => {
-              const el = tabsRef.current;
-              el.scrollBy({ left: 200, behavior: 'smooth' });
-              setTimeout(checkScroll, 350);
-            }}
-            style={{
-              position: 'absolute', right: '-20px', top: '50%', transform: 'translateY(-50%)',
-              width: '40px', height: '40px', borderRadius: '50%', background: '#fff',
-              border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', color: '#5b51d8'
-            }}
-          >
-            <ChevronRight size={20} />
-          </button>
+            <button
+              onClick={() => {
+                const el = tabsRef.current;
+                el.scrollBy({ left: 200, behavior: 'smooth' });
+                setTimeout(checkScroll, 350);
+              }}
+              style={{
+                position: 'absolute', right: '-20px', top: '50%', transform: 'translateY(-50%)',
+                width: '40px', height: '40px', borderRadius: '50%', background: '#fff',
+                border: '1.5px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', color: '#5b51d8'
+              }}
+            >
+              <ChevronRight size={20} />
+            </button>
           )}
 
-          <div 
+          <div
             ref={tabsRef}
             id="exam-tabs-scroll"
-            style={{ 
-              display: 'flex', gap: '12px', overflowX: 'auto', padding: '10px 40px', 
+            style={{
+              display: 'flex', gap: '12px', overflowX: 'auto', padding: '10px 40px',
               scrollbarWidth: 'none', position: 'relative', scrollSnapType: 'x mandatory'
-            }} 
+            }}
             className="no-scrollbar"
           >
             {['All', 'MBBS', 'BE/B.Tech', 'BBA', 'BCA', 'B.Sc (Nursing)', 'Arts', 'Law', 'Science', 'Commerce', 'Pharmacy', 'ME/M.Tech'].map(tab => (
@@ -320,10 +320,10 @@ const ExamsSection = ({ showHeader = true }) => {
       </div>
 
         {/* Exams Grid */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
-          gap: '24px' 
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: '24px'
         }}>
           <AnimatePresence mode="popLayout">
             {filteredExams.map((exam) => (
@@ -341,15 +341,15 @@ const ExamsSection = ({ showHeader = true }) => {
                 }}
               >
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'start' }}>
-                  <div style={{ 
-                    width: '64px', height: '64px', borderRadius: '12px', 
+                  <div style={{
+                    width: '64px', height: '64px', borderRadius: '12px',
                     background: '#f8fafc', border: '1px solid #f1f5f9',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     overflow: 'hidden', padding: '10px', flexShrink: 0
                   }}>
-                    <img 
-                      src={exam.logo} 
-                      alt={exam.name} 
+                    <img
+                      src={exam.logo}
+                      alt={exam.name}
                       style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                       onError={(e) => { e.currentTarget.src = PLACEHOLDER_LOGO; }}
                     />
@@ -363,16 +363,16 @@ const ExamsSection = ({ showHeader = true }) => {
                 <div style={{ padding: '0 4px' }}>
                   <div style={{ display: 'grid', gap: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
-                        <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Exam Date</span>
-                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{exam.examDate}</span>
+                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Exam Date</span>
+                      <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{exam.examDate}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
-                        <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Application Form</span>
-                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{exam.appDate}</span>
+                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Application Form</span>
+                      <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{exam.appDate}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Result Announce</span>
-                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{exam.resultDate}</span>
+                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Result Announce</span>
+                      <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{exam.resultDate}</span>
                     </div>
                   </div>
                 </div>
@@ -391,7 +391,7 @@ const ExamsSection = ({ showHeader = true }) => {
                   }}>
                     Read More
                   </button>
-                  <button style={{ 
+                  <button style={{
                     flex: 1, padding: '12px 0', borderRadius: '50px', border: '1.5px solid #5b51d8',
                     background: 'transparent', color: '#5b51d8',
                     fontSize: '14px', fontWeight: 800, cursor: 'pointer', transition: 'all 0.3s ease'

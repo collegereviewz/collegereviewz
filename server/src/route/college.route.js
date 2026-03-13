@@ -1,10 +1,12 @@
 import express from 'express';
-import { getColleges, getCollegeStats, getCollegeCourses, getCollegeCutoffs } from '../controller/college.controller.js';
+import { getColleges, getCollegeStats, getCollegeCourses, getCollegeCutoffs, getCollegeById, updateCollege } from '../controller/college.controller.js';
 
 const router = express.Router();
 
 router.get('/', getColleges);
 router.get('/stats/:name', getCollegeStats);
+router.get('/id/:id', getCollegeById);
+router.patch('/:id', updateCollege);
 router.get('/courses/:name', getCollegeCourses);
 router.get('/cutoffs/:name', getCollegeCutoffs);
 

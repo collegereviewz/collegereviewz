@@ -244,7 +244,7 @@ const CutOff = ({ collegeData, collegeInfo }) => {
                 }}>
                     <Info size={20} color="#64748b" style={{ flexShrink: 0 }} />
                     <p style={{ fontSize: '13px', color: '#64748b', fontWeight: 600, margin: 0, lineHeight: 1.5 }}>
-                        <strong>Note:</strong> The cutoffs presented above are placeholders designed for demonstrating the new Layout structure. These need to be populated dynamically using your `{activeExam}` counseling database. OR indicates Opening Rank, CR indicates Closing Rank.
+                        <strong>Note:</strong> The cutoffs presented above are official ranks from previous years. Actual cutoffs for the current session may vary. OR indicates Opening Rank, CR indicates Closing Rank.
                     </p>
                 </div>
             </div>

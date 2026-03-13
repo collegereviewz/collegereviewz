@@ -64,7 +64,7 @@ const Result = ({ collegeData }) => {
                 }}>
                     <AlertCircle size={20} color="#f97316" style={{ flexShrink: 0 }} />
                     <p style={{ fontSize: '13px', color: '#9a3412', lineHeight: '1.5', margin: 0 }}>
-                        For official grade cards and transcripts, students are advised to check the University portal (MAKAUT) using their roll number and registration details.
+                        For official grade cards and transcripts, students are advised to check the university/affiliated body's official student portal using their roll number and registration details.
                     </p>
                 </div>
             </div>

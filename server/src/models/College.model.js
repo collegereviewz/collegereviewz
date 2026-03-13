@@ -6,6 +6,7 @@ const collegeSchema = new mongoose.Schema({
     aisheId: { type: String, unique: true, sparse: true },
     name: { type: String, required: true },
     popularName: { type: String },
+    logo: { type: String },
     address: { type: String },
     district: { type: String },
     institutionType: { type: String },
@@ -70,9 +71,9 @@ const collegeSchema = new mongoose.Schema({
     },
     reviewStats: {
         external: {
-            google: { rating: { type: Number, default: 0 }, count: { type: Number, default: 0 } },
-            shiksha: { rating: { type: Number, default: 0 }, count: { type: Number, default: 0 } },
-            collegedunia: { rating: { type: Number, default: 0 }, count: { type: Number, default: 0 } }
+            google: { rating: { type: mongoose.Schema.Types.Decimal128, default: 0 }, count: { type: Number, default: 0 } },
+            shiksha: { rating: { type: mongoose.Schema.Types.Decimal128, default: 0 }, count: { type: Number, default: 0 } },
+            collegedunia: { rating: { type: mongoose.Schema.Types.Decimal128, default: 0 }, count: { type: Number, default: 0 } }
         },
         pros: [String],
         cons: [String],

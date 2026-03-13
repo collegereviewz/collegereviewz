@@ -73,7 +73,7 @@ export const guessDomain = (name) => {
 /**
  * Scraping logic for news/notifications/events
  */
-export const scrapeUpdates = async (domain, collegeName = '') => {
+export const scrapeUpdates = async (domain, collegeName = '', skipAI = false) => {
     try {
         const url = domain.startsWith('http') ? domain : `https://${domain}`;
         const { data } = await axios.get(url, {
@@ -95,8 +95,8 @@ export const scrapeUpdates = async (domain, collegeName = '') => {
 
         const pageText = $('body').text().replace(/\s+/g, ' ');
 
-        // Use AI if collegeName is provided to better parse fees and other info
-        if (collegeName) {
+        // Use AI if collegeName is provided and we really need data
+        if (collegeName && !skipAI) {
             console.log(`Using Gemini to extract info for ${collegeName}...`);
             const aiData = await extractCollegeInfo(collegeName, pageText);
             if (aiData) {
@@ -204,7 +204,9 @@ export const updateCollegeData = async (collegeId) => {
 
         if (!college.officialWebsite) college.officialWebsite = domain;
 
-        const scrapedData = await scrapeUpdates(domain, college.name);
+        const skipAI = college.fees && college.fees !== "Check Website" && (new Date() - new Date(college.updates?.lastUpdated || 0)) < 24 * 60 * 60 * 1000;
+        
+        const scrapedData = await scrapeUpdates(domain, college.name, skipAI);
 
         if (scrapedData) {
             college.updates = scrapedData;
@@ -214,8 +216,8 @@ export const updateCollegeData = async (collegeId) => {
             if (scrapedData.highestPackage) college.highestPackage = scrapedData.highestPackage;
         }
 
-        // AGGRESSIVE FALLBACK: If fees are still missing or too simple after scraping, do direct AI research
-        if (!college.fees || college.fees.length < 3 || college.fees === "Check Website") {
+        // AGGRESSIVE FALLBACK: If fees are still missing or too simple after scraping, and we haven't updated recently
+        if ((!college.fees || college.fees.length < 5 || college.fees === "Check Website") && !skipAI) {
             console.log(`Fees missing/poor for ${college.name} after scraping. Triggering deep Gemini research...`);
             const aiData = await extractCollegeInfo(college.name);
             if (aiData) {

@@ -39,14 +39,25 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
     useEffect(() => {
         const fetchDetails = async () => {
             try {
-                // Use a cleaner name for API requests to avoid 404s from descriptive titles
-                const searchName = collegeInfo.fullName.split(' - ')[0];
-                const response = await axios.get(`http://localhost:5000/api/colleges/${encodeURIComponent(searchName)}/stats`);
+                const id = collegeInfo.data?._id || collegeData?._id;
+                let url;
+                if (id) {
+                    url = `http://localhost:5000/api/colleges/id/${id}`;
+                } else {
+                    const searchName = collegeInfo.fullName.split(' - ')[0];
+                    url = `http://localhost:5000/api/colleges/stats/${encodeURIComponent(searchName)}`;
+                }
+
+                const response = await axios.get(url);
                 if (response.data.success) {
-                    setCollegeData(response.data.data);
+                    const newData = response.data.data;
+                    setCollegeData(prev => ({
+                        ...(prev || {}),
+                        ...newData
+                    }));
                     setStats({
-                        rating: response.data.data.rating,
-                        reviewsCount: response.data.data.reviewsCount
+                        rating: newData.rating,
+                        reviewsCount: newData.reviewsCount
                     });
                 }
             } catch (error) {
@@ -54,7 +65,7 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
             }
         };
         fetchDetails();
-    }, [collegeInfo.fullName]);
+    }, [collegeInfo.fullName, collegeInfo.data?._id]);
 
     const handleStatsUpdate = useCallback((newStats) => {
 
@@ -158,11 +169,11 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
                                 boxShadow: '0 12px 24px rgba(0,0,0,0.2)',
                                 overflow: 'hidden'
                             }}>
-                                {collegeInfo.isGeneric ? (
-                                    <CollegeLogo collegeName={collegeInfo.fullName} style={{ maxWidth: '100%', maxHeight: '100%' }} />
-                                ) : (
-                                    <img src={collegeInfo.logo} alt="Logo" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-                                )}
+                                <CollegeLogo 
+                                    collegeName={collegeInfo.fullName} 
+                                    logo={collegeData?.logo || (!collegeInfo.isGeneric ? collegeInfo.logo : null)} 
+                                    style={{ maxWidth: '100%', maxHeight: '100%' }} 
+                                />
                             </div>
                             <div>
                                 <h1 style={{ fontSize: '32px', fontWeight: 900, marginBottom: '8px', letterSpacing: '-0.5px' }}>
@@ -246,16 +257,16 @@ const CollegeProfileTemplate = ({ collegeInfo }) => {
                     {activeTab === 'Reviews' ? (
                         <div style={{ background: '#fff', borderRadius: '20px', padding: '28px', border: '1px solid #e2e8f0' }}>
                             <ActiveComponent
-                                collegeId={collegeInfo.data?._id || collegeInfo.data?.data?._id}
-                                collegeName={collegeInfo.fullName || collegeInfo.data?.name}
-                                collegeData={collegeInfo.data}
+                                collegeId={collegeData?._id || collegeInfo.data?._id || collegeInfo.data?.data?._id}
+                                collegeName={collegeData?.name || collegeInfo.fullName}
+                                collegeData={collegeData}
                                 collegeStats={stats}
                                 isEmbedded={true}
                                 onStatsUpdate={handleStatsUpdate}
                             />
                         </div>
                     ) : (
-                        <ActiveComponent collegeData={collegeInfo.data} onTabChange={setActiveTab} />
+                        <ActiveComponent collegeData={collegeData} onTabChange={setActiveTab} />
                     )}
                 </Suspense>
             </div>

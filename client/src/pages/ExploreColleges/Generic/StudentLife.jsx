@@ -3,7 +3,8 @@ import { Users, Music, Coffee, BookOpen, Star, Heart } from 'lucide-react';
 
 const StudentLife = ({ collegeData }) => {
     const name = collegeData?.name || 'College';
-    const description = collegeData?.studentLife || 'Campus life at this institute offers a blend of academic rigor and vibrant extracurricular activities. Students participate in various clubs, annual fests, and technical workshops throughout the year.';
+    const description = collegeData?.studentLife || 'Campus life details are being updated. Most institutes offer a blend of academic rigor and vibrant extracurricular activities, including various clubs, annual fests, and technical workshops.';
+    const hasDynamicLife = !!collegeData?.studentLife;
     
     const cardStyle = {
         background: '#fff',
@@ -52,26 +53,35 @@ const StudentLife = ({ collegeData }) => {
             </div>
 
             {/* Highlights */}
-            <div style={{ display: 'flex', gap: '20px' }}>
-                <EventItem 
-                    title="Annual Fests" 
-                    icon={<Music />} 
-                    color="#5b51d8" 
-                    desc="Techtrix (Technical Fest) and Bihaan (Cultural Fest) are the major annual highlights, drawing participation from across the state." 
-                />
-                <EventItem 
-                    title="Active Clubs" 
-                    icon={<Star />} 
-                    color="#f59e0b" 
-                    desc="Numerous student clubs like the Robotics Club, Coding Club, and Photography Club provide platforms for skill development beyond academics." 
-                />
-                <EventItem 
-                    title="Social Impact" 
-                    icon={<Heart />} 
-                    color="#ef4444" 
-                    desc="Students actively engage in social service via the NSS unit, organizing blood donation camps, environmental drives, and community outreach." 
-                />
-            </div>
+            {hasDynamicLife && (
+                <div style={{ display: 'flex', gap: '20px' }}>
+                    <EventItem 
+                        title="Annual Fests" 
+                        icon={<Music />} 
+                        color="#5b51d8" 
+                        desc="Colleges typically host major annual fests, including technical and cultural events that draw participation from across the region." 
+                    />
+                    <EventItem 
+                        title="Active Clubs" 
+                        icon={<Star />} 
+                        color="#f59e0b" 
+                        desc="Numerous student-led clubs provide platforms for skill development and creative expression beyond traditional academics." 
+                    />
+                    <EventItem 
+                        title="Social Impact" 
+                        icon={<Heart />} 
+                        color="#ef4444" 
+                        desc="Students often engage in community service and social initiatives, fostering a sense of responsibility and leadership." 
+                    />
+                </div>
+            )}
+            
+            {!hasDynamicLife && (
+                <div style={{ padding: '40px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '16px', border: '1px dashed #e2e8f0' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: 800 }}>Student life highlights coming soon.</h3>
+                    <p style={{ fontSize: '14px', marginTop: '8px' }}>We are collecting information about events, clubs, and campus culture for {collegeData?.name || 'this college'}.</p>
+                </div>
+            )}
 
             {/* Daily Experience */}
             <div style={{ ...cardStyle, background: 'linear-gradient(135deg, #1e1b4b, #5b51d8)', color: '#fff' }}>

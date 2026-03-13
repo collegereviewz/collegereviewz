@@ -2,19 +2,9 @@ import React from 'react';
 import { Bell, Newspaper, Calendar as CalendarIcon, Download, Link as LinkIcon, ExternalLink } from 'lucide-react';
 
 const NotificationUpload = ({ collegeData }) => {
-    const notifications = collegeData?.updates?.notifications || [
-        { title: 'B.Tech Admission 2024-25: Counseling Round 1 Results Out', date: 'March 05, 2025', link: '#' },
-        { title: 'Notice regarding Semester Examination Form Fill-up', date: 'March 02, 2025', link: '#' },
-        { title: 'Upcoming Tech-Fest: Techtrix 2025 Registration Open', date: 'Feb 28, 2025', link: '#' }
-    ];
-    const news = collegeData?.updates?.news || [
-        { title: 'RCCIIT Students Win Smart India Hackathon 2024', date: 'Jan 15, 2025', link: '#' },
-        { title: 'New Centre of Excellence in AI/ML Inaugurated at Campus', date: 'Dec 20, 2024', link: '#' }
-    ];
-    const events = collegeData?.updates?.events || [
-        { title: 'Annual Cultural Fest - Bihaan 2025', date: 'April 10-12, 2025', link: '#' },
-        { title: 'Industry-Academia Resource Conclave', date: 'March 25, 2025', link: '#' }
-    ];
+    const notifications = collegeData?.updates?.notifications || [];
+    const news = collegeData?.updates?.news || [];
+    const events = collegeData?.updates?.events || [];
 
     const cardStyle = {
         background: '#fff',
@@ -56,22 +46,28 @@ const NotificationUpload = ({ collegeData }) => {
                 {title}
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {data.map((item, i) => (
-                    <div key={i} style={itemStyle} onMouseEnter={e => e.currentTarget.style.borderColor = iconColor} onMouseLeave={e => e.currentTarget.style.borderColor = '#f1f5f9'}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            <div style={{ fontSize: '14px', fontWeight: 800, color: '#334155' }}>{item.title}</div>
-                            <div style={{ fontSize: '12px', color: '#64748b' }}>{item.date}</div>
+                {data.length > 0 ? (
+                    data.map((item, i) => (
+                        <div key={i} style={itemStyle} onMouseEnter={e => e.currentTarget.style.borderColor = iconColor} onMouseLeave={e => e.currentTarget.style.borderColor = '#f1f5f9'} onClick={() => item.link && window.open(item.link, '_blank')}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                <div style={{ fontSize: '14px', fontWeight: 800, color: '#334155' }}>{item.title}</div>
+                                <div style={{ fontSize: '12px', color: '#64748b' }}>{item.date}</div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                 <button style={{ padding: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', cursor: 'pointer' }}>
+                                    <Download size={16} color="#64748b" />
+                                 </button>
+                                 <button style={{ padding: '8px', background: iconColor, border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+                                    <ExternalLink size={16} color="#fff" />
+                                 </button>
+                            </div>
                         </div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                             <button style={{ padding: '8px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', cursor: 'pointer' }}>
-                                <Download size={16} color="#64748b" />
-                             </button>
-                             <button style={{ padding: '8px', background: iconColor, border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-                                <ExternalLink size={16} color="#fff" />
-                             </button>
-                        </div>
+                    ))
+                ) : (
+                    <div style={{ padding: '24px', textAlign: 'center', color: '#94a3b8', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #e2e8f0' }}>
+                        <div style={{ fontSize: '13px', fontWeight: 700 }}>No {title.toLowerCase()} posted yet.</div>
                     </div>
-                ))}
+                )}
             </div>
         </div>
     );

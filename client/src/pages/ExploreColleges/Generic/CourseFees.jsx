@@ -30,8 +30,9 @@ const GenericCourseFees = ({ collegeData }) => {
                 </h2>
 
                 {!hasAny ? (
-                    <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8', fontSize: '14px', fontWeight: 600 }}>
-                        Course and fee details not available. Please visit the official website.
+                    <div style={{ padding: '60px 40px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '16px', border: '1px dashed #e2e8f0' }}>
+                        <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#334155', marginBottom: '8px' }}>Course & Fees Coming Soon</h3>
+                        <p style={{ fontSize: '14px', margin: 0 }}>The detailed fee structure for the current academic session is being updated for {name}.</p>
                     </div>
                 ) : (
 

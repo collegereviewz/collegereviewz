@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const Location = ({ collegeData }) => {
     const navigate = useNavigate();
     const name = collegeData?.name || 'College';
-    const address = collegeData?.address && !collegeData.address.includes('updated') ? collegeData.address : '';
+    const address = collegeData?.address || '';
     const district = collegeData?.district || '';
     const state = collegeData?.state || 'India';
     const phone = collegeData?.contactDetails?.phone || 'N/A';
@@ -36,7 +36,7 @@ const Location = ({ collegeData }) => {
                 {/* Left: Map & Contact */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
                     <div style={{ ...cardStyle, padding: '0', overflow: 'hidden', position: 'relative', flex: 1, minHeight: '350px' }}>
-                        <div style={{ width: '100%', height: '100%', filter: !user ? 'blur(8px)' : 'none', pointerEvents: !user ? 'none' : 'auto' }}>
+                        <div style={{ width: '100%', height: '100%', pointerEvents: 'auto' }}>
                             <iframe 
                                 title="College Location"
                                 src={finalMapLink}
@@ -48,45 +48,9 @@ const Location = ({ collegeData }) => {
                             ></iframe>
                         </div>
 
-                        {!user && (
-                            <div style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                                zIndex: 10,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                background: 'rgba(255, 255, 255, 0.2)',
-                                textAlign: 'center',
-                                padding: '24px'
-                            }}>
-                                <div style={{ 
-                                    background: '#fff', 
-                                    padding: '24px', 
-                                    borderRadius: '20px', 
-                                    boxShadow: '0 15px 35px rgba(0,0,0,0.1)',
-                                    maxWidth: '280px',
-                                    border: '1px solid #f1f5f9'
-                                }}>
-                                    <div style={{ width: '48px', height: '48px', background: '#f5f3ff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                                        <Lock size={24} color="#6366f1" />
-                                    </div>
-                                    <h4 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '8px' }}>Map is Locked</h4>
-                                    <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '20px', lineHeight: 1.5 }}>Please login to view the interactive campus map and directions.</p>
-                                    <button 
-                                        onClick={() => window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }))}
-                                        style={{ width: '100%', padding: '12px', background: '#5b51d8', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                        <LogIn size={16} /> Login to Unlock
-                                    </button>
-                                </div>
-                            </div>
-                        )}
+                        {/* Removed Lock Overlay */}
                         
-                        {user && (
+                        {true && (
                             <button 
                                 onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`, '_blank')}
                                 style={{
@@ -116,7 +80,7 @@ const Location = ({ collegeData }) => {
                             </button>
                         )}
                         
-                        {user && (
+                        {true && (
                             <div style={{
                                 position: 'absolute',
                                 top: '50%',
@@ -140,11 +104,11 @@ const Location = ({ collegeData }) => {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                             <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                                 <Phone size={20} color="#5b51d8" />
-                                <span style={{ fontSize: '15px', fontWeight: 700, color: '#334155', filter: !user ? 'blur(4px)' : 'none' }}>{user ? phone : '+91 XXXXX XXXXX'}</span>
+                                <span style={{ fontSize: '15px', fontWeight: 700, color: '#334155' }}>{phone}</span>
                             </div>
                             <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                                 <Mail size={20} color="#3b82f6" />
-                                <span style={{ fontSize: '15px', fontWeight: 700, color: '#334155', filter: !user ? 'blur(4px)' : 'none' }}>{user ? email : 'login to view@college.com'}</span>
+                                <span style={{ fontSize: '15px', fontWeight: 700, color: '#334155' }}>{email}</span>
                             </div>
                         </div>
                     </div>
@@ -157,9 +121,9 @@ const Location = ({ collegeData }) => {
                             <MapPin size={24} color="#5b51d8" />
                             Registered Address
                         </h3>
-                        <div style={{ filter: !user ? 'blur(5px)' : 'none', pointerEvents: !user ? 'none' : 'auto' }}>
+                        <div>
                             <p style={{ fontSize: '15px', color: '#64748b', lineHeight: 1.8, marginBottom: 0 }}>
-                                {address || 'Official registered address is being updated for this college.'}
+                                {address || `Official registered address for ${name} is located in ${district ? district + ', ' : ''}${state}.`}
                                 {(district || state) && (
                                     <>
                                         <br />
@@ -172,11 +136,7 @@ const Location = ({ collegeData }) => {
                                 )}
                             </p>
                         </div>
-                        {!user && (
-                            <div style={{ position: 'absolute', bottom: '24px', left: '28px', color: '#5b51d8', fontSize: '13px', fontWeight: 800 }}>
-                                Address details available for logged in users
-                            </div>
-                        )}
+                        {/* Removed Lock Message */}
                     </div>
 
                     <div style={{ ...cardStyle, gap: '24px', flex: 1 }}>

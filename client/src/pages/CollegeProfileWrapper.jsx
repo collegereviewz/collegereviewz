@@ -69,7 +69,7 @@ const CollegeProfileWrapper = () => {
             folderName: stateData.programme === 'MBBS' || stateData.course === 'MBBS' ? 'MBBS' : 'Generic',
             detailsFolder: '.',
             fullName: stateData.name,
-            logo: 'https://via.placeholder.com/100', // Default logo
+            logo: stateData.logo || 'https://via.placeholder.com/100', // Use logo from DB if available
             heroImage: 'https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
             location: stateData.location,
             type: stateData.rankingInfo || stateData.courseName || 'College',

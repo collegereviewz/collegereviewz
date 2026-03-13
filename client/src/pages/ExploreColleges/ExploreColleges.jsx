@@ -222,7 +222,8 @@ const ExploreColleges = () => {
                 courses: col.courses || [],
                 establishedYear: col.establishedYear || "—",
                 managementType: col.managementType || "Private",
-                officialWebsite: col.officialWebsite || ""
+                officialWebsite: col.officialWebsite || "",
+                logo: col.logo || ""
               };
             });
             setDisplayedColleges(mapped);
@@ -580,7 +581,7 @@ const ExploreColleges = () => {
                       <td style={{ padding: '24px 20px 10px', borderRight: '1px solid rgba(0,0,0,0.1)' }}>
                         <div style={{ display: 'flex', gap: '15px' }}>
                           <div style={{ width: '45px', height: '45px', borderRadius: '8px', border: '1px solid #e2e8f0', padding: '4px', background: '#fff', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                            <CollegeLogo collegeName={col.name} style={{ maxWidth: '100%', maxHeight: '100%' }} />
+                            <CollegeLogo collegeName={col.name} logo={col.logo} style={{ maxWidth: '100%', maxHeight: '100%' }} />
                           </div>
                           <div style={{ flex: 1 }}>
                             <h4 onClick={() => {

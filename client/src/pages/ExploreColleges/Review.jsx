@@ -53,8 +53,20 @@ const renderContentWithHashtags = (content, setFilterTag) => {
 const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData, collegeStats }) => {
     const API_BASE = 'http://localhost:5000/api/reviews';
     const [posts, setPosts] = useState([]);
-    const [stats, setStats] = useState(collegeStats || collegeData?.reviewStats || collegeData?.data?.reviewStats || null);
-    const [statsLoading, setStatsLoading] = useState(!stats);
+    
+    // Derived stats from props - ensures reactivity when parent data updates
+    const stats = useMemo(() => {
+        const baseStats = collegeData?.reviewStats || collegeData?.data?.reviewStats || null;
+        if (collegeStats && baseStats) {
+            return {
+                ...baseStats,
+                internalRating: collegeStats.rating,
+                internalCount: collegeStats.reviewsCount
+            };
+        }
+        return baseStats;
+    }, [collegeData, collegeStats]);
+
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -79,30 +91,7 @@ const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData, collegeSta
         return '#' + shortName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
     }, [collegeName]);
 
-    useEffect(() => {
-        const fetchStats = async (isRetry = false) => {
-            if (!collegeName) return;
-            try {
-                setStatsLoading(true);
-                // Trigger scrape if stats are missing or incomplete
-                const res = await axios.get(`http://localhost:5000/api/colleges/${encodeURIComponent(collegeName)}/stats?triggerScrape=true`);
-                if (res.data.success && res.data.data.reviewStats) {
-                    setStats(res.data.data.reviewStats);
-                } else if (!isRetry) {
-                    // If background scrape was triggered, wait 5s and try once more
-                    setTimeout(() => fetchStats(true), 5000);
-                }
-            } catch (err) {
-                console.error("Error fetching stats:", err);
-            } finally {
-                if (!isRetry) setStatsLoading(false);
-            }
-        };
-
-        if (!stats || !stats.external?.google?.rating) {
-            fetchStats();
-        }
-    }, [collegeName, collegeId]);
+    // Removal of fetchStats useEffect (AI scraping trigger) as part of DB-first strategy
 
     useEffect(() => {
         fetchReviews(1, false);
@@ -385,39 +374,14 @@ const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData, collegeSta
             </div>
 
             {/* External Ratings and Insights */}
-            {statsLoading ? (
-                <div style={{ padding: '40px', textAlign: 'center', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#4f46e5', marginBottom: '12px' }}>Scraping reviews and insights...</div>
-                    <div className="stats-loader" style={{ width: '40px', height: '40px', border: '3px solid #e2e8f0', borderTop: '3px solid #4f46e5', borderRadius: '50%', margin: '0 auto', animation: 'spin 1s linear infinite' }} />
-                    <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-                </div>
-            ) : stats && (
+            {stats && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
                     {/* Modern Ordered Ratings Table */}
                     <div style={{ background: '#fff', borderRadius: '20px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
                         <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 900, color: '#0f172a' }}>Platform Comparison</h3>
-                            <button 
-                                onClick={() => fetchStats()} 
-                                disabled={statsLoading}
-                                style={{ 
-                                    background: 'none', 
-                                    border: '1px solid #e2e8f0', 
-                                    borderRadius: '8px', 
-                                    padding: '6px 12px', 
-                                    fontSize: '12px', 
-                                    fontWeight: 700, 
-                                    color: '#4f46e5', 
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px'
-                                }}
-                            >
-                                <RefreshCcw size={14} className={statsLoading ? 'spin-anim' : ''} />
-                                {statsLoading ? 'Refreshing...' : 'Refresh Ratings'}
-                            </button>
+                            <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, background: '#f1f5f9', padding: '4px 12px', borderRadius: '20px', textTransform: 'uppercase' }}>Database Verified</div>
                         </div>
                         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                             <thead>
@@ -429,14 +393,23 @@ const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData, collegeSta
                             </thead>
                             <tbody>
                                 {[
-                                    { name: 'Google Review', key: 'google', color: '#4285F4', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg' },
-                                    { name: 'Shiksha Reviews', key: 'shiksha', color: '#FF7D00', logo: 'https://images.shiksha.com/mediadata/images/favicon.ico' },
+                                    { name: 'Google Review', key: 'google', color: '#4285F4', logo: 'https://www.google.com/favicon.ico' },
+                                    { name: 'Shiksha Reviews', key: 'shiksha', color: '#FF7D00', logo: 'https://www.shiksha.com/favicon.ico' },
                                     { name: 'Collegedunia Review', key: 'collegedunia', color: '#00BFA5', logo: 'https://collegedunia.com/favicon.ico' },
                                     { name: 'Our Review (Internal)', key: 'internal', color: '#4f46e5', logo: internalLogo }
                                 ].map((source, i) => {
                                     const sourceStats = source.key === 'internal'
                                         ? { rating: ratingStats.average, count: ratingStats.total }
                                         : (stats.external?.[source.key] || { rating: 0, count: 0 });
+
+                                    // Handle MongoDB Decimal128 serialization
+                                    const getRatingValue = (val) => {
+                                        if (!val) return 0;
+                                        if (typeof val === 'object' && val.$numberDecimal) return parseFloat(val.$numberDecimal);
+                                        return parseFloat(val) || 0;
+                                    };
+
+                                    const ratingVal = getRatingValue(sourceStats.rating);
 
                                     return (
                                         <tr key={i} style={{ borderBottom: i === 3 ? 'none' : '1px solid #f8fafc', transition: 'background 0.2s', background: i === 3 ? '#fefce8' : 'transparent' }}>
@@ -450,11 +423,11 @@ const Review = ({ collegeId, collegeName, onStatsUpdate, collegeData, collegeSta
                                             <td style={{ padding: '20px 24px' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                     <div style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a' }}>
-                                                        {sourceStats.rating > 0 ? Number(sourceStats.rating).toFixed(1) : <span style={{ color: '#94a3b8', fontSize: '14px' }}>N/A</span>}
+                                                        {ratingVal > 0 ? ratingVal.toFixed(1) : <span style={{ color: '#94a3b8', fontSize: '14px' }}>N/A</span>}
                                                     </div>
-                                                    {sourceStats.rating > 0 && (
+                                                    {ratingVal > 0 && (
                                                         <div style={{ display: 'flex', gap: '2px' }}>
-                                                            {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill={s <= Math.round(Number(sourceStats.rating)) ? '#f59e0b' : 'none'} color="#f59e0b" />)}
+                                                            {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill={s <= Math.round(ratingVal) ? '#f59e0b' : 'none'} color="#f59e0b" />)}
                                                         </div>
                                                     )}
                                                 </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Review from '../Review';
-import { ChevronRight, Info, BookOpen, Trophy, SlidersHorizontal, Users, Play, Bell, Newspaper, Calendar, Navigation } from 'lucide-react';
+import { ChevronRight, Info, BookOpen, Trophy, SlidersHorizontal, Users, Play, Bell, Newspaper, Calendar, Navigation, Download } from 'lucide-react';
 import HowToReach from './HowToReach.jsx';
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
@@ -22,28 +22,10 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
     const entranceExam = collegeData?.entranceExam || '—';
     const rankingStr = collegeData?.rankingInfo || '—';
 
-    // ─── DYNAMIC UPDATES LOGIC ──────────────────────────────────────────────
-    const [dynamicUpdates, setDynamicUpdates] = useState({ notifications: [], news: [], events: [] });
-    const [loadingUpdates, setLoadingUpdates] = useState(true);
-    const [updatesTab, setUpdatesTab] = useState('notifications');
-
-    useEffect(() => {
-        const fetchUpdates = async () => {
-            if (!collegeId) return;
-            try {
-                setLoadingUpdates(true);
-                const response = await axios.get(`http://localhost:5000/api/colleges/${collegeId}/updates`);
-                setDynamicUpdates(response.data);
-            } catch (error) {
-                console.error('Error fetching dynamic updates:', error);
-            } finally {
-                setLoadingUpdates(false);
-            }
-        };
-        fetchUpdates();
-    }, [collegeId]);
-
-    const activeList = dynamicUpdates[updatesTab] || [];
+    // ─── DYNAMIC UPDATES DATA ──────────────────────────────────────────────
+    const notifications = collegeData?.updates?.notifications || [];
+    const news = collegeData?.updates?.news || [];
+    const events = collegeData?.updates?.events || [];
 
     const quickFacts = [
         { label: 'NIRF Rank',          value: rankingStr },
@@ -66,6 +48,7 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
         `Learn more about ${name}`,
         averagePackage !== '—' ? `Excellent placements with an average package of ${averagePackage}` : 'Placements and ROI statistics coming soon',
         highestPackage !== '—' ? `Highest package reaches up to ${highestPackage}` : 'Top recruiter details to be updated',
+        ...(collegeData?.topRecruiters?.length > 0 ? [`Top recruiters include: ${collegeData.topRecruiters.slice(0, 5).join(', ')}`] : [])
     ];
 
     // Map fees from courses array
@@ -90,9 +73,51 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
         { id: 'contact-details',      label: 'Contact Details', show: true }
     ].filter(item => item.show);
 
-    // ─── HELPERS ──────────────────────────────────────────────────────────────
+    // ─── HELPERS & STYLES ──────────────────────────────────────────────────────────
     const card = { background: '#fff', borderRadius: '20px', padding: '24px', border: '1px solid #e2e8f0' };
     const h2s  = { fontSize: '16px', fontWeight: 900, color: '#1e293b', marginBottom: '16px' };
+
+    const updateItemStyle = {
+        background: '#f8fafc',
+        borderRadius: '10px',
+        padding: '10px 12px',
+        border: '1px solid #f1f5f9',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        cursor: 'pointer',
+        transition: 'all 0.2s'
+    };
+
+    const UpdateSection = ({ title, icon, data, iconColor }) => (
+        <div style={{ ...card, padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px', borderBottom: '1px solid #f1f5f9' }}>
+                <span style={{ color: iconColor }}>{React.cloneElement(icon, { size: 18 })}</span>
+                <h3 style={{ fontSize: '14px', fontWeight: 900, color: '#1e293b', margin: 0 }}>{title}</h3>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '160px', overflowY: 'auto' }} className="no-scrollbar">
+                {data.length > 0 ? data.slice(0, 2).map((upd, i) => (
+                    <div 
+                        key={i} 
+                        style={updateItemStyle}
+                        onClick={() => upd.link && window.open(upd.link, '_blank')}
+                        onMouseEnter={e => e.currentTarget.style.borderColor = iconColor}
+                        onMouseLeave={e => e.currentTarget.style.borderColor = '#f1f5f9'}
+                    >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <div style={{ fontSize: '11px', fontWeight: 700, color: '#334155', lineHeight: 1.3 }}>{upd.title}</div>
+                            <div style={{ fontSize: '9px', color: '#64748b' }}>{upd.date}</div>
+                        </div>
+                        <ChevronRight size={12} color="#94a3b8" />
+                    </div>
+                )) : (
+                    <div style={{ padding: '12px', textAlign: 'center', color: '#94a3b8', fontSize: '11px', background: '#f8fafc', borderRadius: '10px', border: '1px dashed #e2e8f0' }}>
+                        No updates posted yet.
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 
     const StyledTable = ({ columns, rows }) => (
         <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', marginTop: '14px' }}>
@@ -123,89 +148,29 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
-            {/* ══ ROW 1: Updates | Quick Facts | Video ══════════════════════ */}
+            {/* ══ ROW 1: Updates | Quick Facts | View Details ═══════ */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 260px 200px', gap: '20px', alignItems: 'stretch' }}>
 
-                {/* Updates & News */}
-                <div style={card}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <h2 style={{ ...h2s, marginBottom: 0 }}>Latest Updates</h2>
-                            {activeList.length > 0 && <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#ecfdf5', padding: '2px 8px', borderRadius: '12px', border: '1px solid #10b981' }}>
-                                <div style={{ width: '6px', height: '6px', background: '#10b981', borderRadius: '50%', animation: 'pulse 1.5s infinite' }} />
-                                <span style={{ fontSize: '9px', fontWeight: 800, color: '#047857' }}>LIVE</span>
-                            </div>}
+                {/* Latest Updates Grid Container */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+                    <UpdateSection title="Notifications" icon={<Bell />} data={notifications} iconColor="#5b51d8" />
+                    <UpdateSection title="Events" icon={<Calendar />} data={events} iconColor="#10b981" />
+                    <UpdateSection title="News" icon={<Newspaper />} data={news} iconColor="#3b82f6" />
+                    
+                    {/* Quick Downloads Card */}
+                    <div style={{ ...card, padding: '20px', background: 'linear-gradient(135deg, #1e1b4b, #5b51d8)', borderColor: 'transparent', color: '#fff', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                            <Download size={18} color="#fff" />
+                            <h3 style={{ fontSize: '14px', fontWeight: 900, color: '#fff', margin: 0 }}>Downloads</h3>
                         </div>
-                        <div style={{ display: 'flex', gap: '8px', background: '#f1f5f9', padding: '4px', borderRadius: '10px' }}>
-                            {[
-                                { id: 'notifications', icon: <Bell size={12} />, label: 'Notices' },
-                                { id: 'news', icon: <Newspaper size={12} />, label: 'News' },
-                                { id: 'events', icon: <Calendar size={12} />, label: 'Events' }
-                            ].map(tab => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setUpdatesTab(tab.id)}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '4px',
-                                        padding: '6px 10px',
-                                        borderRadius: '8px',
-                                        border: 'none',
-                                        fontSize: '10px',
-                                        fontWeight: 800,
-                                        cursor: 'pointer',
-                                        background: updatesTab === tab.id ? '#5b51d8' : 'transparent',
-                                        color: updatesTab === tab.id ? '#fff' : '#64748b',
-                                        transition: 'all 0.2s'
-                                    }}
-                                >
-                                    {tab.icon} {tab.label}
-                                </button>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            {['Brochure', 'Fee Structure'].map((doc, i) => (
+                                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'rgba(255,255,255,0.1)', borderRadius: '10px', cursor: 'pointer' }}>
+                                    <span style={{ fontSize: '11px', fontWeight: 700 }}>{doc}</span>
+                                    <Download size={12} color="#fff" />
+                                </div>
                             ))}
                         </div>
-                    </div>
-                    
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '220px', overflowY: 'auto' }} className="no-scrollbar">
-                        {loadingUpdates ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                {[1, 2, 3].map(i => (
-                                    <div key={i} style={{ height: '50px', background: '#f1f5f9', borderRadius: '12px', animation: 'pulse 1.5s infinite alternate' }} />
-                                ))}
-                            </div>
-                        ) : activeList.length > 0 ? (
-                            activeList.map((upd, i) => (
-                                <a 
-                                    key={i} 
-                                    href={upd.link} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    style={{ 
-                                        textDecoration: 'none',
-                                        background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)', 
-                                        borderRadius: '12px', 
-                                        padding: '12px', 
-                                        display: 'flex', 
-                                        flexDirection: 'column',
-                                        gap: '4px',
-                                        border: '1px solid #e2e8f0',
-                                        transition: 'transform 0.2s' 
-                                    }}
-                                    onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-                                    onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
-                                >
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '10px', color: '#5b51d8', fontWeight: 800 }}>{upd.date}</span>
-                                        <ChevronRight size={12} color="#94a3b8" />
-                                    </div>
-                                    <p style={{ fontSize: '11px', color: '#1e293b', fontWeight: 600, lineHeight: 1.4, margin: 0 }}>{upd.title}</p>
-                                </a>
-                            ))
-                        ) : (
-                            <div style={{ padding: '20px', textAlign: 'center', color: '#94a3b8', fontSize: '12px' }}>
-                                Visit official website for latest updates.
-                            </div>
-                        )}
                     </div>
                 </div>
 
@@ -254,7 +219,7 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
                 <div style={card}>
                     <h3 style={h2s}>Overview</h3>
                     <p style={{ fontSize: '13px', lineHeight: 1.9, color: '#475569', textAlign: 'left' }}>
-                        {name} is located in <strong>{location}</strong>. It is recognized as {type}. Detailed overview and admission descriptions will be updated here based on the latest data.
+                        {collegeData?.about || `${name} is located in ${location}. It is recognized as ${type}. Detailed overview and admission descriptions will be updated here based on the latest data.`}
                     </p>
                 </div>
 
@@ -326,7 +291,7 @@ const CollegeInfo = ({ collegeData, onTabChange }) => {
                     <div id="college-info" style={{ ...card, padding: '28px' }}>
                         <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '12px' }}>{name} College Info</h2>
                         <p style={{ fontSize: '13px', lineHeight: 1.9, color: '#475569' }}>
-                            Comprehensive college info spanning history, departments, and vision.
+                            {collegeData?.about ? collegeData.about : `Comprehensive college info for ${name} spanning history, departments, and vision will be available shortly.`}
                         </p>
                     </div>
 

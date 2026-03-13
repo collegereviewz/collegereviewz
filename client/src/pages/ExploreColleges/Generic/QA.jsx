@@ -3,10 +3,8 @@ import { HelpCircle, ChevronDown, ChevronUp, MessageSquare } from 'lucide-react'
 
 const QA = ({ collegeData }) => {
     const name = collegeData?.name || 'College';
-    const faqs = collegeData?.faq || [
-        { question: 'What is the average package for CSE?', answer: 'The average package for CSE typically ranges between 4.5 to 6.5 LPA depending on the year.' },
-        { question: 'Is hostel facility available?', answer: 'Yes, separate hostel facilities for boys and girls are available with basic amenities.' }
-    ];
+    const faqs = collegeData?.faq?.length > 0 ? collegeData.faq : [];
+    const hasFaqs = faqs.length > 0;
 
     const [openIndex, setOpenIndex] = useState(0);
 
@@ -29,44 +27,51 @@ const QA = ({ collegeData }) => {
                 </h2>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {faqs.map((f, i) => (
-                        <div key={i} style={{ 
-                            borderRadius: '16px', 
-                            border: '1px solid #f1f5f9', 
-                            overflow: 'hidden',
-                            background: openIndex === i ? '#fff' : '#f8fafc'
-                        }}>
-                            <button 
-                                onClick={() => setOpenIndex(openIndex === i ? -1 : i)}
-                                style={{ 
-                                    width: '100%', 
-                                    padding: '20px 24px', 
-                                    display: 'flex', 
-                                    justifyContent: 'space-between', 
-                                    alignItems: 'center',
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    textAlign: 'left'
-                                }}
-                            >
-                                <span style={{ fontSize: '15px', fontWeight: 800, color: openIndex === i ? '#5b51d8' : '#1e293b' }}>{f.question}</span>
-                                {openIndex === i ? <ChevronUp size={20} color="#5b51d8" /> : <ChevronDown size={20} color="#64748b" />}
-                            </button>
-                            {openIndex === i && (
-                                <div style={{ 
-                                    padding: '0 24px 24px 24px', 
-                                    fontSize: '14px', 
-                                    color: '#64748b', 
-                                    lineHeight: 1.8,
-                                    borderTop: '1px solid #f1f5f9',
-                                    paddingTop: '16px'
-                                }}>
-                                    {f.answer}
-                                </div>
-                            )}
+                    {hasFaqs ? (
+                        faqs.map((f, i) => (
+                            <div key={i} style={{ 
+                                borderRadius: '16px', 
+                                border: '1px solid #f1f5f9', 
+                                overflow: 'hidden',
+                                background: openIndex === i ? '#fff' : '#f8fafc'
+                            }}>
+                                <button 
+                                    onClick={() => setOpenIndex(openIndex === i ? -1 : i)}
+                                    style={{ 
+                                        width: '100%', 
+                                        padding: '20px 24px', 
+                                        display: 'flex', 
+                                        justifyContent: 'space-between', 
+                                        alignItems: 'center',
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        textAlign: 'left'
+                                    }}
+                                >
+                                    <span style={{ fontSize: '15px', fontWeight: 800, color: openIndex === i ? '#5b51d8' : '#1e293b' }}>{f.question || f.q}</span>
+                                    {openIndex === i ? <ChevronUp size={20} color="#5b51d8" /> : <ChevronDown size={20} color="#64748b" />}
+                                </button>
+                                {openIndex === i && (
+                                    <div style={{ 
+                                        padding: '0 24px 24px 24px', 
+                                        fontSize: '14px', 
+                                        color: '#64748b', 
+                                        lineHeight: 1.8,
+                                        borderTop: '1px solid #f1f5f9',
+                                        paddingTop: '16px'
+                                    }}>
+                                        {f.answer || f.a}
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <div style={{ padding: '40px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '16px', border: '1px dashed #e2e8f0' }}>
+                            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#334155' }}>FAQs Coming Soon</h3>
+                            <p style={{ fontSize: '14px', marginTop: '8px' }}>We are compiling common questions and answers for {name}.</p>
                         </div>
-                    ))}
+                    )}
                 </div>
             </div>
 

@@ -1,10 +1,9 @@
 import React from 'react';
 import { getCollegeLogo } from '../utils/logoUtils';
 
-const CollegeLogo = ({ collegeName, style }) => {
-    // Attempt to guess domain if it was available in a more complex app, 
-    // but for now we'll use the name helper which has major mappings.
-    const logoUrl = getCollegeLogo(null, collegeName);
+const CollegeLogo = ({ collegeName, style, logo }) => {
+    // Priority: 1. Explicit logo prop, 2. Guessed logo from name
+    const logoUrl = logo || getCollegeLogo(null, collegeName);
 
     // Fallback if no logo found
     if (!logoUrl) {

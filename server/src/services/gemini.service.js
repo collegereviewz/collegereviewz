@@ -75,8 +75,9 @@ export const extractCollegeInfo = async (collegeName, scrapedText = '', retries 
   } catch (error) {
     console.error(`Gemini API Error (Retries left: ${retries}):`, error.message);
     if (retries > 0 && (error.message.includes('503') || error.message.includes('429') || error.message.includes('Service Unavailable'))) {
-      console.log(`Retrying in 5 seconds...`);
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      const delay = Math.pow(2, 2 - retries) * 5000; // 5s, 10s backoff
+      console.log(`Quota/Service error. Retrying in ${delay / 1000} seconds... (Retries left: ${retries})`);
+      await new Promise(resolve => setTimeout(resolve, delay));
       return extractCollegeInfo(collegeName, scrapedText, retries - 1);
     }
     return null;

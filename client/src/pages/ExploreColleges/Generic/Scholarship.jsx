@@ -6,9 +6,9 @@ const Scholarship = ({ collegeData }) => {
     const user = JSON.parse(localStorage.getItem('user') || 'null');
     
     const summaryStats = [
-        { label: 'Total Scholarships Tracked', value: '45+' },
-        { label: 'Total Aid Available', value: '15+ Cr (Illustrative)' },
-        { label: 'Active Applications', value: '12' }
+        { label: 'Scholarships Tracked', value: collegeData?.scholarships ? 'Active' : 'Pending' },
+        { label: 'Aid Information', value: collegeData?.scholarships ? 'Available' : 'Coming Soon' },
+        { label: 'Status', value: 'Updated for 2025' }
     ];
 
     const mainScholarships = [
@@ -111,84 +111,18 @@ const Scholarship = ({ collegeData }) => {
             <div style={{ display: 'flex', gap: '24px' }}>
                 {/* Left Column: Scholarship Cards */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-                        {mainScholarships.map((s, idx) => (
-                            <motion.div 
-                                key={idx}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.1 }}
-                                style={{ 
-                                    background: s.bg, 
-                                    borderRadius: '20px', 
-                                    padding: '24px',
-                                    color: '#fff',
-                                    position: 'relative',
-                                    overflow: 'hidden',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: '16px',
-                                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
-                                }}
-                            >
-                                {/* Decorative elements */}
-                                <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
-                                    {s.miniChart}
-                                </div>
-
-                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                    <div style={{ padding: '4px' }}>
-                                        {s.chart}
-                                    </div>
-                                    <h3 style={{ fontSize: '18px', fontWeight: 800 }}>{s.name}</h3>
-                                </div>
-
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
-                                    {s.details.map((detail, dIdx) => (
-                                        <div key={dIdx} style={{ fontSize: '12px', lineHeight: 1.4 }}>
-                                            <span style={{ opacity: 0.8, fontWeight: 700 }}>{detail.label}: </span>
-                                            <span style={{ 
-                                                fontWeight: 800, 
-                                                color: detail.highlight ? '#fbbf24' : '#fff',
-                                                textDecoration: detail.link ? 'underline' : 'none',
-                                                cursor: detail.link ? 'pointer' : 'default'
-                                            }}>
-                                                {detail.value}
-                                            </span>
-                                            {detail.expandable && <ChevronDown size={14} style={{ marginLeft: '4px', display: 'inline' }} />}
-                                        </div>
-                                    ))}
-                                </div>
-                            </motion.div>
-                        ))}
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px' }}>
+                        <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', marginBottom: '16px' }}>Scholarship & Financial Aid Overview</h3>
+                        <p style={{ fontSize: '14px', lineHeight: 1.8, color: '#445469' }}>
+                            {collegeData?.scholarships || `${collegeData?.name || 'This college'} provides various merit-based and need-based scholarships to its students. Detailed information about the specific eligibility criteria and application process is being updated and will be available shortly.`}
+                        </p>
                     </div>
 
                     {/* Lower List Section */}
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px' }}>
-                        <h4 style={{ fontSize: '15px', fontWeight: 900, color: '#1e293b', marginBottom: '16px' }}>Recent & Institutional Schemes</h4>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            {institutionalSchemes.map((scheme, sIdx) => (
-                                <div key={sIdx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '12px', borderBottom: sIdx === 0 ? '1px solid #f1f5f9' : 'none' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#e2e8f0' }} />
-                                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#334155' }}>
-                                            {scheme.name} 
-                                            {scheme.isNew && <span style={{ marginLeft: '8px', padding: '2px 6px', background: '#f0fdf4', color: '#166534', borderRadius: '4px', fontSize: '10px', fontWeight: 800 }}>New</span>}
-                                        </span>
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '8px' }}>
-                                        {scheme.tags.map((tag, tIdx) => (
-                                            <span key={tIdx} style={{ 
-                                                fontSize: '10px', fontWeight: 700, 
-                                                background: tag === 'Tech' ? '#eff6ff' : '#f8fafc', 
-                                                color: tag === 'Tech' ? '#2563eb' : '#64748b', 
-                                                padding: '2px 8px', borderRadius: '6px', border: '1px solid rgba(0,0,0,0.05)'
-                                            }}>{tag}</span>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                    <div style={{ background: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '16px', padding: '24px', textAlign: 'center' }}>
+                        <p style={{ fontSize: '13px', color: '#64748b', fontWeight: 600, margin: 0 }}>
+                             Institutional merit scheme details are being verified. Visit the official campus portal for the latest circulars.
+                        </p>
                     </div>
                 </div>
 
@@ -211,7 +145,7 @@ const Scholarship = ({ collegeData }) => {
                             <div style={{ display: 'flex', gap: '12px' }}>
                                 <div style={{ color: '#64748b' }}><TrendingUp size={16} /></div>
                                 <div style={{ fontSize: '12px', color: '#334155', lineHeight: 1.4 }}>
-                                    <strong style={{ fontWeight: 800 }}>Matches Found:</strong> 2 scholarships match your user profile (Dummy Data)
+                                    <strong style={{ fontWeight: 800 }}>Matches Found:</strong> Sign in to check your personalized criteria matches.
                                 </div>
                             </div>
                             
@@ -225,7 +159,7 @@ const Scholarship = ({ collegeData }) => {
                             <div style={{ display: 'flex', gap: '12px' }}>
                                 <div style={{ color: '#3b82f6' }}><Info size={16} /></div>
                                 <div style={{ fontSize: '12px', color: '#334155', lineHeight: 1.4 }}>
-                                    <strong style={{ fontWeight: 800 }}>AI-Predicted Success Rate:</strong> 70% (Illustrative)
+                                    <strong style={{ fontWeight: 800 }}>AI Advantage:</strong> Get insights onto which scholarship you have the best chance for.
                                 </div>
                             </div>
                         </div>

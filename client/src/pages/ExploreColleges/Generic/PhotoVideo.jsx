@@ -47,8 +47,9 @@ const PhotoVideo = ({ collegeData }) => {
                         ))}
                     </div>
                 ) : (
-                    <div style={{ padding: '40px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '16px', marginTop: '20px' }}>
-                        No photos available yet. AI is currently checking for campus images.
+                    <div style={{ padding: '60px 40px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '16px', marginTop: '20px', border: '1px dashed #e2e8f0' }}>
+                        <div style={{ fontSize: '16px', fontWeight: 800, color: '#334155', marginBottom: '8px' }}>Images Coming Soon</div>
+                        <p style={{ fontSize: '14px', margin: 0 }}>We are currently updating the campus gallery for {collegeData?.name || 'this college'}.</p>
                     </div>
                 )}
             </div>
@@ -67,7 +68,7 @@ const PhotoVideo = ({ collegeData }) => {
                                     title={`Video ${i}`} 
                                     width="100%" 
                                     height="240" 
-                                    src={v.includes('youtube.com') ? v.replace('watch?v=', 'embed/') : v} 
+                                    src={v.includes('youtube.com') ? v.replace('watch?v=', 'embed/').split('&')[0] : v.includes('youtu.be') ? `https://www.youtube.com/embed/${v.split('/').pop()}` : v} 
                                     frameBorder="0" 
                                     allowFullScreen
                                 ></iframe>
@@ -75,9 +76,10 @@ const PhotoVideo = ({ collegeData }) => {
                         ))}
                     </div>
                 ) : (
-                    <div style={{ padding: '40px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '16px', marginTop: '20px' }}>
-                        <Play size={40} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
-                        <p>Video tours Coming Soon (Updating via Gemini AI)</p>
+                    <div style={{ padding: '60px 40px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '16px', marginTop: '20px', border: '1px dashed #e2e8f0' }}>
+                        <Play size={40} style={{ margin: '0 auto 16px', opacity: 0.3 }} />
+                        <div style={{ fontSize: '16px', fontWeight: 800, color: '#334155', marginBottom: '8px' }}>Video Tours Coming Soon</div>
+                        <p style={{ fontSize: '14px', margin: 0 }}>Official campus walkthroughs and student testimonials are being processed.</p>
                     </div>
                 )}
             </div>

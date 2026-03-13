@@ -23,7 +23,7 @@ export const initCronJobs = () => {
             for (const college of colleges) {
                 try {
                     await updateCollegeData(college._id);
-                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    await new Promise(resolve => setTimeout(resolve, 6000));
                 } catch (err) {
                     console.error(`Quick Cron error for ${college.name}:`, err.message);
                 }

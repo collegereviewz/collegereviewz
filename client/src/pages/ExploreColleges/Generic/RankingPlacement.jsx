@@ -60,22 +60,17 @@ const RankingPlacement = ({ collegeData }) => {
         }
     ];
 
-    const rankings = [
-        { name: 'NIRF 2025', rank: 'Rank 1', desc: 'Ranking methodology brief with NIRF 2025' },
-        { name: 'QS World Rankings', rank: '203', desc: 'Ranking methodology by QS World Rankings' },
-        { name: 'NAAC Accreditation Rare', rank: 'Grade A', desc: 'Ranking methodology brief in-electron World' },
-        { name: 'NAAC Accreditation', rank: 'A', desc: 'Ranking methodology brief as and race' }
+    const rankings = collegeData?.ranking ? [
+        { name: 'Latest Ranking', rank: collegeData.ranking, desc: `Official ranking for ${name} as per latest records.` },
+        { name: 'NIRF Ranking', rank: collegeData.ranking?.includes('NIRF') ? collegeData.ranking.split('NIRF')[1].trim() : 'Updated soon', desc: 'Ranking methodology brief by NIRF' }
+    ] : [
+        { name: 'NIRF', rank: 'Coming Soon', desc: 'Official NIRF ranking is being updated for this session.' },
+        { name: 'QS World Rankings', rank: 'Coming Soon', desc: 'International ranking status is being verified.' },
+        { name: 'NAAC Accreditation', rank: 'Coming Soon', desc: 'Latest NAAC accreditation status will be posted here.' }
     ];
 
-    const topRecruiters = recruiters.length > 0 ? recruiters.map(r => ({ name: r, offers: '210 offers', sector: 'Technology, Communities' })) : [
-        { name: 'TCS', offers: '210 offers', sector: 'Technology, Communities' },
-        { name: 'Cognizant', offers: 'Number of offers mode (Illustrative)', sector: 'Technology, Communities' },
-        { name: 'Wipro', offers: '50 offers', sector: 'Sectors: for 75; 50 offers' },
-        { name: 'Infosys', offers: 'Number of offers mode (Illustrative)', sector: 'Sectors: for Infosys, Communications' },
-        { name: 'Capgemini', offers: 'Number of offers mode (Illustrative)', sector: '' },
-        { name: 'Accenture', offers: 'Number of offers mode (Illustrative)', sector: '' },
-        { name: 'Amazon', offers: 'Number of offers mode (Illustrative)', sector: '' },
-        { name: 'L&T Infotech', offers: 'Number of offers mode (Illustrative)', sector: '' }
+    const topRecruiters = recruiters.length > 0 ? recruiters.map(r => ({ name: r, offers: 'Top Recruiter', sector: 'Recruiting for various positions' })) : [
+        { name: 'Information Pending', offers: '—', sector: 'Detailed recruiter list coming soon' }
     ];
 
     return (
@@ -113,8 +108,8 @@ const RankingPlacement = ({ collegeData }) => {
                             
                             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                                 <div>
-                                    <div style={{ fontSize: '24px', fontWeight: 900, color: '#1e293b', filter: !user ? 'blur(8px)' : 'none' }}>
-                                        {user ? stat.value : '₹ XX.X LPA'}
+                                    <div style={{ fontSize: '24px', fontWeight: 900, color: '#1e293b' }}>
+                                        {stat.value}
                                     </div>
                                     {stat.trend && (
                                         <div style={{ fontSize: '12px', color: stat.color, fontWeight: 700, marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -223,8 +218,7 @@ const RankingPlacement = ({ collegeData }) => {
                         padding: '16px', 
                         display: 'flex', 
                         flexDirection: 'column', 
-                        gap: '10px',
-                        filter: !user ? 'blur(5px)' : 'none'
+                        gap: '10px'
                     }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <div style={{ width: '40px', height: '40px', background: '#eff6ff', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', color: '#3b82f6', fontWeight: 900 }}>
@@ -245,25 +239,7 @@ const RankingPlacement = ({ collegeData }) => {
                     </div>
                 ))}
                 
-                {!user && (
-                    <div style={{ 
-                        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, 
-                        background: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(2px)', 
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                        zIndex: 5, borderRadius: '16px' 
-                    }}>
-                        <button 
-                            onClick={() => window.dispatchEvent(new CustomEvent('open-auth-modal', { detail: 'login' }))}
-                            style={{ 
-                                padding: '12px 24px', background: '#1e293b', color: '#fff', 
-                                border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', gap: '8px'
-                            }}
-                        >
-                            <Lock size={16} /> Unlock Recruitment Details
-                        </button>
-                    </div>
-                )}
+                {/* Removed Auth Overlay */}
             </div>
         </div>
         </>

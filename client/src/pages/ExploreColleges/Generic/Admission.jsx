@@ -51,7 +51,7 @@ const Admission = ({ collegeData }) => {
                             {name} Admission Guide
                         </h2>
                         <p style={textStyle}>
-                            Get detailed information about the admission process, eligibility criteria, and important dates for the current academic session.
+                            {collegeData?.admissionProcess || "Get detailed information about the admission process, eligibility criteria, and important dates for the current academic session. Detailed guide coming soon."}
                         </p>
                     </div>
                     <button 
@@ -195,17 +195,28 @@ const Admission = ({ collegeData }) => {
             <div style={cardStyle}>
                 <h3 style={subTitleStyle}>Common Admission FAQs</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    {[
-                        { q: 'Is there any direct admission?', a: 'Direct admission is available for certain management quota seats, subject to eligibility.' },
-                        { q: 'What is the application fee?', a: 'The application fee typically ranges from ₹1000 to ₹1500 depending on the course.' }
-                    ].map((f, i) => (
-                        <div key={i} style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px' }}>
-                            <div style={{ fontWeight: 800, fontSize: '14px', color: '#1e293b', marginBottom: '6px', display: 'flex', gap: '8px' }}>
-                                <HelpCircle size={16} color="#5b51d8" /> {f.q}
+                    {collegeData?.faq?.length > 0 ? (
+                        collegeData.faq.map((f, i) => (
+                            <div key={i} style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px' }}>
+                                <div style={{ fontWeight: 800, fontSize: '14px', color: '#1e293b', marginBottom: '6px', display: 'flex', gap: '8px' }}>
+                                    <HelpCircle size={16} color="#5b51d8" /> {f.question || f.q}
+                                </div>
+                                <div style={{ fontSize: '13px', color: '#64748b', lineHeight: 1.6 }}>{f.answer || f.a}</div>
                             </div>
-                            <div style={{ fontSize: '13px', color: '#64748b', lineHeight: 1.6 }}>{f.a}</div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        [
+                            { q: 'Is there any direct admission?', a: 'Direct admission is available for certain management quota seats, subject to eligibility.' },
+                            { q: 'What is the application fee?', a: 'The application fee typically ranges from ₹1000 to ₹1500 depending on the course.' }
+                        ].map((f, i) => (
+                            <div key={i} style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px' }}>
+                                <div style={{ fontWeight: 800, fontSize: '14px', color: '#1e293b', marginBottom: '6px', display: 'flex', gap: '8px' }}>
+                                    <HelpCircle size={16} color="#5b51d8" /> {f.q}
+                                </div>
+                                <div style={{ fontSize: '13px', color: '#64748b', lineHeight: 1.6 }}>{f.a}</div>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
         </div>

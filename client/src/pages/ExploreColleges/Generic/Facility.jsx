@@ -1,38 +1,42 @@
 import React, { useState } from 'react';
-import { Building2, Book, Monitor, Coffee, Home, Dumbbell, Wifi, Laptop, Microscope, Activity, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Building2, Book, Monitor, Coffee, Home, Dumbbell, Wifi, Activity, ChevronLeft, ChevronRight, X, Microscope } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Facility = ({ collegeData }) => {
     const [selectedFacility, setSelectedFacility] = useState(null);
 
-    const facilities = collegeData?.facilities || [
-        'Library', 'Hostel', 'Computer Labs', 'Cafeteria', 'Wi-Fi Campus', 
-        'Sports Complex', 'Auditorium', 'Medical Facilities', 'Gym', 'Laboratories'
+    const name = collegeData?.name || 'College';
+    const dbFacilities = collegeData?.facilities || [];
+    
+    const standardFacilities = [
+        { name: 'Library', icon: <Book />, color: '#8B5CF6', bg: '#f5f3ff' },
+        { name: 'Hostel', icon: <Home />, color: '#10B981', bg: '#ecfdf5' },
+        { name: 'Computer Labs', icon: <Monitor />, color: '#3B82F6', bg: '#eff6ff' },
+        { name: 'Cafeteria', icon: <Coffee />, color: '#F59E0B', bg: '#fffbeb' },
+        { name: 'Wi-Fi Campus', icon: <Wifi />, color: '#6366F1', bg: '#eef2ff' },
+        { name: 'Sports Complex', icon: <Dumbbell />, color: '#EF4444', bg: '#fef2f2' },
+        { name: 'Auditorium', icon: <Building2 />, color: '#7C3AED', bg: '#f5f3ff' },
+        { name: 'Medical Facilities', icon: <Activity />, color: '#FB7185', bg: '#fff1f2' },
+        { name: 'Gym', icon: <Dumbbell />, color: '#EF4444', bg: '#fef2f2' },
+        { name: 'Laboratories', icon: <Monitor />, color: '#3B82F6', bg: '#eff6ff' }
     ];
 
     const facilityDescriptions = {
-        'Library': 'The central library boasts a collection of over 30,000 books, journals, and digital resources. It provides a peaceful environment for research and study, with dedicated sections for various engineering disciplines. It includes e-books, research papers, and a quiet reading hall.',
-        'Hostel': 'Modern hostels provide comfortable accommodation with basic amenities like Wi-Fi, laundry, and common rooms. Separate facilities are available for boys and girls with 24/7 security and nutritious mess food.',
-        'Computer Labs': 'State-of-the-art computer labs equipped with high-performance systems and the latest software for practical training, programming, and research projects. High-speed LAN connectivity is available for all systems.',
-        'Cafeteria': 'The spacious cafeteria serves a variety of hygienic and nutritious meals, snacks, and beverages to students and staff at reasonable prices. It is a popular spot for social interaction.',
-        'Wi-Fi Campus': 'High-speed internet connectivity is available across the entire campus, including academic blocks, libraries, and hostels, ensuring students have access to online resources 24/7.',
-        'Sports Complex': 'A well-equipped sports complex featuring indoor and outdoor facilities for cricket, football, basketball, badminton, and more. Trained coaches are available for guidance.',
-        'Auditorium': 'A grand, air-conditioned auditorium with modern audio-visual equipment, stage lighting, and a large seating capacity for seminars, cultural events, and guest lectures.',
-        'Medical Facilities': 'On-campus medical center with qualified doctors and nursing staff to provide primary healthcare and emergency services. Ample first-aid kits and ambulance services are available.',
-        'Gym': 'A fully equipped modern gymnasium with cardio and weight training equipment to help students maintain physical fitness and mental well-being.',
-        'Laboratories': 'Subject-specific laboratories with advanced equipment and safety measures for hands-on learning, practical examinations, and conducting research experiments.'
+        'Library': 'Over 30,000 books, journals, and digital resources with peaceful reading halls.',
+        'Hostel': 'Comfortable separate accommodation for boys and girls with high security and mess.',
+        'Computer Labs': 'High-performance systems with latest software and high-speed LAN connectivity.',
+        'Cafeteria': 'Hygienic and nutritious food, snacks, and beverages for students and staff.',
+        'Wi-Fi Campus': '24/7 high-speed internet connectivity across all academic and residential blocks.',
+        'Sports Complex': 'Indoor and outdoor facilities for cricket, football, basketball, and more.',
+        'Auditorium': 'Modern air-conditioned auditorium for seminars, cultural events, and guest lectures.',
+        'Medical Facilities': 'On-campus medical center with qualified doctors and emergency ambulance services.',
+        'Gym': 'Fully equipped modern gymnasium for physical fitness and mental well-being.',
+        'Laboratories': 'Subject-specific advanced labs for hands-on learning and research experiments.'
     };
 
-    const getIcon = (name, size = 32) => {
-        const n = name.toLowerCase();
-        if (n.includes('library') || n.includes('book')) return <Book size={size} color="#5b51d8" />;
-        if (n.includes('lab') || n.includes('laptop') || n.includes('monitor')) return <Monitor size={size} color="#3b82f6" />;
-        if (n.includes('cafeteria') || n.includes('food') || n.includes('canteen')) return <Coffee size={size} color="#f59e0b" />;
-        if (n.includes('hostel')) return <Home size={size} color="#10b981" />;
-        if (n.includes('sport') || n.includes('gym') || n.includes('playground')) return <Dumbbell size={size} color="#ef4444" />;
-        if (n.includes('wi-fi') || n.includes('internet')) return <Wifi size={size} color="#6366f1" />;
-        if (n.includes('medical') || n.includes('health')) return <Activity size={size} color="#ec4899" />;
-        if (n.includes('auditorium')) return <Building2 size={size} color="#8b5cf6" />;
+    const getIcon = (facilityName, size = 32) => {
+        const standard = standardFacilities.find(sf => sf.name === facilityName);
+        if (standard) return React.cloneElement(standard.icon, { size, color: standard.color });
         return <Microscope size={size} color="#64748b" />;
     };
 
@@ -43,87 +47,94 @@ const Facility = ({ collegeData }) => {
         border: '1px solid #e2e8f0',
         display: 'flex',
         flexDirection: 'column',
-        gap: '24px',
-        boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.01)'
+        gap: '32px',
+        boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)'
     };
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', position: 'relative' }}>
             <div style={cardStyle}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h2 style={{ fontSize: '22px', fontWeight: 900, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <Building2 size={26} color="#5b51d8" />
+                    <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <Building2 size={24} color="#5b51d8" />
                         Campus Facilities & Infrastructure
                     </h2>
                 </div>
 
                 <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(5, 1fr)', 
-                    gap: '20px',
-                    padding: '10px 0'
+                    position: 'relative',
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
                 }}>
-                    {facilities.map((f, i) => (
-                        <motion.div 
-                            key={i} 
-                            onClick={() => setSelectedFacility(f)}
-                            style={{ 
-                                padding: '24px', 
-                                background: '#f8fafc', 
-                                borderRadius: '24px', 
-                                border: '1px solid #f1f5f9', 
-                                display: 'flex', 
-                                flexDirection: 'column', 
-                                alignItems: 'center', 
-                                textAlign: 'center',
-                                gap: '16px',
-                                cursor: 'pointer',
-                                transition: 'background 0.3s'
-                            }} 
-                            whileHover={{ 
-                                y: -8,
-                                background: '#fff',
-                                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02)',
-                                borderColor: '#5b51d833'
-                            }}
-                        >
-                            <div style={{ 
-                                padding: '20px', 
-                                background: '#fff', 
-                                borderRadius: '20px', 
-                                boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}>
-                                {getIcon(f)}
-                            </div>
-                            <div style={{ fontSize: '15px', fontWeight: 800, color: '#1e293b' }}>{f}</div>
-                        </motion.div>
+                    <div style={{ 
+                        flex: 1,
+                        display: 'grid', 
+                        gridTemplateColumns: 'repeat(5, 1fr)', 
+                        gap: '20px',
+                    }}>
+                        {standardFacilities.map((f, i) => (
+                            <motion.div 
+                                key={i} 
+                                onClick={() => setSelectedFacility(f.name)}
+                                style={{ 
+                                    padding: '24px 12px', 
+                                    background: '#fff', 
+                                    borderRadius: '20px', 
+                                    border: '1.5px solid #f1f5f9', 
+                                    display: 'flex', 
+                                    flexDirection: 'column', 
+                                    alignItems: 'center', 
+                                    textAlign: 'center',
+                                    gap: '16px',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease',
+                                    opacity: 1 // ALWAYS FULLY VISIBLE
+                                }} 
+                                whileHover={{ 
+                                    y: -5,
+                                    boxShadow: '0 10px 20px -5px rgba(0, 0, 0, 0.05)',
+                                    borderColor: f.color + '44'
+                                }}
+                            >
+                                <div style={{ 
+                                    width: '56px',
+                                    height: '56px',
+                                    background: f.bg, 
+                                    borderRadius: '16px', 
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: f.color
+                                }}>
+                                    {React.cloneElement(f.icon, { size: 28 })}
+                                </div>
+                                <div style={{ fontSize: '13px', fontWeight: 800, color: '#1e293b' }}>{f.name}</div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {dbFacilities.length > 0 && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
+                    {dbFacilities.slice(0, 2).map((f, i) => (
+                        <div key={i} style={cardStyle}>
+                            <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <div style={{ padding: '8px', background: '#f8fafc', borderRadius: '8px' }}>
+                                    {getIcon(f, 20)}
+                                </div>
+                                {f}
+                            </h3>
+                            <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.8 }}>
+                                {facilityDescriptions[f] || `Information about the ${f} at ${name} is currently being updated.`}
+                            </p>
+                        </div>
                     ))}
                 </div>
-            </div>
+            )}
 
-
-            {/* Infrastructure Details - Static for Library and Hostel by default */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
-                <div style={cardStyle}>
-                    <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <Book size={20} color="#5b51d8" />
-                        Central Library
-                    </h3>
-                    <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.8 }}>The central library boasts a collection of over 30,000 books, journals, and digital resources. It provides a peaceful environment for research and study, with dedicated sections for various disciplines.</p>
-                </div>
-                <div style={cardStyle}>
-                    <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <Home size={20} color="#10b981" />
-                        Hostel Accommodation
-                    </h3>
-                    <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.8 }}>Modern hostels provide comfortable accommodation with basic amenities like Wi-Fi, laundry, and common rooms. Separate facilities are available for boys and girls with 24/7 security.</p>
-                </div>
-            </div>
-
-            {/* Modal Detail Pop-up */}
             <AnimatePresence>
                 {selectedFacility && (
                     <motion.div
@@ -181,11 +192,8 @@ const Facility = ({ collegeData }) => {
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     cursor: 'pointer',
-                                    color: '#64748b',
-                                    transition: 'all 0.2s'
+                                    color: '#64748b'
                                 }}
-                                onMouseEnter={(e) => { e.currentTarget.style.background = '#e2e8f0'; e.currentTarget.style.color = '#0f172a'; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#64748b'; }}
                             >
                                 <X size={20} />
                             </button>
@@ -205,7 +213,7 @@ const Facility = ({ collegeData }) => {
                                     {selectedFacility}
                                 </h3>
                                 <p style={{ fontSize: '16px', color: '#64748b', lineHeight: 1.8 }}>
-                                    {facilityDescriptions[selectedFacility] || "Details about this facility are currently being updated. Please check back later."}
+                                    {facilityDescriptions[selectedFacility] || "Details about this facility are currently being updated."}
                                 </p>
                             </div>
 
@@ -220,12 +228,8 @@ const Facility = ({ collegeData }) => {
                                     borderRadius: '16px',
                                     fontWeight: 700,
                                     fontSize: '15px',
-                                    cursor: 'pointer',
-                                    boxShadow: '0 10px 15px -3px rgba(91, 81, 216, 0.3)',
-                                    transition: 'all 0.2s'
+                                    cursor: 'pointer'
                                 }}
-                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                             >
                                 Close Details
                             </button>

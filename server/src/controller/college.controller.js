@@ -155,6 +155,72 @@ export const getColleges = async (req, res) => {
             scoreStage = { $addFields: { relevanceScore: 0 } };
         }
 
+        // Add INI Score for prioritization of IITs, NITs, etc.
+        const iitRegex = /\b(Indian Institute of Technology|IIT)\b/i;
+        const nitRegex = /\b(National Institute of Technology|NIT)\b/i;
+        const iiitRegex = /\b(Indian Institute of Information Technology|IIIT)\b/i;
+        const otherIniKeywords = [
+            'Indian Institute of Management',
+            'All India Institute of Medical Sciences',
+            'BITS PILANI',
+            'Indian Institute of Science Education and Research',
+            'IIM ',
+            'AIIMS ',
+            'IISER '
+        ];
+
+        const otherIniRegex = new RegExp(otherIniKeywords.join('|'), 'i');
+
+        const iniScoreStage = {
+            $addFields: {
+                iniScore: {
+                    $cond: {
+                        if: {
+                            $or: [
+                                { $regexMatch: { input: "$name", regex: iitRegex } },
+                                { $regexMatch: { input: "$popularName", regex: iitRegex } }
+                            ]
+                        },
+                        then: 100,
+                        else: {
+                            $cond: {
+                                if: {
+                                    $or: [
+                                        { $regexMatch: { input: "$name", regex: nitRegex } },
+                                        { $regexMatch: { input: "$popularName", regex: nitRegex } }
+                                    ]
+                                },
+                                then: 80,
+                                else: {
+                                    $cond: {
+                                        if: {
+                                            $or: [
+                                                { $regexMatch: { input: "$name", regex: iiitRegex } },
+                                                { $regexMatch: { input: "$popularName", regex: iiitRegex } }
+                                            ]
+                                        },
+                                        then: 60,
+                                        else: {
+                                            $cond: {
+                                                if: {
+                                                    $or: [
+                                                        { $regexMatch: { input: "$name", regex: otherIniRegex } },
+                                                        { $regexMatch: { input: "$popularName", regex: otherIniRegex } }
+                                                    ]
+                                                },
+                                                then: 40,
+                                                else: 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
         // Filter by state
         if (state && state !== 'All') {
             query.state = { $regex: new RegExp(`^${state}$`, 'i') };
@@ -189,9 +255,10 @@ export const getColleges = async (req, res) => {
         const pipeline = [
             { $match: query },
             scoreStage,
+            iniScoreStage,
             // Step 1: Smallest possible projection for sorting + Scoring
-            { $project: { _id: 1, name: 1, relevanceScore: 1 } },
-            { $sort: { relevanceScore: -1, name: 1 } },
+            { $project: { _id: 1, name: 1, relevanceScore: 1, iniScore: 1 } },
+            { $sort: { relevanceScore: -1, iniScore: -1, name: 1 } },
             { $skip: skip },
             { $limit: parseInt(limit) },
             // Step 2: Hydrate full details only for the paginated results
@@ -253,42 +320,16 @@ export const getColleges = async (req, res) => {
 export const getCollegeStats = async (req, res) => {
     try {
         const { name } = req.params;
-        const { triggerScrape = 'false' } = req.query;
-
         const escapedName = name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
         const college = await College.findOne({
             $or: [
                 { name: { $regex: new RegExp(`^${escapedName}$`, 'i') } },
                 { name: { $regex: new RegExp(name.split(' - ')[0], 'i') } }
             ]
-        });
+        }).lean();
+
         if (!college) {
             return res.status(404).json({ success: false, message: 'College not found' });
-        }
-
-        // If reviewStats is missing or user requested a fresh scrape, trigger Gemini in background (non-blocking)
-        if (triggerScrape === 'true' || !college.reviewStats || !college.reviewStats.external || !college.reviewStats.external.google.rating) {
-            // FIRE AND FORGET - Do not await here
-            (async () => {
-                try {
-                    const { extractCollegeInfo } = await import('../services/gemini.service.js');
-                    const aiData = await extractCollegeInfo(college.name);
-                    if (aiData && aiData.reviewStats) {
-                        const freshCollege = await College.findById(college._id);
-                        if (freshCollege) {
-                            freshCollege.reviewStats = aiData.reviewStats;
-                            if (aiData.fees) freshCollege.fees = aiData.fees;
-                            if (aiData.courses) freshCollege.courses = aiData.courses;
-                            if (aiData.avgPackage) freshCollege.avgPackage = aiData.avgPackage;
-                            if (aiData.highestPackage) freshCollege.highestPackage = aiData.highestPackage;
-                            await freshCollege.save();
-                            console.log(`AI background update successful for: ${college.name}`);
-                        }
-                    }
-                } catch (aiErr) {
-                    console.error('Failed to trigger background AI scrape:', aiErr.message);
-                }
-            })();
         }
 
         const statsPipeline = [
@@ -307,13 +348,72 @@ export const getCollegeStats = async (req, res) => {
         res.json({
             success: true,
             data: {
+                ...college,
                 rating: stats.length > 0 ? stats[0].averageRating : 0,
-                reviewsCount: stats.length > 0 ? stats[0].totalReviews : 0,
-                reviewStats: college.reviewStats
+                reviewsCount: stats.length > 0 ? stats[0].totalReviews : 0
             }
         });
     } catch (error) {
         console.error('Error fetching college stats:', error);
+        res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    }
+};
+
+export const getCollegeById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const college = await College.findById(id).lean();
+
+        if (!college) {
+            return res.status(404).json({ success: false, message: 'College not found' });
+        }
+
+        const statsPipeline = [
+            { $match: { collegeId: college._id } },
+            {
+                $group: {
+                    _id: '$collegeId',
+                    averageRating: { $avg: '$rating' },
+                    totalReviews: { $sum: 1 }
+                }
+            }
+        ];
+
+        const stats = await Review.aggregate(statsPipeline);
+
+        res.json({
+            success: true,
+            data: {
+                ...college,
+                rating: stats.length > 0 ? stats[0].averageRating : 0,
+                reviewsCount: stats.length > 0 ? stats[0].totalReviews : 0
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching college by ID:', error);
+        res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    }
+};
+
+
+export const updateCollege = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates = req.body;
+
+        const college = await College.findByIdAndUpdate(id, updates, { new: true });
+
+        if (!college) {
+            return res.status(404).json({ success: false, message: 'College not found' });
+        }
+
+        res.json({
+            success: true,
+            message: 'College updated successfully',
+            data: college
+        });
+    } catch (error) {
+        console.error('Error updating college:', error);
         res.status(500).json({ success: false, message: 'Server Error', error: error.message });
     }
 };

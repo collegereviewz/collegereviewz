@@ -46,15 +46,18 @@ const ContactDetails = ({ collegeData }) => {
                     </div>
 
                     <div style={cardStyle}>
-                        <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b' }}>Social Media</h3>
+                        <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#1e293b' }}>Follow Us</h3>
+                        <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6 }}>
+                            Stay updated with the latest campus news and events through our official social media channels.
+                        </p>
                         <div style={{ display: 'flex', gap: '16px' }}>
                             {[
-                                { icon: <Facebook />, color: '#1877f2' },
-                                { icon: <Twitter />, color: '#1da1f2' },
-                                { icon: <Linkedin />, color: '#0a66c2' },
-                                { icon: <Instagram />, color: '#e4405f' }
+                                { icon: <Facebook />, color: '#1877f2', name: 'Facebook' },
+                                { icon: <Twitter />, color: '#1da1f2', name: 'Twitter' },
+                                { icon: <Linkedin />, color: '#0a66c2', name: 'LinkedIn' },
+                                { icon: <Instagram />, color: '#e4405f', name: 'Instagram' }
                             ].map((s, i) => (
-                                <div key={i} style={{ 
+                                <div key={i} title={s.name} style={{ 
                                     width: '48px', 
                                     height: '48px', 
                                     borderRadius: '12px', 

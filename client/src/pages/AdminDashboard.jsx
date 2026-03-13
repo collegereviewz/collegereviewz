@@ -11,13 +11,27 @@ import {
     User as UserIcon,
     Key,
     Save,
+    PlusCircle,
+    FilePlus,
+    Trash2,
+    Plus,
+    Info,
+    Calendar,
+    TrendingUp,
+    AlertCircle,
+    Briefcase,
     CheckCircle,
     XCircle,
-    Clock,
-    Briefcase,
     Download,
-    PlusCircle
+    Clock,
+    GraduationCap,
+    Globe,
+    Building2,
+    Map
 } from 'lucide-react';
+// Removed static examsData import for dynamic fetching
+// import examsData from './ExploreColleges/Exams/exams_data.json';
+import Swal from 'sweetalert2';
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('users');
@@ -30,6 +44,9 @@ const AdminDashboard = () => {
     const [appLoading, setAppLoading] = useState(false);
     const [appError, setAppError] = useState('');
 
+    const [examsData, setExamsData] = useState([]);
+    const [examsLoading, setExamsLoading] = useState(false);
+
     const [jobForm, setJobForm] = useState({
         title: '',
         department: '',
@@ -40,6 +57,85 @@ const AdminDashboard = () => {
     });
     const [jobFormLoading, setJobFormLoading] = useState(false);
     const [jobFormSuccess, setJobFormSuccess] = useState('');
+
+    const [examForm, setExamForm] = useState({
+        name: '',
+        fullName: '',
+        category: '',
+        examDate: '',
+        appDate: '',
+        resultDate: '',
+        conductingBody: '',
+        officialWebsite: '',
+        summary: '',
+        highlights: {
+            mode: 'Pen & Paper (OMR)',
+            totalMarks: '',
+            negative: '',
+            duration: '',
+            languages: '',
+            frequency: 'Once a year'
+        },
+        competitionTrends: [
+            { year: 2024, count: '' }
+        ],
+        importantDates: [
+            { label: 'Exam Date', date: '', status: 'Confirmed' }
+        ],
+        updates: [
+            { title: '', date: '', text: '', type: 'all' }
+        ]
+    });
+    const [examFormLoading, setExamFormLoading] = useState(false);
+    const [examFormSuccess, setExamFormSuccess] = useState('');
+
+    const [allColleges, setAllColleges] = useState([]);
+    const [collegeForm, setCollegeForm] = useState({
+        name: '',
+        state: '',
+        district: '',
+        popularName: '',
+        address: '',
+        institutionType: 'IIT',
+        university: '',
+        officialWebsite: '',
+        fees: '',
+        establishedYear: '',
+        managementType: 'Government',
+        avgPackage: '',
+        highestPackage: ''
+    });
+    const [collegeLoading, setCollegeLoading] = useState(false);
+    const [selectedCollegeId, setSelectedCollegeId] = useState('');
+
+    const handleHighlightChange = (field, value) => {
+        setExamForm(prev => ({
+            ...prev,
+            highlights: { ...prev.highlights, [field]: value }
+        }));
+    };
+
+    const addArrayItem = (field, defaultValue) => {
+        setExamForm(prev => ({
+            ...prev,
+            [field]: [...prev[field], defaultValue]
+        }));
+    };
+
+    const updateArrayItem = (field, index, value) => {
+        setExamForm(prev => {
+            const newArray = [...prev[field]];
+            newArray[index] = { ...newArray[index], ...value };
+            return { ...prev, [field]: newArray };
+        });
+    };
+
+    const removeArrayItem = (field, index) => {
+        setExamForm(prev => ({
+            ...prev,
+            [field]: prev[field].filter((_, i) => i !== index)
+        }));
+    };
 
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -57,8 +153,35 @@ const AdminDashboard = () => {
         } else {
             fetchUsers();
             fetchApplications();
+            fetchCollegesAdmin();
+            fetchExamsAdmin();
         }
     }, [adminToken]);
+
+    const fetchExamsAdmin = async () => {
+        setExamsLoading(true);
+        try {
+            const response = await axios.get('http://localhost:5000/api/admin/exams', {
+                headers: { Authorization: `Bearer ${adminToken}` }
+            });
+            setExamsData(response.data);
+        } catch (err) {
+            console.error("Error fetching exams:", err);
+        } finally {
+            setExamsLoading(false);
+        }
+    };
+
+    const fetchCollegesAdmin = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/colleges?limit=1000');
+            if (response.data.success) {
+                setAllColleges(response.data.data);
+            }
+        } catch (err) {
+            console.error("Error fetching colleges:", err);
+        }
+    };
 
     const fetchApplications = async () => {
         setAppLoading(true);
@@ -94,6 +217,257 @@ const AdminDashboard = () => {
             alert('Failed to create job posting.');
         } finally {
             setJobFormLoading(false);
+        }
+    };
+
+    const handleAddExam = async (e) => {
+        e.preventDefault();
+        setExamFormLoading(true);
+        try {
+            // Process updates to ensure timestamps for the 24-hour rule
+            const processedUpdates = (examForm.updates || []).map(upd => ({
+                ...upd,
+                timestamp: upd.timestamp || new Date().toISOString()
+            }));
+
+            const response = await axios.post('http://localhost:5000/api/admin/exams', {
+                ...examForm,
+                updates: processedUpdates
+            }, {
+                headers: { Authorization: `Bearer ${adminToken}` }
+            });
+            
+            if (response.data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Exam and all linked data updated/added successfully across the platform!',
+                    confirmButtonColor: '#6366f1'
+                });
+                
+                // Refresh exams list from server
+                fetchExamsAdmin();
+                
+                // We'll reset the form.
+                setExamForm({
+                    name: '',
+                    fullName: '',
+                    category: '',
+                    examDate: '',
+                    appDate: '',
+                    resultDate: '',
+                    conductingBody: '',
+                    officialWebsite: '',
+                    summary: '',
+                    highlights: {
+                        mode: 'Pen & Paper (OMR)',
+                        totalMarks: '',
+                        negative: '',
+                        duration: '',
+                        languages: '',
+                        frequency: 'Once a year'
+                    },
+                    competitionTrends: [{ year: 2024, count: '' }],
+                    importantDates: [{ label: 'Exam Date', date: '', status: 'Confirmed' }],
+                    updates: [{ title: '', date: '', text: '', type: 'all' }]
+                });
+            }
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.response?.data?.message || 'Failed to update exam data.'
+            });
+        } finally {
+            setExamFormLoading(false);
+        }
+    };
+
+    const handleAddCollege = async (e) => {
+        e.preventDefault();
+        setCollegeLoading(true);
+        try {
+            const response = await axios.post('http://localhost:5000/api/admin/colleges', collegeForm, {
+                headers: { Authorization: `Bearer ${adminToken}` }
+            });
+            
+            if (response.data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'College Updated!',
+                    text: 'College details have been saved to the database.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                fetchCollegesAdmin(); // Refresh the list
+            }
+        } catch (err) {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to update college.' });
+        } finally {
+            setCollegeLoading(false);
+        }
+    };
+
+    const handleSelectExistingCollege = (e) => {
+        const id = e.target.value;
+        setSelectedCollegeId(id);
+        if (!id) {
+            setCollegeForm({
+                name: '', state: '', district: '', popularName: '', address: '',
+                institutionType: 'IIT', university: '', officialWebsite: '',
+                fees: '', establishedYear: '', managementType: 'Government',
+                avgPackage: '', highestPackage: ''
+            });
+            return;
+        }
+
+        const selected = allColleges.find(col => col._id === id);
+        if (selected) {
+            setCollegeForm({
+                _id: selected._id,
+                name: selected.name || '',
+                state: selected.state || '',
+                district: selected.district || '',
+                popularName: selected.popularName || '',
+                address: selected.address || '',
+                institutionType: selected.institutionType || '',
+                university: selected.university || '',
+                officialWebsite: selected.officialWebsite || '',
+                fees: selected.fees || '',
+                establishedYear: selected.establishedYear || '',
+                managementType: selected.managementType || '',
+                avgPackage: selected.avgPackage || '',
+                highestPackage: selected.highestPackage || ''
+            });
+        }
+    };
+
+    const handleDeleteCollege = async () => {
+        if (!selectedCollegeId) return;
+        
+        const result = await Swal.fire({
+            title: 'Delete College?',
+            text: "This will permanently remove this college from the database.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#1e293b',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await axios.delete(`http://localhost:5000/api/admin/colleges/${selectedCollegeId}`, {
+                    headers: { Authorization: `Bearer ${adminToken}` }
+                });
+                Swal.fire('Deleted!', 'College has been removed.', 'success');
+                setSelectedCollegeId('');
+                setCollegeForm({
+                    name: '', state: '', district: '', popularName: '', address: '',
+                    institutionType: 'IIT', university: '', officialWebsite: '',
+                    fees: '', establishedYear: '', managementType: 'Government',
+                    avgPackage: '', highestPackage: ''
+                });
+                fetchCollegesAdmin();
+            } catch (err) {
+                Swal.fire('Error', 'Failed to delete college.', 'error');
+            }
+        }
+    };
+
+    const handleSelectExistingExam = (e) => {
+        const examName = e.target.value;
+        if (!examName) {
+            setExamForm({
+                name: '',
+                fullName: '',
+                category: '',
+                examDate: '',
+                appDate: '',
+                resultDate: '',
+                conductingBody: '',
+                officialWebsite: '',
+                summary: '',
+                highlights: {
+                    mode: 'Pen & Paper (OMR)',
+                    totalMarks: '',
+                    negative: '',
+                    duration: '',
+                    languages: '',
+                    frequency: 'Once a year'
+                },
+                competitionTrends: [{ year: 2024, count: '' }],
+                importantDates: [{ label: 'Exam Date', date: '', status: 'Confirmed' }],
+                updates: [{ title: '', date: '', text: '', type: 'all' }]
+            });
+            return;
+        }
+
+        const selected = examsData.find(ex => ex.name === examName);
+        if (selected) {
+            setExamForm({
+                name: selected.name || '',
+                fullName: selected.fullName || '',
+                category: selected.category || '',
+                examDate: selected.examDate || '',
+                appDate: selected.appDate || '',
+                resultDate: selected.resultDate || '',
+                conductingBody: selected.conductingBody || '',
+                officialWebsite: selected.officialWebsite || '',
+                summary: selected.summary || '',
+                highlights: {
+                    mode: selected.highlights?.mode || 'Pen & Paper (OMR)',
+                    totalMarks: selected.highlights?.totalMarks || '',
+                    negative: selected.highlights?.negative || '',
+                    duration: selected.highlights?.duration || '',
+                    languages: selected.highlights?.languages || '',
+                    frequency: selected.highlights?.frequency || 'Once a year'
+                },
+                competitionTrends: selected.competitionTrends && selected.competitionTrends.length > 0 
+                    ? selected.competitionTrends 
+                    : [{ year: 2024, count: '' }],
+                importantDates: (selected.dates || selected.importantDates) && (selected.dates || selected.importantDates).length > 0 
+                    ? (selected.dates || selected.importantDates)
+                    : [{ label: 'Exam Date', date: '', status: 'Confirmed' }],
+                updates: selected.updates && selected.updates.length > 0 
+                    ? selected.updates 
+                    : [{ title: '', date: '', text: '', type: 'all' }]
+            });
+        }
+    };
+
+    const handleDeleteExam = async () => {
+        if (!examForm.name) return;
+
+        const result = await Swal.fire({
+            title: 'Delete Exam?',
+            text: `Remove ${examForm.name} from the platform? This cannot be undone.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'Yes, Delete'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await axios.delete(`http://localhost:5000/api/admin/exams/${encodeURIComponent(examForm.name)}`, {
+                    headers: { Authorization: `Bearer ${adminToken}` }
+                });
+                Swal.fire('Deleted!', 'Exam has been removed.', 'success');
+                // Refresh list from server after delete
+                fetchExamsAdmin();
+                // Refresh local state if possible or just clear form
+                setExamForm({
+                    name: '', fullName: '', category: '', examDate: '', appDate: '', resultDate: '',
+                    conductingBody: '', officialWebsite: '', summary: '',
+                    highlights: { mode: 'Pen & Paper (OMR)', totalMarks: '', negative: '', duration: '', languages: '', frequency: 'Once a year' },
+                    competitionTrends: [{ year: 2024, count: '' }],
+                    importantDates: [{ label: 'Exam Date', date: '', status: 'Confirmed' }],
+                    updates: [{ title: '', date: '', text: '', type: 'all' }]
+                });
+            } catch (err) {
+                Swal.fire('Error', 'Failed to delete exam.', 'error');
+            }
         }
     };
 
@@ -219,6 +593,32 @@ const AdminDashboard = () => {
                         }}
                     >
                         <PlusCircle size={20} /> Post New Job
+                    </div>
+                    <div
+                        onClick={() => setActiveTab('addExam')}
+                        style={{
+                            padding: '14px 16px', borderRadius: '12px', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px',
+                            background: activeTab === 'addExam' ? 'rgba(99,102,241,0.1)' : 'transparent',
+                            color: activeTab === 'addExam' ? '#818cf8' : '#94a3b8',
+                            transition: 'all 0.2s',
+                            fontWeight: activeTab === 'addExam' ? 600 : 500
+                        }}
+                    >
+                        <FilePlus size={20} /> Exams Hub
+                    </div>
+                    <div
+                        onClick={() => setActiveTab('manageColleges')}
+                        style={{
+                            padding: '14px 16px', borderRadius: '12px', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px',
+                            background: activeTab === 'manageColleges' ? 'rgba(99,102,241,0.1)' : 'transparent',
+                            color: activeTab === 'manageColleges' ? '#818cf8' : '#94a3b8',
+                            transition: 'all 0.2s',
+                            fontWeight: activeTab === 'manageColleges' ? 600 : 500
+                        }}
+                    >
+                        <GraduationCap size={20} /> Colleges Database
                     </div>
                     <div
                         onClick={() => setActiveTab('settings')}
@@ -459,6 +859,374 @@ const AdminDashboard = () => {
                                 </div>
                             )}
                         </motion.div>
+                    ) : activeTab === 'addExam' ? (
+                        <motion.div
+                            key="addExam"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            style={{ maxWidth: '800px' }}
+                        >
+                            <h2 style={{ fontSize: '28px', fontWeight: 700, color: '#1e293b', marginBottom: '8px' }}>Add New Exam</h2>
+                            <p style={{ color: '#64748b', marginBottom: '32px' }}>Enter details to list a new competitive examination</p>
+
+                            <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', padding: '32px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', marginBottom: '80px' }}>
+                                {examFormSuccess && (
+                                    <div style={{ 
+                                        background: '#dcfce7', color: '#15803d', padding: '16px', borderRadius: '12px', 
+                                        marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 
+                                    }}>
+                                        <CheckCircle size={20} /> {examFormSuccess}
+                                    </div>
+                                )}
+                                
+                                <div style={{ marginBottom: '32px', padding: '24px', background: '#f0f9ff', borderRadius: '16px', border: '1.5px solid #bae6fd' }}>
+                                    <label style={{ ...labelStyle, color: '#0369a1' }}>Select Existing Exam to Edit (Optional)</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <select 
+                                            onChange={handleSelectExistingExam} 
+                                            style={{ ...inputStyles, border: '1.5px solid #7dd3fc', background: '#fff' }}
+                                        >
+                                            <option value="">-- Create New Exam / Reset Form --</option>
+                                            {examsData.map((ex, i) => (
+                                                <option key={i} value={ex.name}>{ex.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: '#0ea5e9', fontWeight: 600 }}>
+                                        Selecting an exam will automatically fill the fields below for quick editing.
+                                    </p>
+                                </div>
+
+                                <form onSubmit={handleAddExam} style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+                                    
+                                    {/* Section: Basic Information */}
+                                    <section>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', paddingBottom: '12px', borderBottom: '1px solid #f1f5f9' }}>
+                                            <Info size={20} color="#6366f1" />
+                                            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b', margin: 0 }}>Basic Information</h3>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                                            <div>
+                                                <label style={labelStyle}>Exam Abbreviation *</label>
+                                                <input required type="text" value={examForm.name} onChange={e => setExamForm({...examForm, name: e.target.value})} style={inputStyles} placeholder="e.g. NEET UG" />
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>Full Name *</label>
+                                                <input required type="text" value={examForm.fullName} onChange={e => setExamForm({...examForm, fullName: e.target.value})} style={inputStyles} placeholder="e.g. National Eligibility cum Entrance Test" />
+                                            </div>
+                                        </div>
+                                        
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                                            <div>
+                                                <label style={labelStyle}>Category *</label>
+                                                <select required value={examForm.category} onChange={e => setExamForm({...examForm, category: e.target.value})} style={inputStyles}>
+                                                    <option value="">Select Category</option>
+                                                    <option value="Medical">Medical</option>
+                                                    <option value="Engineering">Engineering</option>
+                                                    <option value="Management">Management</option>
+                                                    <option value="Law">Law</option>
+                                                    <option value="Arts & Design">Arts & Design</option>
+                                                    <option value="Science">Science</option>
+                                                    <option value="Commerce">Commerce</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>Conducting Body</label>
+                                                <input type="text" value={examForm.conductingBody} onChange={e => setExamForm({...examForm, conductingBody: e.target.value})} style={inputStyles} placeholder="e.g. NTA" />
+                                            </div>
+                                        </div>
+
+                                        <div style={{ marginBottom: '20px' }}>
+                                            <label style={labelStyle}>Official Website URL</label>
+                                            <input type="text" value={examForm.officialWebsite} onChange={e => setExamForm({...examForm, officialWebsite: e.target.value})} style={inputStyles} placeholder="e.g. neet.nta.nic.in" />
+                                        </div>
+
+                                        <div>
+                                            <label style={labelStyle}>Short Summary *</label>
+                                            <textarea required rows={3} value={examForm.summary} onChange={e => setExamForm({...examForm, summary: e.target.value})} style={{...inputStyles, resize: 'vertical'}} placeholder="Enter a brief description of the exam..." />
+                                        </div>
+                                    </section>
+
+                                    {/* Section: Exam Highlights */}
+                                    <section>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', paddingBottom: '12px', borderBottom: '1px solid #f1f5f9' }}>
+                                            <TrendingUp size={20} color="#10b981" />
+                                            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b', margin: 0 }}>Exam Highlights</h3>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                                            <div>
+                                                <label style={labelStyle}>Exam Mode</label>
+                                                <input type="text" value={examForm.highlights.mode} onChange={e => handleHighlightChange('mode', e.target.value)} style={inputStyles} placeholder="e.g. Pen & Paper" />
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>Total Marks</label>
+                                                <input type="text" value={examForm.highlights.totalMarks} onChange={e => handleHighlightChange('totalMarks', e.target.value)} style={inputStyles} placeholder="e.g. 720 Marks" />
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>Negative Marking</label>
+                                                <input type="text" value={examForm.highlights.negative} onChange={e => handleHighlightChange('negative', e.target.value)} style={inputStyles} placeholder="e.g. -1 for wrong" />
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+                                            <div>
+                                                <label style={labelStyle}>Duration</label>
+                                                <input type="text" value={examForm.highlights.duration} onChange={e => handleHighlightChange('duration', e.target.value)} style={inputStyles} placeholder="e.g. 3h 20m" />
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>Languages</label>
+                                                <input type="text" value={examForm.highlights.languages} onChange={e => handleHighlightChange('languages', e.target.value)} style={inputStyles} placeholder="e.g. 13 Languages" />
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>Frequency</label>
+                                                <input type="text" value={examForm.highlights.frequency} onChange={e => handleHighlightChange('frequency', e.target.value)} style={inputStyles} placeholder="e.g. Annual" />
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    {/* Section: 10 Years Review (Competition Trends) */}
+                                    <section>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '12px', borderBottom: '1px solid #f1f5f9' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <Users size={20} color="#f59e0b" />
+                                                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b', margin: 0 }}>10 Years Review (Trends)</h3>
+                                            </div>
+                                            <button type="button" onClick={() => addArrayItem('competitionTrends', { year: 2024, count: '' })} style={addItemButtonStyle}>
+                                                <Plus size={16} /> Add Year
+                                            </button>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px' }}>
+                                            {examForm.competitionTrends.map((trend, idx) => (
+                                                <div key={idx} style={arrayItemCardStyle}>
+                                                    <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                                                        <input type="number" value={trend.year} onChange={e => updateArrayItem('competitionTrends', idx, { year: e.target.value })} style={{ ...inputStyles, padding: '8px 12px' }} placeholder="Year" />
+                                                        <button type="button" onClick={() => removeArrayItem('competitionTrends', idx)} style={removeButtonStyle}>
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    </div>
+                                                    <input type="text" value={trend.count} onChange={e => updateArrayItem('competitionTrends', idx, { count: e.target.value })} style={{ ...inputStyles, padding: '8px 12px' }} placeholder="Count (e.g. 23.3)" />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+
+                                    {/* Section: Important Dates */}
+                                    <section>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '12px', borderBottom: '1px solid #f1f5f9' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <Calendar size={20} color="#3b82f6" />
+                                                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b', margin: 0 }}>Important Dates</h3>
+                                            </div>
+                                            <button type="button" onClick={() => addArrayItem('importantDates', { label: '', date: '', status: 'Expected' })} style={addItemButtonStyle}>
+                                                <Plus size={16} /> Add Date
+                                            </button>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                            {examForm.importantDates.map((dateObj, idx) => (
+                                                <div key={idx} style={{ ...arrayItemCardStyle, display: 'grid', gridTemplateColumns: '2fr 2fr 1.5fr auto', gap: '12px', alignItems: 'center' }}>
+                                                    <input type="text" value={dateObj.label} onChange={e => updateArrayItem('importantDates', idx, { label: e.target.value })} style={{ ...inputStyles, padding: '8px 12px' }} placeholder="Label (e.g. Results)" />
+                                                    <input type="text" value={dateObj.date} onChange={e => updateArrayItem('importantDates', idx, { date: e.target.value })} style={{ ...inputStyles, padding: '8px 12px' }} placeholder="Date (e.g. June 2026)" />
+                                                    <select value={dateObj.status} onChange={e => updateArrayItem('importantDates', idx, { status: e.target.value })} style={{ ...inputStyles, padding: '8px 12px' }}>
+                                                        <option value="Confirmed">Confirmed</option>
+                                                        <option value="Expected">Expected</option>
+                                                        <option value="Tentative">Tentative</option>
+                                                        <option value="Completed">Completed</option>
+                                                    </select>
+                                                    <button type="button" onClick={() => removeArrayItem('importantDates', idx)} style={removeButtonStyle}>
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+
+                                    {/* Section: Recent Updates */}
+                                    <section>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '12px', borderBottom: '1px solid #f1f5f9' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <AlertCircle size={20} color="#ef4444" />
+                                                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b', margin: 0 }}>Recent Updates (Filtering Ready)</h3>
+                                            </div>
+                                            <button type="button" onClick={() => addArrayItem('updates', { title: '', date: '', text: '', type: 'all' })} style={addItemButtonStyle}>
+                                                <Plus size={16} /> Add Update
+                                            </button>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                            {examForm.updates.map((update, idx) => (
+                                                <div key={idx} style={{ ...arrayItemCardStyle, padding: '20px' }}>
+                                                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '12px', marginBottom: '12px' }}>
+                                                        <input type="text" value={update.title} onChange={e => updateArrayItem('updates', idx, { title: e.target.value })} style={{ ...inputStyles, padding: '8px 12px' }} placeholder="Update Title" />
+                                                        <input type="text" value={update.date} onChange={e => updateArrayItem('updates', idx, { date: e.target.value })} style={{ ...inputStyles, padding: '8px 12px' }} placeholder="Time (e.g. 10:30 AM)" />
+                                                        <select value={update.type} onChange={e => updateArrayItem('updates', idx, { type: e.target.value })} style={{ ...inputStyles, padding: '8px 12px' }}>
+                                                            <option value="all">Standard (All)</option>
+                                                            <option value="today">Today's Update</option>
+                                                            <option value="imp">Important (Imp.)</option>
+                                                        </select>
+                                                        <button type="button" onClick={() => removeArrayItem('updates', idx)} style={removeButtonStyle}>
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                    <textarea rows={2} value={update.text} onChange={e => updateArrayItem('updates', idx, { text: e.target.value })} style={{ ...inputStyles, resize: 'vertical' }} placeholder="Detailed update description..." />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '16px', marginTop: '20px', paddingBefore: '40px', borderTop: '1px solid #f1f5f9', paddingTop: '32px' }}>
+                                        {examForm.name && examsData.some(ex => ex.name === examForm.name) && (
+                                            <button type="button" onClick={handleDeleteExam} style={{
+                                                background: '#fef2f2', color: '#ef4444', padding: '14px 28px', borderRadius: '16px',
+                                                fontWeight: 700, fontSize: '15px', border: '1.5px solid #fee2e2', cursor: 'pointer'
+                                            }}>
+                                                Delete Exam
+                                            </button>
+                                        )}
+                                        <button disabled={examFormLoading} type="submit" style={{
+                                            background: 'linear-gradient(135deg, #a855f7, #6366f1)', color: 'white', padding: '16px 48px', borderRadius: '16px',
+                                            fontWeight: 700, fontSize: '16px', border: 'none', cursor: examFormLoading ? 'not-allowed' : 'pointer',
+                                            opacity: examFormLoading ? 0.7 : 1, transition: 'all 0.3s',
+                                            boxShadow: '0 10px 15px -3px rgba(168, 85, 247, 0.3)'
+                                        }}>
+                                            {examFormLoading ? 'Processing...' : 'Save Complete Exam Data'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </motion.div>
+                    ) : activeTab === 'manageColleges' ? (
+                        <motion.div
+                            key="manageColleges"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                        >
+                            <div style={{ marginBottom: '32px' }}>
+                                <h2 style={{ fontSize: '28px', fontWeight: 700, color: '#1e293b', margin: 0 }}>Colleges Database</h2>
+                                <p style={{ color: '#64748b', marginTop: '4px' }}>Update existing colleges or add new ones to the explorer</p>
+                            </div>
+
+                            {/* Select Existing College */}
+                            <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '24px', borderRadius: '20px', marginBottom: '32px' }}>
+                                <label style={{ display: 'block', color: '#1e40af', fontWeight: 800, fontSize: '14px', marginBottom: '12px' }}>
+                                    SEARCH & SELECT COLLEGE TO EDIT
+                                </label>
+                                <select 
+                                    value={selectedCollegeId} 
+                                    onChange={handleSelectExistingCollege} 
+                                    style={{ ...inputStyles, border: '1.5px solid #60a5fa', background: 'white' }}
+                                >
+                                    <option value="">-- Start Typing to Select / Create New --</option>
+                                    {allColleges.sort((a,b) => a.name.localeCompare(b.name)).map(col => (
+                                        <option key={col._id} value={col._id}>{col.name} ({col.state})</option>
+                                    ))}
+                                </select>
+                                <p style={{ fontSize: '12px', color: '#3b82f6', marginTop: '10px', fontWeight: 600 }}>
+                                    <Info size={14} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> 
+                                    Tip: Selecting a college will automatically fill the form below. If you want to add a new one, leave this empty.
+                                </p>
+                            </div>
+
+                            <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', padding: '40px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                                <form onSubmit={handleAddCollege} style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                                    
+                                    <section>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                                            <Building2 size={24} color="#6366f1" />
+                                            <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#1e293b', margin: 0 }}>Basic Credentials</h3>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr', gap: '24px' }}>
+                                            <div>
+                                                <label style={labelStyle}>Full Institutional Name *</label>
+                                                <input required type="text" value={collegeForm.name} onChange={e => setCollegeForm({...collegeForm, name: e.target.value})} style={inputStyles} placeholder="e.g. Indian Institute of Technology Bombay" />
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>State / UT *</label>
+                                                <input required type="text" value={collegeForm.state} onChange={e => setCollegeForm({...collegeForm, state: e.target.value})} style={inputStyles} placeholder="e.g. Maharashtra" />
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px', marginTop: '20px' }}>
+                                            <div>
+                                                <label style={labelStyle}>District</label>
+                                                <input type="text" value={collegeForm.district} onChange={e => setCollegeForm({...collegeForm, district: e.target.value})} style={inputStyles} placeholder="e.g. Mumbai" />
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>Popular Name / Abbreviation</label>
+                                                <input type="text" value={collegeForm.popularName} onChange={e => setCollegeForm({...collegeForm, popularName: e.target.value})} style={inputStyles} placeholder="e.g. IITB" />
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>Institution Type</label>
+                                                <input type="text" value={collegeForm.institutionType} onChange={e => setCollegeForm({...collegeForm, institutionType: e.target.value})} style={inputStyles} placeholder="e.g. IIT, NIT, Private" />
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                                            <Globe size={24} color="#10b981" />
+                                            <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#1e293b', margin: 0 }}>Online & Management</h3>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: '24px' }}>
+                                            <div>
+                                                <label style={labelStyle}>Official Website URL</label>
+                                                <input type="url" value={collegeForm.officialWebsite} onChange={e => setCollegeForm({...collegeForm, officialWebsite: e.target.value})} style={inputStyles} placeholder="https://..." />
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>Year of Establishment</label>
+                                                <input type="text" value={collegeForm.establishedYear} onChange={e => setCollegeForm({...collegeForm, establishedYear: e.target.value})} style={inputStyles} placeholder="e.g. 1958" />
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>Management</label>
+                                                <select value={collegeForm.managementType} onChange={e => setCollegeForm({...collegeForm, managementType: e.target.value})} style={inputStyles}>
+                                                    <option value="Government">Government</option>
+                                                    <option value="Private">Private</option>
+                                                    <option value="Deemed">Deemed</option>
+                                                    <option value="Public">Public</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                                            <TrendingUp size={24} color="#f59e0b" />
+                                            <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#1e293b', margin: 0 }}>Fees & Placements</h3>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+                                            <div>
+                                                <label style={labelStyle}>Average Fees (per year)</label>
+                                                <input type="text" value={collegeForm.fees} onChange={e => setCollegeForm({...collegeForm, fees: e.target.value})} style={inputStyles} placeholder="e.g. 2.5 Lakh" />
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>Avg. Package</label>
+                                                <input type="text" value={collegeForm.avgPackage} onChange={e => setCollegeForm({...collegeForm, avgPackage: e.target.value})} style={inputStyles} placeholder="e.g. 15 LPA" />
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>Highest Package</label>
+                                                <input type="text" value={collegeForm.highestPackage} onChange={e => setCollegeForm({...collegeForm, highestPackage: e.target.value})} style={inputStyles} placeholder="e.g. 1.2 Crore" />
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '16px', marginTop: '20px' }}>
+                                        {selectedCollegeId && (
+                                            <button type="button" onClick={handleDeleteCollege} style={{
+                                                background: '#fef2f2', color: '#ef4444', padding: '14px 28px', borderRadius: '16px',
+                                                fontWeight: 700, fontSize: '15px', border: '1.5px solid #fee2e2', cursor: 'pointer'
+                                            }}>
+                                                Delete College
+                                            </button>
+                                        )}
+                                        <button disabled={collegeLoading} type="submit" style={{
+                                            background: 'linear-gradient(135deg, #6366f1, #38bdf8)', color: 'white', padding: '16px 48px', borderRadius: '16px',
+                                            fontWeight: 700, fontSize: '16px', border: 'none', cursor: collegeLoading ? 'not-allowed' : 'pointer',
+                                            transition: 'all 0.3s', boxShadow: '0 10px 15px -3px rgba(99, 102, 241, 0.3)'
+                                        }}>
+                                            {collegeLoading ? 'Saving...' : 'Save College Data'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </motion.div>
                     ) : activeTab === 'postJob' ? (
                         <motion.div
                             key="postJob"
@@ -627,7 +1395,49 @@ const inputStyles = {
     border: '1px solid #e2e8f0',
     fontSize: '15px',
     outline: 'none',
-    boxSizing: 'border-box'
+    boxSizing: 'border-box',
+    transition: 'all 0.2s'
+};
+
+const labelStyle = {
+    display: 'block',
+    color: '#475569',
+    fontWeight: 700,
+    fontSize: '14px',
+    marginBottom: '8px'
+};
+
+const addItemButtonStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 12px',
+    borderRadius: '8px',
+    background: '#f8fafc',
+    border: '1.5px solid #e2e8f0',
+    color: '#1e293b',
+    fontSize: '12px',
+    fontWeight: 700,
+    cursor: 'pointer'
+};
+
+const arrayItemCardStyle = {
+    padding: '16px',
+    background: '#f8fafc',
+    borderRadius: '16px',
+    border: '1.5px solid #f1f5f9'
+};
+
+const removeButtonStyle = {
+    padding: '8px',
+    borderRadius: '8px',
+    background: '#fff',
+    border: '1.5px solid #fee2e2',
+    color: '#ef4444',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
 };
 
 export default AdminDashboard;

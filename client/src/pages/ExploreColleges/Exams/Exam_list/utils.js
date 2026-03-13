@@ -9,13 +9,13 @@ export const getDefaultExamData = (examName, stateData) => {
         officialWebsite: stateData?.officialWebsite || 'Official Website',
         status: stateData?.status || 'Notification Awaited',
         daysLeft: stateData?.daysLeft || 'TBA',
-        highlights: stateData?.highlights || { 
-            mode: 'Computer-Based / Offline', 
-            totalMarks: 'As per pattern', 
-            negative: 'Applicable', 
-            duration: 'Varies', 
-            languages: 'English & Regional', 
-            frequency: 'Annual' 
+        highlights: stateData?.highlights || {
+            mode: 'Computer-Based / Offline',
+            totalMarks: 'As per pattern',
+            negative: 'Applicable',
+            duration: 'Varies',
+            languages: 'English & Regional',
+            frequency: 'Annual'
         },
         dates: stateData?.dates && stateData.dates.length > 0 ? stateData.dates : [
             { label: 'Application', date: stateData?.appDate || 'TBA', status: 'Expected' },

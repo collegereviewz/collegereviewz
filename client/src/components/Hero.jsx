@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Search, CheckCircle, MessageSquare, ChevronRight, Star, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/background3.png';
 
 const stats = [
@@ -18,7 +19,18 @@ const checks = [
 
 
 
-const Hero = ({ onNavigate }) => (
+const Hero = ({ onNavigate }) => {
+  const [searchValue, setSearchValue] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    if (searchValue.trim()) {
+      navigate(`/ExploreColleges?search=${encodeURIComponent(searchValue.trim())}`);
+      window.scrollTo(0, 0);
+    }
+  };
+  
+  return (
   <>
     {/* ── Responsive CSS ───────────────────────────────────────────────── */}
     <style>{`
@@ -339,6 +351,9 @@ const Hero = ({ onNavigate }) => (
               <input
                 type="text"
                 placeholder="Search colleges, courses, exams or reviews..."
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
                 style={{
                   width: '100%', padding: '14px 62px 14px 22px',
                   background: 'rgba(255,255,255,0.08)', border: '1.5px solid rgba(255,255,255,0.15)',
@@ -349,12 +364,15 @@ const Hero = ({ onNavigate }) => (
                 onFocus={e => e.target.style.borderColor = '#38bdf8'}
                 onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.15)'}
               />
-              <button style={{
-                position: 'absolute', right: '6px', top: '50%', transform: 'translateY(-50%)',
-                background: 'linear-gradient(135deg, #5b51d8, #38bdf8)',
-                border: 'none', borderRadius: '50px', padding: '9px 18px',
-                color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center'
-              }}>
+              <button 
+                onClick={handleSearch}
+                style={{
+                  position: 'absolute', right: '6px', top: '50%', transform: 'translateY(-50%)',
+                  background: 'linear-gradient(135deg, #5b51d8, #38bdf8)',
+                  border: 'none', borderRadius: '50px', padding: '9px 18px',
+                  color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center'
+                }}
+              >
                 <Search size={17} strokeWidth={2.5} />
               </button>
             </div>
@@ -429,6 +447,7 @@ const Hero = ({ onNavigate }) => (
       </div>
     </section>
   </>
-);
+  );
+};
 
 export default Hero;

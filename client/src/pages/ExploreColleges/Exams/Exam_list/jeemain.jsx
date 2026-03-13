@@ -30,9 +30,9 @@ const JEEMAIN = () => {
             { label: 'Session 2 Exam', date: 'Apr 2026', status: 'Expected' }
         ],
         colleges: [
-            { label: 'NIT Trichy', rank: '99.8%ile' },
-            { label: 'NIT Surathkal', rank: '99.6%ile' },
-            { label: 'IIIT Hyderabad', rank: '99.9%ile' }
+            { label: 'NIT Trichy' },
+            { label: 'NIT Surathkal' },
+            { label: 'IIIT Hyderabad' }
         ]
     };
 

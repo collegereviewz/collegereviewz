@@ -23,6 +23,7 @@ import clatLogo from '../assets/Exams/clat.png';
 
 // Import Exam Data
 import examsListData from '../data/exams_list.json';
+import examsDynamicData from '../pages/ExploreColleges/Exams/exams_data.json';
 import examOfficialLogos from '../data/exam_official_logos.json';
 
 // Logo.dev API Configuration
@@ -150,9 +151,77 @@ const ExamsSection = ({ showHeader = true }) => {
       }
     };
 
+    const formatVal = (raw) => {
+      if (!raw) return "0";
+      // Assuming raw is in Lakhs based on our data structure
+      if (raw >= 100) return (raw / 100).toFixed(1) + ' Cr';
+      return raw.toFixed(1) + ' Lakh';
+    };
+
+    const totalAppeared = exam.appeared_summary || formatVal((exam.competitionTrends || [])
+      .slice(0, 10)
+      .reduce((acc, curr) => acc + curr.count, 0));
+
+    // Dynamic Data Merge (Admin updates)
+    const dynamicMatch = examsDynamicData.find(e => 
+      e.name?.toLowerCase().trim() === (exam.name || '').toLowerCase().trim() ||
+      e.fullName?.toLowerCase().trim() === (exam.fullName || '').toLowerCase().trim()
+    );
+
+    const finalLatestAppeared = dynamicMatch?.latest_appeared_summary || exam.latest_appeared_summary;
+    
+    // Smart Date Extraction from importantDates array (prioritize specific labels)
+    const impDates = dynamicMatch?.importantDates || dynamicMatch?.dates || [];
+    const findDate = (labels) => {
+        const match = impDates.find(d => labels.some(l => d.label?.toLowerCase().includes(l.toLowerCase())));
+        return match ? match.date : null;
+    };
+
+    // Smart Year Detection (get max year from trends)
+    const allTrends = [...(dynamicMatch?.competitionTrends || []), ...(exam.competitionTrends || [])];
+    const detectedLatestYear = allTrends.length > 0 
+        ? Math.max(...allTrends.map(t => parseInt(t.year)).filter(y => !isNaN(y))) 
+        : 2024;
+
+    const finalLatestYear = dynamicMatch?.latest_year || detectedLatestYear;
+    const finalExamDate = findDate(['Entrance Exam', 'Exam Date']) || dynamicMatch?.examDate || exam.examDate;
+    const finalResultDate = findDate(['Result Declaration', 'Result Date', 'Result Announce']) || dynamicMatch?.resultDate || exam.resultDate;
+
+    // Extract Truly Latest Update (Priority: Imp/Admin > Recent Timestamp)
+    const latestUpdate = [
+        ...(dynamicMatch?.updates || []),
+        ...(exam.updates || [])
+    ].sort((a, b) => {
+        const priority = { 'imp': 0, 'critical': 0, 'admin': 0, 'today': 1, 'warning': 1 };
+        const aP = priority[a.type?.toLowerCase()] ?? 99;
+        const bP = priority[b.type?.toLowerCase()] ?? 99;
+        if (aP !== bP) return aP - bP;
+        const aT = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+        const bT = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+        return bT - aT;
+    }).filter(upd => {
+        const type = upd.type?.toLowerCase();
+        // Important updates always show; standard updates show for 24h
+        if (['imp', 'critical', 'admin'].includes(type)) return true;
+        if (!upd.timestamp) return true; // Fallback
+        const postTime = new Date(upd.timestamp).getTime();
+        const now = new Date().getTime();
+        return (now - postTime) < (24 * 60 * 60 * 1000);
+    })[0] || null;
+
     return {
       ...exam,
       logo,
+      examDate: finalExamDate,
+      resultDate: finalResultDate,
+      latest_appeared_summary: finalLatestAppeared,
+      latest_year: finalLatestYear,
+      summary: dynamicMatch?.summary || exam.summary,
+      latestUpdate: latestUpdate ? {
+        ...latestUpdate,
+        type: latestUpdate.type?.toLowerCase() || 'all'
+      } : null,
+      totalAppeared: totalAppeared.includes('+') ? totalAppeared : totalAppeared + '+',
       fallbackIcon: getFallbackIcon(exam.category),
       // Assign colors based on category
       color: exam.category === 'MBBS' ? '#ef4444' : 
@@ -360,6 +429,17 @@ const ExamsSection = ({ showHeader = true }) => {
                   </div>
                 </div>
 
+                {/* Short Summary Preview */}
+                {exam.summary && (
+                  <p style={{ 
+                    fontSize: '13px', color: '#64748b', margin: 0, lineHeight: 1.5,
+                    overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', 
+                    WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', minHeight: '39px'
+                  }}>
+                    {exam.summary}
+                  </p>
+                )}
+
                 <div style={{ padding: '0 4px' }}>
                   <div style={{ display: 'grid', gap: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
@@ -367,8 +447,8 @@ const ExamsSection = ({ showHeader = true }) => {
                       <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{exam.examDate}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Application Form</span>
-                      <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>{exam.appDate}</span>
+                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Appeared ({exam.latest_year || 2024})</span>
+                      <span style={{ fontSize: '14px', fontWeight: 900, color: '#2563eb', background: '#eff6ff', padding: '2px 8px', borderRadius: '6px' }}>{exam.latest_appeared_summary || (exam.totalAppeared + '+')}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontSize: '14px', fontWeight: 700, color: '#64748b' }}>Result Announce</span>
@@ -376,6 +456,7 @@ const ExamsSection = ({ showHeader = true }) => {
                     </div>
                   </div>
                 </div>
+
 
                 <div style={{ display: 'flex', gap: '12px', marginTop: 'auto' }}>
                   <button 
@@ -427,42 +508,17 @@ const ExamsSection = ({ showHeader = true }) => {
           </div>
         )}
 
-        {/* Best of Luck / Footer Note */}
-        <div style={{ 
-          marginTop: '80px', 
-          padding: '40px', 
-          borderRadius: '32px', 
-          background: 'linear-gradient(135deg, rgba(91, 81, 216, 0.03), rgba(56, 189, 248, 0.03))',
-          textAlign: 'center',
-          border: '1.5px dashed rgba(91, 81, 216, 0.2)'
-        }}>
-          <div style={{ 
-            display: 'inline-flex', 
-            alignItems: 'center', 
-            gap: '12px', 
-            padding: '8px 24px', 
-            borderRadius: '50px', 
-            background: '#fff', 
-            color: '#5b51d8', 
-            fontSize: '14px', 
-            fontWeight: 800, 
-            marginBottom: '20px',
-            boxShadow: '0 4px 12px rgba(91, 81, 216, 0.08)'
-          }}>
-            <GraduationCap size={18} /> Official Exam Partner Resource
-          </div>
-          <h2 style={{ fontSize: '32px', fontWeight: 950, color: '#1e293b', marginBottom: '16px' }}>
-            Best of luck for your <span style={{ color: '#5b51d8' }}>Brilliant Future!</span>
-          </h2>
-          <p style={{ fontSize: '16px', color: '#64748b', fontWeight: 600, maxWidth: '600px', margin: '0 auto' }}>
-            We've curated these 500+ official entrance exams to help you navigate your academic journey. Stay focused, stay prepared.
-          </p>
-        </div>
+
       </div>
 
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes pulse {
+          0% { opacity: 1; }
+          50% { opacity: 0.6; }
+          100% { opacity: 1; }
+        }
       `}</style>
     </section>
   );

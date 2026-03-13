@@ -6,7 +6,7 @@ import {
   Trash2, SlidersHorizontal, ArrowRight, Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import CollegeLogo from '../../components/CollegeLogo.jsx';
 // import engineeringColleges from '../../data/engineeringColleges';
 
@@ -72,9 +72,9 @@ const ExploreColleges = () => {
 
   const INDIAN_STATES = [
     "All", "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar",
-    "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli", "Daman and Diu", "Delhi",
+    "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli", "Daman and Diu", 
     "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", "Jharkhand",
-    "Karnataka", "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", "Maharashtra",
+    "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", 
     "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Puducherry", "Punjab",
     "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh",
     "Uttarakhand", "West Bengal"
@@ -100,7 +100,8 @@ const ExploreColleges = () => {
   const [filteredColleges, setFilteredColleges] = useState([]);
   const [displayedColleges, setDisplayedColleges] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [totalColleges, setTotalColleges] = useState(0);
@@ -154,7 +155,7 @@ const ExploreColleges = () => {
         const queryParams = new URLSearchParams({
           page: currentPage,
           limit: itemsPerPage,
-          search: searchTerm.trim(),
+          search: (searchParams.get('search') || '').trim(),
           state: selectedState,
           course: selectedStream
         });
@@ -250,7 +251,7 @@ const ExploreColleges = () => {
     return () => {
       isMounted = false;
     };
-  }, [selectedStream, currentPage, searchTerm, selectedState]);
+  }, [selectedStream, currentPage, searchParams, selectedState]);
 
 
   const STRIP_H = 130;
@@ -469,32 +470,38 @@ const ExploreColleges = () => {
 
             <div style={{ width: '1px', height: '24px', background: '#e2e8f0', margin: '0 4px', flexShrink: 0 }} />
 
-            {/* Search Input */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 20px',
-              background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: '50px',
-              flexShrink: 0, minWidth: '240px', transition: 'all 0.2s ease'
-            }}>
-              <Search size={18} color="#64748b" />
-              <input
-                type="text"
-                placeholder="Search College Name or Location..."
-                value={searchTerm}
-                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                style={{
-                  border: 'none', background: 'transparent', outline: 'none',
-                  fontSize: '13px', fontWeight: 600, color: '#1e293b', width: '100%'
-                }}
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
-                >
-                  <Trash2 size={14} color="#94a3b8" />
-                </button>
-              )}
-            </div>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 24px',
+                background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: '50px',
+                flexShrink: 0, minWidth: '400px', transition: 'all 0.3s ease',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+              }}>
+                <Search size={18} color="#6366f1" />
+                <input
+                  type="text"
+                  placeholder="Search College Name or Location..."
+                  value={searchTerm}
+                  onChange={(e) => { 
+                    const val = e.target.value;
+                    setSearchTerm(val);
+                    const newParams = new URLSearchParams(searchParams);
+                    if (val) {
+                      newParams.set('search', val);
+                    } else {
+                      newParams.delete('search');
+                    }
+                    setSearchParams(newParams, { replace: true });
+                    setCurrentPage(1);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') e.preventDefault();
+                  }}
+                  style={{
+                    border: 'none', background: 'transparent', outline: 'none',
+                    fontSize: '14px', fontWeight: 600, color: '#1e293b', width: '100%'
+                  }}
+                />
+              </div>
           </div>
         </div>
       </div>
@@ -589,7 +596,6 @@ const ExploreColleges = () => {
                             </p>
                             <div style={{ display: 'flex', gap: '8px' }}>
                               <button style={{ padding: '7px 14px', background: '#5b51d8', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><ArrowRight size={13} /> Apply</button>
-                              <button style={{ padding: '7px 14px', background: '#eef2ff', color: '#5b51d8', border: 'none', borderRadius: '4px', fontSize: '11px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Download size={13} /> Brochure</button>
                               <button style={{ padding: '7px 14px', background: '#fff', color: '#5b51d8', border: '1px solid #5b51d8', borderRadius: '4px', fontSize: '11px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Heart size={13} /> Save</button>
                             </div>
                           </div>

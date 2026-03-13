@@ -3,7 +3,7 @@ import { Menu, X, Edit3, GraduationCap, Twitter, Facebook, Instagram, LogOut, Ch
 import { motion, AnimatePresence } from 'framer-motion';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 
-import logoImg from '../assets/logo6.png';
+import logoImg from '../assets/finallogo.png';
 
 const Header = ({ currentView }) => {
   const [scrolled, setScrolled] = useState(false);

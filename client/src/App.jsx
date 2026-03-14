@@ -160,9 +160,9 @@ function AppContent() {
             </motion.div>
           </AnimatePresence>
         </main>
-        {!hideMainUI && <Footer />}
+        {/* {!hideMainUI && <Footer />}
         {!hideMainUI && <FloatingAskExperts onClick={() => setIsAssistantOpen(true)} />}
-        {!hideMainUI && <AIVoiceAssistant isOpen={isAssistantOpen} onClose={() => setIsAssistantOpen(false)} />}
+        {!hideMainUI && <AIVoiceAssistant isOpen={isAssistantOpen} onClose={() => setIsAssistantOpen(false)} />} */}
       </div>
     </>
   );

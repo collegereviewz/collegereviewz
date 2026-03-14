@@ -4,7 +4,6 @@ import JosaaCutoff from '../models/JosaaCutoff.model.js';
 import CsabCutoff from '../models/CsabCutoff.model.js';
 import CcmtCutoff from '../models/CcmtCutoff.model.js';
 import WbjeeCutoff from '../models/WbjeeCutoff.model.js';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -510,45 +509,14 @@ export const getCollegeCommute = async (req, res) => {
             return res.json({ success: true, data: college.commuteIntelligence });
         }
 
-        // Verify API Key
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ success: false, message: 'Gemini API keys are not configured properly' });
-        }
-
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-
-        const prompt = `
-        Find the nearest airport, railway station, and bus terminal to the following college:
-        College Name: ${college.name}
-        District/Location: ${college.district || ''}
-        State: ${college.state || ''}
-
-        Please provide the average travel time by car from the college to each hub.
-        
-        Return the result EXACTLY as a JSON array of objects with the following format, and nothing else (no markdown blocks, no \`\`\`json, just the raw array).
-        [
-            { "type": "airport", "hubName": "Name of Airport", "travelTime": "XX mins" },
-            { "type": "railway", "hubName": "Name of Railway Station", "travelTime": "XX mins" },
-            { "type": "bus", "hubName": "Name of Bus Terminal", "travelTime": "XX mins" }
-        ]
-        `;
-
-        const result = await model.generateContent(prompt);
-        let responseText = result.response.text();
-        responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-
-        const parsedData = JSON.parse(responseText);
-
-        // Update in database
-        college.commuteIntelligence = parsedData;
-        await college.save();
-
-        res.json({ success: true, data: parsedData });
+        // AI-driven commute fetching disabled as per user request
+        return res.status(501).json({ 
+            success: false, 
+            message: 'Dynamic commute intelligence is currently disabled. Please contact admin for manual data entry.' 
+        });
     } catch (error) {
-        console.error('Error dynamically fetching commute data:', error);
-        res.status(500).json({ success: false, message: 'Failed to find commute info' });
+        console.error('Error fetching commute data:', error);
+        res.status(500).json({ success: false, message: 'Server Error' });
     }
 };
 
